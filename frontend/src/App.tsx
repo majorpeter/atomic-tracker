@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import "./App.css";
 
 import { Test, myTestObj } from "@atomic-tracker/common";
+import { Button, Sheet } from "@mui/joy";
+import Add from "@mui/icons-material/Add";
 
 function App() {
   const [obj, setObj] = useState<Test>(myTestObj);
@@ -10,9 +12,9 @@ function App() {
   useEffect(() => {
     (async () => {
       try {
-      const resp = await fetch("http://localhost:8080/");
-      const data = (await resp.json()) as Test;
-      setObj(data);
+        const resp = await fetch("http://localhost:8080/");
+        const data = (await resp.json()) as Test;
+        setObj(data);
       } catch {
         setError(true);
       }
@@ -20,14 +22,16 @@ function App() {
   }, []);
 
   return (
-    <>
+    <Sheet variant="outlined">
       {error ? (
         <p>Cannot get data from backend</p>
       ) : (
         <>
           {myTestObj.name} / <b>{obj.name}</b>
-          <div className="card">
-            <button
+          <p>
+            <Button
+              variant="outlined"
+              startDecorator={<Add />}
               onClick={() =>
                 setObj((obj) => ({
                   ...obj,
@@ -36,11 +40,11 @@ function App() {
               }
             >
               count is {obj.id}
-            </button>
-          </div>
+            </Button>
+          </p>
         </>
       )}
-    </>
+    </Sheet>
   );
 }
 
