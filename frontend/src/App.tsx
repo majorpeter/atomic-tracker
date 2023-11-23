@@ -4,6 +4,7 @@ import "./App.css";
 import { Test, myTestObj } from "@atomic-tracker/common";
 import { Button, Sheet } from "@mui/joy";
 import Add from "@mui/icons-material/Add";
+import Habits from "./components/Habits";
 
 function App() {
   const [obj, setObj] = useState<Test>(myTestObj);
@@ -22,29 +23,34 @@ function App() {
   }, []);
 
   return (
-    <Sheet variant="outlined">
-      {error ? (
-        <p>Cannot get data from backend</p>
-      ) : (
-        <>
-          {myTestObj.name} / <b>{obj.name}</b>
-          <p>
-            <Button
-              variant="outlined"
-              startDecorator={<Add />}
-              onClick={() =>
-                setObj((obj) => ({
-                  ...obj,
-                  id: obj.id + 1,
-                }))
-              }
-            >
-              count is {obj.id}
-            </Button>
-          </p>
-        </>
-      )}
-    </Sheet>
+    <>
+      <div>
+        <Habits />
+      </div>
+      <Sheet variant="outlined">
+        {error ? (
+          <p>Cannot get data from backend</p>
+        ) : (
+          <>
+            {myTestObj.name} / <b>{obj.name}</b>
+            <p>
+              <Button
+                variant="outlined"
+                startDecorator={<Add />}
+                onClick={() =>
+                  setObj((obj) => ({
+                    ...obj,
+                    id: obj.id + 1,
+                  }))
+                }
+              >
+                count is {obj.id}
+              </Button>
+            </p>
+          </>
+        )}
+      </Sheet>
+    </>
   );
 }
 
