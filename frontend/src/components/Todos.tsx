@@ -1,6 +1,11 @@
+import { Fragment } from "react";
+
 import {
+  Button,
   Card,
+  CardActions,
   CardContent,
+  CardOverflow,
   Divider,
   List,
   ListDivider,
@@ -11,7 +16,7 @@ import {
 
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import RepeatIcon from "@mui/icons-material/Repeat";
-import { Fragment } from "react";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 const DUMMY_TODOS: {
   title: string;
@@ -36,6 +41,11 @@ const DUMMY_TODOS: {
 ];
 
 const Todos: React.FC = () => {
+  const countPastDue = DUMMY_TODOS.reduce(
+    (value, item) => value + (item.pastDue ? 1 : 0),
+    0
+  );
+
   return (
     <Card>
       <Typography fontSize="lg" fontWeight="lg">
@@ -77,6 +87,23 @@ const Todos: React.FC = () => {
           })}
         </List>
       </CardContent>
+
+      <CardOverflow variant="soft">
+        <Divider inset="context" />
+
+        <CardActions>
+          <Typography>{DUMMY_TODOS.length} items</Typography>
+          {countPastDue && (
+            <>
+              <Divider orientation="vertical" />
+              <Typography color="danger">{countPastDue} past due</Typography>
+            </>
+          )}
+          <Button sx={{ ml: "auto" }} startDecorator={<OpenInNewIcon />}>
+            Edit
+          </Button>
+        </CardActions>
+      </CardOverflow>
     </Card>
   );
 };
