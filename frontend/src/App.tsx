@@ -8,6 +8,7 @@ import Habits from "./components/Habits";
 import Todos from "./components/Todos";
 import Agenda from "./components/Agenda";
 import Projects from "./components/Projects";
+import Journal from "./components/Journal";
 
 function App() {
   const [obj, setObj] = useState<Test>(myTestObj);
@@ -39,7 +40,11 @@ function App() {
           <Grid xs={7}>
             <Projects />
           </Grid>
+          <Grid xs={5}>
+            <Journal />
+          </Grid>
         </Grid>
+
         <Card>
           {error ? (
             <p>Cannot get data from backend</p>
