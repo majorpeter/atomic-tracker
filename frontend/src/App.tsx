@@ -7,6 +7,7 @@ import Add from "@mui/icons-material/Add";
 import Habits from "./components/Habits";
 import Todos from "./components/Todos";
 import Agenda from "./components/Agenda";
+import Projects from "./components/Projects";
 
 function App() {
   const [obj, setObj] = useState<Test>(myTestObj);
@@ -35,32 +36,33 @@ function App() {
           <Grid xs={5}>
             <Agenda />
           </Grid>
-          <Grid xs={4}>
-            <Card>
-              {error ? (
-                <p>Cannot get data from backend</p>
-              ) : (
-                <>
-                  {myTestObj.name} / <b>{obj.name}</b>
-                  <p>
-                    <Button
-                      variant="outlined"
-                      startDecorator={<Add />}
-                      onClick={() =>
-                        setObj((obj) => ({
-                          ...obj,
-                          id: obj.id + 1,
-                        }))
-                      }
-                    >
-                      count is {obj.id}
-                    </Button>
-                  </p>
-                </>
-              )}
-            </Card>
+          <Grid xs={7}>
+            <Projects />
           </Grid>
         </Grid>
+        <Card>
+          {error ? (
+            <p>Cannot get data from backend</p>
+          ) : (
+            <>
+              {myTestObj.name} / <b>{obj.name}</b>
+              <p>
+                <Button
+                  variant="outlined"
+                  startDecorator={<Add />}
+                  onClick={() =>
+                    setObj((obj) => ({
+                      ...obj,
+                      id: obj.id + 1,
+                    }))
+                  }
+                >
+                  count is {obj.id}
+                </Button>
+              </p>
+            </>
+          )}
+        </Card>
       </div>
     </>
   );

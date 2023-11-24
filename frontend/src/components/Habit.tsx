@@ -39,7 +39,7 @@ const Habit: React.FC<HabitProps> = ({ title, icon, value, target }) => {
           <Typography level="body-md" fontWeight="bold">
             {title}
           </Typography>
-          <Typography level="h3" color="neutral">
+          <Typography level="h3" color="neutral" sx={{ textAlign: "center" }}>
             <Typography color="primary" level="h1" sx={{ paddingRight: 0.3 }}>
               {value}
             </Typography>
