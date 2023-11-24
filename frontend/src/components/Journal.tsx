@@ -14,15 +14,18 @@ import { Link } from "react-router-dom";
 
 import { journalEditorRoute } from "../pages/JournalEditorModal";
 
-const DUMMY_JOURNAL = {
-  text: [
-    "I saw a cute dog today",
-    "had lunch with a friend",
-    "watched the latest episode of my show",
-  ],
-};
+import { Journal as api } from "@api";
+import { useEffect, useState } from "react";
 
 const Journal: React.FC = () => {
+  const [data, setData] = useState<api.type>([]);
+
+  useEffect(() => {
+    (async () => {
+      setData(await (await fetch("http://localhost:8080" + api.path)).json());
+    })();
+  }, []);
+
   return (
     <Card>
       <Typography fontSize="lg" fontWeight="lg">
@@ -30,7 +33,7 @@ const Journal: React.FC = () => {
       </Typography>
       <Divider />
       <CardContent>
-        {DUMMY_JOURNAL.text.map((item, index) => (
+        {data.map((item, index) => (
           <p key={index}>{item}</p>
         ))}
       </CardContent>

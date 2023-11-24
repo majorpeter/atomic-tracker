@@ -1,9 +1,6 @@
-import { useEffect, useState } from "react";
 import "./App.css";
 
-import { Test, myTestObj } from "@atomic-tracker/common";
-import { Button, Card, Grid } from "@mui/joy";
-import Add from "@mui/icons-material/Add";
+import { Grid } from "@mui/joy";
 import Habits from "./components/Habits";
 import Todos from "./components/Todos";
 import Agenda from "./components/Agenda";
@@ -13,21 +10,6 @@ import GreetingClock from "./components/GreetingClock";
 import { Outlet } from "react-router-dom";
 
 function App() {
-  const [obj, setObj] = useState<Test>(myTestObj);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const resp = await fetch("http://localhost:8080/");
-        const data = (await resp.json()) as Test;
-        setObj(data);
-      } catch {
-        setError(true);
-      }
-    })();
-  }, []);
-
   return (
     <>
       <Outlet />
@@ -47,30 +29,6 @@ function App() {
           <Journal />
         </Grid>
       </Grid>
-
-      <Card>
-        {error ? (
-          <p>Cannot get data from backend</p>
-        ) : (
-          <>
-            {myTestObj.name} / <b>{obj.name}</b>
-            <p>
-              <Button
-                variant="outlined"
-                startDecorator={<Add />}
-                onClick={() =>
-                  setObj((obj) => ({
-                    ...obj,
-                    id: obj.id + 1,
-                  }))
-                }
-              >
-                count is {obj.id}
-              </Button>
-            </p>
-          </>
-        )}
-      </Card>
     </>
   );
 }
