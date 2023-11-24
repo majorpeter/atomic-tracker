@@ -11,6 +11,7 @@ import {
   ListDivider,
   ListItem,
   ListItemDecorator,
+  Sheet,
   Typography,
 } from "@mui/joy";
 
@@ -37,7 +38,14 @@ const DUMMY_TODOS: {
     deadline: "2023-11-30",
     pastDue: false,
   },
-  { title: "Grocery shopping", repeats: false, pastDue: false },
+  {
+    title: "Grocery shopping",
+    repeats: false,
+    deadline: "2023-12-01",
+    pastDue: false,
+  },
+  { title: "Wash car", repeats: true, deadline: "2023-12-02", pastDue: false },
+  { title: "Select wall paint color", repeats: false, pastDue: false },
 ];
 
 const Todos: React.FC = () => {
@@ -53,39 +61,44 @@ const Todos: React.FC = () => {
       </Typography>
       <Divider />
       <CardContent>
-        <List>
-          {DUMMY_TODOS.map((item, index) => {
-            const deadLine = item.deadline ? (
-              <Typography
-                color={item.pastDue ? "danger" : "neutral"}
-                fontWeight={item.pastDue ? "lg" : ""}
-              >
-                {item.deadline}
-              </Typography>
-            ) : null;
-
-            return (
-              <Fragment key={index}>
-                {index > 0 && <ListDivider />}
-                <ListItem endAction={deadLine}>
-                  <ListItemDecorator>
-                    {item.repeats ? (
-                      <RepeatIcon />
-                    ) : (
-                      <CheckBoxOutlineBlankIcon />
-                    )}{" "}
-                  </ListItemDecorator>
+        <Sheet sx={{ maxHeight: 250, overflow: "auto" }}>
+          <List>
+            {DUMMY_TODOS.map((item, index) => {
+              const deadLine = item.deadline ? (
+                <ListItemDecorator sx={{ ml: "auto" }}>
                   <Typography
                     color={item.pastDue ? "danger" : "neutral"}
                     fontWeight={item.pastDue ? "lg" : ""}
                   >
-                    {item.title}
+                    {item.deadline}
                   </Typography>
-                </ListItem>
-              </Fragment>
-            );
-          })}
-        </List>
+                </ListItemDecorator>
+              ) : null;
+
+              return (
+                <Fragment key={index}>
+                  {index > 0 && <ListDivider />}
+                  <ListItem>
+                    <ListItemDecorator>
+                      {item.repeats ? (
+                        <RepeatIcon />
+                      ) : (
+                        <CheckBoxOutlineBlankIcon />
+                      )}{" "}
+                    </ListItemDecorator>
+                    <Typography
+                      color={item.pastDue ? "danger" : "neutral"}
+                      fontWeight={item.pastDue ? "lg" : ""}
+                    >
+                      {item.title}
+                    </Typography>
+                    {deadLine}
+                  </ListItem>
+                </Fragment>
+              );
+            })}
+          </List>
+        </Sheet>
       </CardContent>
 
       <CardOverflow variant="soft">
