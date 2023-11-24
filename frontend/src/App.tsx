@@ -10,6 +10,7 @@ import Agenda from "./components/Agenda";
 import Projects from "./components/Projects";
 import Journal from "./components/Journal";
 import GreetingClock from "./components/GreetingClock";
+import { Outlet } from "react-router-dom";
 
 function App() {
   const [obj, setObj] = useState<Test>(myTestObj);
@@ -29,6 +30,7 @@ function App() {
 
   return (
     <>
+      <Outlet />
       <GreetingClock />
       <Habits />
       <Grid container spacing={2}>

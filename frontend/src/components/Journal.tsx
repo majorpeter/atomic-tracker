@@ -10,6 +10,10 @@ import {
 
 import EditIcon from "@mui/icons-material/Edit";
 
+import { Link } from "react-router-dom";
+
+import { journalEditorRoute } from "../pages/JournalEditorModal";
+
 const DUMMY_JOURNAL = {
   text: [
     "I saw a cute dog today",
@@ -34,7 +38,11 @@ const Journal: React.FC = () => {
         <Divider inset="context" />
         <CardActions>
           <div>{/* required for button sizing (not only child) */}</div>
-          <Button sx={{ ml: "auto" }}>
+          <Button
+            component={Link}
+            to={journalEditorRoute.path!}
+            sx={{ ml: "auto" }}
+          >
             <EditIcon />
             Edit
           </Button>
