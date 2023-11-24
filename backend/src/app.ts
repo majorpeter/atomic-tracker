@@ -2,10 +2,14 @@ import express from "express";
 
 import journal from "./controllers/journal";
 
+const PORT = 8080;
+
 const app = express();
-app.listen(8080, () => {
-  console.log("Backend listening!");
+app.listen(PORT, () => {
+  console.log(`Backend listening on localhost:${PORT}!`);
 });
+
+app.use(express.json());
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", req.headers.origin);
@@ -14,6 +18,11 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
   );
+  next();
+});
+
+app.use((req, _, next) => {
+  console.log(req.method, req.path, "from", req.ip);
   next();
 });
 

@@ -14,17 +14,10 @@ import { Link } from "react-router-dom";
 
 import { journalEditorRoute } from "../pages/JournalEditorModal";
 
-import { Journal as api } from "@api";
-import { useEffect, useState } from "react";
+import { useApiQuery } from "../util/api-client";
 
 const Journal: React.FC = () => {
-  const [data, setData] = useState<api.type>([]);
-
-  useEffect(() => {
-    (async () => {
-      setData(await (await fetch("http://localhost:8080" + api.path)).json());
-    })();
-  }, []);
+  const { data } = useApiQuery.journal();
 
   return (
     <Card>
@@ -33,9 +26,7 @@ const Journal: React.FC = () => {
       </Typography>
       <Divider />
       <CardContent>
-        {data.map((item, index) => (
-          <p key={index}>{item}</p>
-        ))}
+        {data && data.items.map((item, index) => <p key={index}>{item}</p>)}
       </CardContent>
       <CardOverflow variant="soft">
         <Divider inset="context" />
