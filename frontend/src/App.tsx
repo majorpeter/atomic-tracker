@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import "./App.css";
 
 import { Test, myTestObj } from "@atomic-tracker/common";
-import { Button, Sheet } from "@mui/joy";
+import { Button, Card, Grid } from "@mui/joy";
 import Add from "@mui/icons-material/Add";
 import Habits from "./components/Habits";
+import Todos from "./components/Todos";
 
 function App() {
   const [obj, setObj] = useState<Test>(myTestObj);
@@ -26,30 +27,37 @@ function App() {
     <>
       <div>
         <Habits />
+        <Grid container spacing={2}>
+          <Grid xs={7}>
+            <Todos />
+          </Grid>
+          <Grid xs={5}>
+            <Card>
+              {error ? (
+                <p>Cannot get data from backend</p>
+              ) : (
+                <>
+                  {myTestObj.name} / <b>{obj.name}</b>
+                  <p>
+                    <Button
+                      variant="outlined"
+                      startDecorator={<Add />}
+                      onClick={() =>
+                        setObj((obj) => ({
+                          ...obj,
+                          id: obj.id + 1,
+                        }))
+                      }
+                    >
+                      count is {obj.id}
+                    </Button>
+                  </p>
+                </>
+              )}
+            </Card>
+          </Grid>
+        </Grid>
       </div>
-      <Sheet variant="outlined">
-        {error ? (
-          <p>Cannot get data from backend</p>
-        ) : (
-          <>
-            {myTestObj.name} / <b>{obj.name}</b>
-            <p>
-              <Button
-                variant="outlined"
-                startDecorator={<Add />}
-                onClick={() =>
-                  setObj((obj) => ({
-                    ...obj,
-                    id: obj.id + 1,
-                  }))
-                }
-              >
-                count is {obj.id}
-              </Button>
-            </p>
-          </>
-        )}
-      </Sheet>
     </>
   );
 }

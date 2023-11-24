@@ -24,9 +24,15 @@ const Habits: React.FC = () => {
     { title: "Meditate", icon: "selfImprovement", value: 1, target: 3 },
   ];
 
-  return <Grid container spacing={2} sx={{ flexGrow: 1, marginBottom: 5}}>
-    {DUMMY_DATA.map((item, index) => <Grid key={index} xs={3}><Habit {...item} /></Grid>)}
-  </Grid>
+  return (
+    <Grid container spacing={2} sx={{ marginBottom: 1 }}>
+      {DUMMY_DATA.map((item, index) => (
+        <Grid key={index} xs="auto" md={3}>
+          <Habit {...item} />
+        </Grid>
+      ))}
+    </Grid>
+  );
 };
 
 export default Habits;
