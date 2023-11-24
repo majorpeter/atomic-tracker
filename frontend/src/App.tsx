@@ -9,6 +9,7 @@ import Todos from "./components/Todos";
 import Agenda from "./components/Agenda";
 import Projects from "./components/Projects";
 import Journal from "./components/Journal";
+import GreetingClock from "./components/GreetingClock";
 
 function App() {
   const [obj, setObj] = useState<Test>(myTestObj);
@@ -28,47 +29,46 @@ function App() {
 
   return (
     <>
-      <div>
-        <Habits />
-        <Grid container spacing={2}>
-          <Grid xs={7}>
-            <Todos />
-          </Grid>
-          <Grid xs={5}>
-            <Agenda />
-          </Grid>
-          <Grid xs={7}>
-            <Projects />
-          </Grid>
-          <Grid xs={5}>
-            <Journal />
-          </Grid>
+      <GreetingClock />
+      <Habits />
+      <Grid container spacing={2}>
+        <Grid xs={7}>
+          <Todos />
         </Grid>
+        <Grid xs={5}>
+          <Agenda />
+        </Grid>
+        <Grid xs={7}>
+          <Projects />
+        </Grid>
+        <Grid xs={5}>
+          <Journal />
+        </Grid>
+      </Grid>
 
-        <Card>
-          {error ? (
-            <p>Cannot get data from backend</p>
-          ) : (
-            <>
-              {myTestObj.name} / <b>{obj.name}</b>
-              <p>
-                <Button
-                  variant="outlined"
-                  startDecorator={<Add />}
-                  onClick={() =>
-                    setObj((obj) => ({
-                      ...obj,
-                      id: obj.id + 1,
-                    }))
-                  }
-                >
-                  count is {obj.id}
-                </Button>
-              </p>
-            </>
-          )}
-        </Card>
-      </div>
+      <Card>
+        {error ? (
+          <p>Cannot get data from backend</p>
+        ) : (
+          <>
+            {myTestObj.name} / <b>{obj.name}</b>
+            <p>
+              <Button
+                variant="outlined"
+                startDecorator={<Add />}
+                onClick={() =>
+                  setObj((obj) => ({
+                    ...obj,
+                    id: obj.id + 1,
+                  }))
+                }
+              >
+                count is {obj.id}
+              </Button>
+            </p>
+          </>
+        )}
+      </Card>
     </>
   );
 }

@@ -26,8 +26,8 @@ const Journal: React.FC = () => {
       </Typography>
       <Divider />
       <CardContent>
-        {DUMMY_JOURNAL.text.map((item) => (
-          <p>{item}</p>
+        {DUMMY_JOURNAL.text.map((item, index) => (
+          <p key={index}>{item}</p>
         ))}
       </CardContent>
       <CardOverflow variant="soft">
