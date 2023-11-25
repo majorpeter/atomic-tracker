@@ -19,44 +19,6 @@ import { useApiQuery } from "../util/api-client";
 import { formatTime } from "../util/formatter";
 import { Api } from "@api";
 
-const DUMMY_AGENDA: {
-  title: string;
-  items: {
-    day?: string;
-    start: string;
-    title: string;
-  }[];
-}[] = [
-  {
-    title: "Today",
-    items: [
-      {
-        start: "8:00",
-        title: "Work",
-      },
-      {
-        start: "14:00",
-        title: "Important meeting",
-      },
-    ],
-  },
-  {
-    title: "Tomorrow (25)",
-    items: [
-      {
-        start: "9:00",
-        title: "Kickoff meeting",
-      },
-      { start: "12:00", title: "Lunch with John" },
-      { start: "18:30", title: "Movies" },
-    ],
-  },
-  {
-    title: "Next week",
-    items: [{ day: "02", start: "19:00", title: "Birtday party" }],
-  },
-];
-
 function formatDateOrTimeForListing(
   item: NonNullable<Api.Calendar.type["today"]>[0],
   category: keyof Api.Calendar.type

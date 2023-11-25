@@ -19,6 +19,8 @@ export namespace Api {
       nextMonth?: EventList;
       later?: EventList;
     };
+
+    export type get_query = { dummy?: unknown };
   }
 
   export namespace Journal {
