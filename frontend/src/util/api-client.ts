@@ -6,10 +6,20 @@ const API_URL = "http://localhost:8080";
 export const queryClient = new QueryClient();
 
 namespace QueryKey {
+  export const Calendar = ["calendar"];
   export const Journal = ["journal"];
 }
 
 export namespace useApiQuery {
+  export function calendar() {
+    return useQuery<Api.Calendar.type>({
+      queryKey: QueryKey.Calendar,
+      queryFn: async () => {
+        return await (await fetch(API_URL + Api.Calendar.path)).json();
+      },
+    });
+  }
+
   export function journal() {
     return useQuery<Api.Journal.type>({
       queryKey: QueryKey.Journal,

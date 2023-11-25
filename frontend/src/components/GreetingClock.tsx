@@ -1,7 +1,6 @@
 import { Typography } from "@mui/joy";
 import { useEffect, useState } from "react";
-
-const LANG = "en";
+import { LANG } from "../util/formatter";
 
 function greetingForTime(date: Date) {
   const h = date.getHours();

@@ -1,4 +1,26 @@
 export namespace Api {
+  export namespace Calendar {
+    export const path = "/calendar";
+
+    type EventList = {
+      summary: string;
+      /// date, in the format "yyyy-mm-dd", if this is an all-day event
+      date?: string;
+      /// ISO datetime str
+      dateTime?: string;
+      url?: string;
+    }[];
+
+    export type type = {
+      today?: EventList;
+      thisWeek?: EventList;
+      nextWeek?: EventList;
+      thisMonth?: EventList;
+      nextMonth?: EventList;
+      later?: EventList;
+    };
+  }
+
   export namespace Journal {
     export const path = "/journal";
 

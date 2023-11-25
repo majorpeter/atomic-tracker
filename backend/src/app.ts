@@ -1,5 +1,6 @@
 import express from "express";
 
+import calendar from "./controllers/calendar";
 import journal from "./controllers/journal";
 
 const PORT = 8080;
@@ -26,4 +27,5 @@ app.use((req, _, next) => {
   next();
 });
 
+calendar(app);
 journal(app);
