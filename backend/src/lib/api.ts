@@ -1,4 +1,18 @@
 export namespace Api {
+  export namespace Todos {
+    export const path = "/todos";
+
+    export type type = {
+      todos: {
+        uid: string;
+        summary?: string;
+        description?: string;
+        due?: string;
+        repeats?: boolean;
+      }[];
+    };
+  }
+
   export namespace Calendar {
     export const path = "/calendar";
 

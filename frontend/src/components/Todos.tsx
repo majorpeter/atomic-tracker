@@ -18,6 +18,7 @@ import {
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import RepeatIcon from "@mui/icons-material/Repeat";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import { useApiQuery } from "../util/api-client";
 
 const DUMMY_TODOS: {
   title: string;
@@ -49,10 +50,14 @@ const DUMMY_TODOS: {
 ];
 
 const Todos: React.FC = () => {
-  const countPastDue = DUMMY_TODOS.reduce(
-    (value, item) => value + (item.pastDue ? 1 : 0),
-    0
-  );
+  const { data } = useApiQuery.todos();
+  const countPastDue = data
+    ? data.todos.reduce(
+        (value, item) =>
+          value + (item.due && new Date(item.due) < new Date() ? 1 : 0),
+        0
+      )
+    : undefined;
 
   return (
     <Card>
@@ -63,40 +68,42 @@ const Todos: React.FC = () => {
       <CardContent>
         <Sheet sx={{ maxHeight: 250, overflow: "auto" }}>
           <List>
-            {DUMMY_TODOS.map((item, index) => {
-              const deadLine = item.deadline ? (
-                <ListItemDecorator sx={{ ml: "auto" }}>
-                  <Typography
-                    color={item.pastDue ? "danger" : "neutral"}
-                    fontWeight={item.pastDue ? "lg" : ""}
-                  >
-                    {item.deadline}
-                  </Typography>
-                </ListItemDecorator>
-              ) : null;
-
-              return (
-                <Fragment key={index}>
-                  {index > 0 && <ListDivider />}
-                  <ListItem>
-                    <ListItemDecorator>
-                      {item.repeats ? (
-                        <RepeatIcon />
-                      ) : (
-                        <CheckBoxOutlineBlankIcon />
-                      )}{" "}
-                    </ListItemDecorator>
+            {data &&
+              data.todos.map((item, index) => {
+                const pastDue = item.due && new Date(item.due) < new Date();
+                const deadLine = item.due ? (
+                  <ListItemDecorator sx={{ ml: "auto" }}>
                     <Typography
-                      color={item.pastDue ? "danger" : "neutral"}
-                      fontWeight={item.pastDue ? "lg" : ""}
+                      color={pastDue ? "danger" : "neutral"}
+                      fontWeight={pastDue ? "lg" : ""}
                     >
-                      {item.title}
+                      {item.due}
                     </Typography>
-                    {deadLine}
-                  </ListItem>
-                </Fragment>
-              );
-            })}
+                  </ListItemDecorator>
+                ) : null;
+
+                return (
+                  <Fragment key={item.uid}>
+                    {index > 0 && <ListDivider />}
+                    <ListItem>
+                      <ListItemDecorator>
+                        {item.repeats ? (
+                          <RepeatIcon />
+                        ) : (
+                          <CheckBoxOutlineBlankIcon />
+                        )}{" "}
+                      </ListItemDecorator>
+                      <Typography
+                        color={pastDue ? "danger" : "neutral"}
+                        fontWeight={pastDue ? "lg" : ""}
+                      >
+                        {item.summary}
+                      </Typography>
+                      {deadLine}
+                    </ListItem>
+                  </Fragment>
+                );
+              })}
           </List>
         </Sheet>
       </CardContent>
@@ -105,7 +112,7 @@ const Todos: React.FC = () => {
         <Divider inset="context" />
 
         <CardActions>
-          <Typography>{DUMMY_TODOS.length} items</Typography>
+          <Typography>{data?.todos.length} items</Typography>
           {countPastDue && (
             <>
               <Divider orientation="vertical" />

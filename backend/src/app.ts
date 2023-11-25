@@ -1,5 +1,6 @@
 import express from "express";
 
+import todos from "./controllers/todos";
 import calendar from "./controllers/calendar";
 import journal from "./controllers/journal";
 
@@ -27,5 +28,6 @@ app.use((req, _, next) => {
   next();
 });
 
+todos(app);
 calendar(app);
 journal(app);

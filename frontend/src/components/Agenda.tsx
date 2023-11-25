@@ -6,6 +6,7 @@ import {
   CardActions,
   CardOverflow,
   Divider,
+  Link,
   List,
   ListItem,
   ListItemDecorator,
@@ -88,9 +89,9 @@ const Agenda: React.FC = () => {
                           </Typography>
                         </ListItemDecorator>
                         {item.url ? (
-                          <a href={item.url} target="_blank">
+                          <Link href={item.url} target="_blank">
                             {item.summary}
-                          </a>
+                          </Link>
                         ) : (
                           item.summary
                         )}
