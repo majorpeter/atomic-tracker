@@ -90,9 +90,17 @@ const Todos: React.FC = () => {
               <Typography color="danger">{countPastDue} past due</Typography>
             </>
           )}
-          <Button sx={{ ml: "auto" }} startDecorator={<OpenInNewIcon />}>
-            Edit
-          </Button>
+          {data?.webui && (
+            <Button
+              component="a"
+              href={data?.webui}
+              target="_blank"
+              sx={{ ml: "auto" }}
+              startDecorator={<OpenInNewIcon />}
+            >
+              Edit
+            </Button>
+          )}
         </CardActions>
       </CardOverflow>
     </Card>

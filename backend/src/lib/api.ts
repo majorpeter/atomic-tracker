@@ -10,6 +10,7 @@ export namespace Api {
         due?: string;
         repeats?: boolean;
       }[];
+      webui?: string;
     };
 
     export type get_query = { dummy?: unknown };

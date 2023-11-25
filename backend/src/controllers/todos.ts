@@ -7,6 +7,17 @@ import path from "path";
 import { Api } from "../lib/api";
 import { DUMMY_TODOS } from "../misc/dummy_data";
 
+async function getConfig(): Promise<{
+  serverUrl: string;
+  user: string;
+  token: string;
+  webuiUrl: string;
+}> {
+  return JSON.parse(
+    (await fs.readFile(path.resolve(__dirname, "..", "todos.json"))).toString()
+  );
+}
+
 function findAttribute(object: DAVObject, path: string[]): string | undefined {
   const currentPath = [];
   for (const row of (object.data as string).split("\n")) {
@@ -59,9 +70,7 @@ function timestampToIso(t: string | undefined): string | undefined {
 }
 
 async function fetchCalendarObjects(): Promise<DAVObject[]> {
-  const config: { serverUrl: string; user: string; token: string } = JSON.parse(
-    (await fs.readFile(path.resolve(__dirname, "..", "todos.json"))).toString()
-  );
+  const config = await getConfig();
 
   const client = await createDAVClient({
     serverUrl: config.serverUrl,
@@ -105,6 +114,8 @@ export default function (app: Express) {
   app.get<{}, Api.Todos.type, {}, Api.Todos.get_query>(
     Api.Todos.path,
     async (req, res) => {
+      const config = await getConfig();
+
       if (req.query.dummy === undefined) {
         const todos: Api.Todos.type["todos"] = (await fetchCalendarObjects())
           .map((i) => ({
@@ -127,7 +138,7 @@ export default function (app: Express) {
           .filter((i) => !i.done)
           .sort((a, b) => sortConvFn(a) - sortConvFn(b));
 
-        res.send({ todos });
+        res.send({ todos, webui: config.webuiUrl });
       } else {
         res.send(DUMMY_TODOS);
       }
