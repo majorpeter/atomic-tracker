@@ -11,6 +11,8 @@ export namespace Api {
         repeats?: boolean;
       }[];
     };
+
+    export type get_query = { dummy?: unknown };
   }
 
   export namespace Calendar {

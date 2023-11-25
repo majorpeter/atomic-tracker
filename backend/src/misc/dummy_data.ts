@@ -1,5 +1,40 @@
 import { Api } from "../lib/api";
 
+export const DUMMY_TODOS: Api.Todos.type = {
+  todos: [
+    { uid: "1", summary: "Testing", repeats: false, due: "2023-10-01" },
+    {
+      uid: "2",
+      summary: "Documentation",
+      repeats: false,
+      due: "2023-11-01",
+    },
+    {
+      uid: "3",
+      summary: "Water plants",
+      repeats: true,
+      due: "2023-11-30",
+    },
+    {
+      uid: "4",
+      summary: "Grocery shopping",
+      repeats: false,
+      due: "2023-12-01",
+    },
+    {
+      uid: "5",
+      summary: "Wash car",
+      repeats: true,
+      due: "2023-12-02",
+    },
+    {
+      uid: "6",
+      summary: "Select wall paint color",
+      repeats: false,
+    },
+  ],
+};
+
 export const DUMMY_CALENDAR: Api.Calendar.type = {
   today: [
     {

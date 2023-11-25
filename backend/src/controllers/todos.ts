@@ -3,7 +3,9 @@ import { Express } from "express";
 
 import fs from "fs/promises";
 import path from "path";
+
 import { Api } from "../lib/api";
+import { DUMMY_TODOS } from "../misc/dummy_data";
 
 function findAttribute(object: DAVObject, path: string[]): string | undefined {
   const currentPath = [];
@@ -100,23 +102,35 @@ function sortConvFn(todo: Api.Todos.type["todos"][0]): number {
 }
 
 export default function (app: Express) {
-  app.get<{}, Api.Todos.type>(Api.Todos.path, async (_, res) => {
-    const todos: Api.Todos.type["todos"] = (await fetchCalendarObjects())
-      .map((i) => ({
-        uid: findAttribute(i, ["VCALENDAR", "VTODO", "UID"])!,
-        summary: findAttribute(i, ["VCALENDAR", "VTODO", "SUMMARY"]),
-        description: findAttribute(i, ["VCALENDAR", "VTODO", "DESCRIPTION"]),
-        due: timestampToIso(findAttribute(i, ["VCALENDAR", "VTODO", "DUE"])),
-        repeats:
-          findAttribute(i, ["VCALENDAR", "VTODO", "RRULE"]) !== undefined,
-        done: findAttribute(i, ["VCALENDAR", "VTODO", "STATUS"]) == "COMPLETED",
-        __data: i.data,
-      }))
-      .filter((i) => !i.done)
-      .sort((a, b) => sortConvFn(a) - sortConvFn(b));
+  app.get<{}, Api.Todos.type, {}, Api.Todos.get_query>(
+    Api.Todos.path,
+    async (req, res) => {
+      if (req.query.dummy === undefined) {
+        const todos: Api.Todos.type["todos"] = (await fetchCalendarObjects())
+          .map((i) => ({
+            uid: findAttribute(i, ["VCALENDAR", "VTODO", "UID"])!,
+            summary: findAttribute(i, ["VCALENDAR", "VTODO", "SUMMARY"]),
+            description: findAttribute(i, [
+              "VCALENDAR",
+              "VTODO",
+              "DESCRIPTION",
+            ]),
+            due: timestampToIso(
+              findAttribute(i, ["VCALENDAR", "VTODO", "DUE"])
+            ),
+            repeats:
+              findAttribute(i, ["VCALENDAR", "VTODO", "RRULE"]) !== undefined,
+            done:
+              findAttribute(i, ["VCALENDAR", "VTODO", "STATUS"]) == "COMPLETED",
+            __data: i.data,
+          }))
+          .filter((i) => !i.done)
+          .sort((a, b) => sortConvFn(a) - sortConvFn(b));
 
-    res.send({
-      todos,
-    });
-  });
+        res.send({ todos });
+      } else {
+        res.send(DUMMY_TODOS);
+      }
+    }
+  );
 }

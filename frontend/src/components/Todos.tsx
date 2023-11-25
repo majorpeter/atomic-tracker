@@ -20,35 +20,6 @@ import RepeatIcon from "@mui/icons-material/Repeat";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { useApiQuery } from "../util/api-client";
 
-const DUMMY_TODOS: {
-  title: string;
-  repeats: boolean;
-  deadline?: string;
-  pastDue: boolean;
-}[] = [
-  { title: "Testing", repeats: false, deadline: "2023-10-01", pastDue: true },
-  {
-    title: "Documentation",
-    repeats: false,
-    deadline: "2023-11-01",
-    pastDue: false,
-  },
-  {
-    title: "Water plants",
-    repeats: true,
-    deadline: "2023-11-30",
-    pastDue: false,
-  },
-  {
-    title: "Grocery shopping",
-    repeats: false,
-    deadline: "2023-12-01",
-    pastDue: false,
-  },
-  { title: "Wash car", repeats: true, deadline: "2023-12-02", pastDue: false },
-  { title: "Select wall paint color", repeats: false, pastDue: false },
-];
-
 const Todos: React.FC = () => {
   const { data } = useApiQuery.todos();
   const countPastDue = data
