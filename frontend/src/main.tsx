@@ -6,12 +6,13 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { journalEditorRoute } from "./pages/JournalEditorModal.tsx";
 import { QueryClientProvider } from "react-query";
 import { queryClient } from "./util/api-client.ts";
+import { todosModalRoute } from "./pages/TodosModal.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-    children: [journalEditorRoute],
+    children: [todosModalRoute, journalEditorRoute],
   },
 ]);
 
