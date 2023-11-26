@@ -1,5 +1,6 @@
 import express from "express";
 
+import habits from "./controllers/habits";
 import todos from "./controllers/todos";
 import calendar from "./controllers/calendar";
 import journal from "./controllers/journal";
@@ -28,6 +29,7 @@ app.use((req, _, next) => {
   next();
 });
 
+habits(app);
 todos(app);
 calendar(app);
 journal(app);

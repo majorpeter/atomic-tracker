@@ -1,4 +1,13 @@
 export namespace Api {
+  export namespace Habits {
+    export const path = "/habits";
+
+    export type type = {
+      name: string;
+      count: number;
+    }[];
+  }
+
   export namespace Todos {
     export const path = "/todos";
 

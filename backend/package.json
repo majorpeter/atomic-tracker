@@ -15,6 +15,8 @@
     "@google-cloud/local-auth": "^2.1.0",
     "express": "^4.18.2",
     "googleapis": "^105.0.0",
+    "sequelize": "^6.35.1",
+    "sqlite3": "^5.1.6",
     "tsc-watch": "^6.0.4",
     "tsdav": "^2.0.6"
   },

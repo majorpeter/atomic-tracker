@@ -6,12 +6,22 @@ const API_URL = "http://localhost:8080";
 export const queryClient = new QueryClient();
 
 namespace QueryKey {
+  export const Habits = ["habits"];
   export const Todos = ["todos"];
   export const Calendar = ["calendar"];
   export const Journal = ["journal"];
 }
 
 export namespace useApiQuery {
+  export function habits() {
+    return useQuery<Api.Habits.type>({
+      queryKey: QueryKey.Habits,
+      queryFn: async () => {
+        return await (await fetch(API_URL + Api.Habits.path)).json();
+      },
+    });
+  }
+
   export function todos() {
     return useQuery<Api.Todos.type>({
       queryKey: QueryKey.Todos,
