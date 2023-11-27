@@ -6,7 +6,7 @@ const DUMMY_DATA: HabitProps[] = [
   {
     id: 1,
     name: "Workout",
-    icon: "workout",
+    iconName: "workout",
     value: 3,
     targetValue: 5,
     historicalPercent: 30,
@@ -14,7 +14,7 @@ const DUMMY_DATA: HabitProps[] = [
   {
     id: 2,
     name: "Reading",
-    icon: "book",
+    iconName: "book",
     value: 2,
     targetValue: 2,
     historicalPercent: 35,
@@ -22,7 +22,7 @@ const DUMMY_DATA: HabitProps[] = [
   {
     id: 3,
     name: "Write Journal",
-    icon: "journal",
+    iconName: "journal",
     value: 3,
     targetValue: 7,
     historicalPercent: 20,
@@ -30,7 +30,7 @@ const DUMMY_DATA: HabitProps[] = [
   {
     id: 4,
     name: "Meditate",
-    icon: "selfImprovement",
+    iconName: "selfImprovement",
     value: 1,
     targetValue: 3,
     historicalPercent: 10,
@@ -45,7 +45,7 @@ const Habits: React.FC = () => {
       {data &&
         data.map((item, index) => (
           <Grid key={index} xs="auto" md={3}>
-            <Habit {...item} icon={DUMMY_DATA[index].icon} />
+            <Habit {...item} />
           </Grid>
         ))}
     </Grid>

@@ -21,6 +21,7 @@ import {
 } from "react-router-dom";
 
 import { fetchHabit } from "../util/api-client";
+import { getHabitIconByName } from "../util/habit-icons";
 
 const HabitTrackerModal: React.FC = () => {
   const navigate = useNavigate();
@@ -34,6 +35,8 @@ const HabitTrackerModal: React.FC = () => {
     navigate("..");
   }
 
+  const Icon = getHabitIconByName(data.iconName);
+
   const date = new Date();
   date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
   const dateStr = date.toJSON().slice(0, 10);
@@ -42,7 +45,10 @@ const HabitTrackerModal: React.FC = () => {
     <Modal open onClose={handleClose}>
       <ModalDialog>
         <ModalClose />
-        <DialogTitle>{data.name}</DialogTitle>
+        <DialogTitle>
+          <Icon />
+          {data.name}
+        </DialogTitle>
         <DialogContent>
           <Table>
             <tbody>

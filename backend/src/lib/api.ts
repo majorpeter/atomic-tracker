@@ -5,6 +5,7 @@ export namespace Api {
     export type type = {
       id: number;
       name: string;
+      iconName: string;
       value: number;
       targetValue: number;
       historicalPercent: number;
@@ -17,6 +18,7 @@ export namespace Api {
 
     export type type = {
       name: string;
+      iconName: string;
       targetValue: number;
       periodLength: number;
       historyLength: number;

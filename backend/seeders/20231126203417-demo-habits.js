@@ -14,6 +14,7 @@ module.exports = {
     await queryInterface.bulkInsert("Habits", [
       {
         name: "Workout",
+        iconName: "workout",
         targetValue: 5,
         periodLength: 7,
         historyLength: 14,
@@ -23,6 +24,7 @@ module.exports = {
       },
       {
         name: "Reading",
+        iconName: "book",
         targetValue: 2,
         periodLength: 7,
         historyLength: 10,
@@ -32,6 +34,7 @@ module.exports = {
       },
       {
         name: "Write Journal",
+        iconName: "journal",
         targetValue: 7,
         periodLength: 7,
         historyLength: 7,
@@ -41,6 +44,7 @@ module.exports = {
       },
       {
         name: "Meditate",
+        iconName: "selfImprovement",
         targetValue: 7,
         periodLength: 7,
         historyLength: 7,

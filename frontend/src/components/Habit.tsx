@@ -1,26 +1,13 @@
 import { Card, CardContent, CircularProgress, Typography } from "@mui/joy";
-import { SvgIconComponent } from "@mui/icons-material";
 
-import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
-import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
-import MenuBookIcon from "@mui/icons-material/MenuBook";
-import ClassIcon from "@mui/icons-material/Class";
-import SelfImprovementIcon from "@mui/icons-material/SelfImprovement";
 import { Link } from "react-router-dom";
 import { habitTrackerRoute } from "../pages/HabitTrackerModal";
-
-const icons: Record<string, SvgIconComponent> = {
-  workout: FitnessCenterIcon,
-  book: MenuBookIcon,
-  journal: ClassIcon,
-  selfImprovement: SelfImprovementIcon,
-};
-const fallbackIcon = QuestionMarkIcon;
+import { getHabitIconByName } from "../util/habit-icons";
 
 export type HabitProps = {
   id: number;
   name: string;
-  icon: string;
+  iconName: string;
   value: number;
   targetValue: number;
   historicalPercent: number;
@@ -29,12 +16,12 @@ export type HabitProps = {
 const Habit: React.FC<HabitProps> = ({
   id,
   name,
-  icon,
+  iconName,
   value,
   targetValue,
   historicalPercent,
 }) => {
-  const Icon = icons[icon] || fallbackIcon;
+  const Icon = getHabitIconByName(iconName);
 
   return (
     <Card

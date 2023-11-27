@@ -12,17 +12,17 @@ export default function (app: Express) {
     const result: Api.Habits.type = [];
     const habits = await Habit.findAll({ where: { ownerId: USER_ID } });
 
-    for (const h of habits) {
+    for (const habit of habits) {
       const periodStart = new Date();
-      periodStart.setDate(periodStart.getDate() - h.periodLength);
+      periodStart.setDate(periodStart.getDate() - habit.periodLength);
       const historyStart = new Date();
-      historyStart.setDate(periodStart.getDate() - h.historyLength);
+      historyStart.setDate(periodStart.getDate() - habit.historyLength);
 
       const trackedInPeriod = (
         await TrackedHabit.findAll({
           where: {
             ownerId: USER_ID,
-            HabitId: h.id,
+            HabitId: habit.id,
             createdAt: { [Op.gt]: periodStart },
           },
         })
@@ -32,23 +32,24 @@ export default function (app: Express) {
         await TrackedHabit.findAll({
           where: {
             ownerId: USER_ID,
-            HabitId: h.id,
+            HabitId: habit.id,
             createdAt: { [Op.gt]: historyStart },
           },
         })
       ).length;
 
       const historicalPercent = Math.round(
-        (trackedInHistory / h.targetValue) *
-          (h.periodLength / h.historyLength) *
+        (trackedInHistory / habit.targetValue) *
+          (habit.periodLength / habit.historyLength) *
           100
       );
 
       result.push({
-        id: h.id,
-        name: h.name,
+        id: habit.id,
+        name: habit.name,
+        iconName: habit.iconName,
         value: trackedInPeriod,
-        targetValue: h.targetValue,
+        targetValue: habit.targetValue,
         historicalPercent,
       });
     }
@@ -85,6 +86,7 @@ export default function (app: Express) {
 
         res.send({
           name: habit.name,
+          iconName: habit.iconName,
           targetValue: habit.targetValue,
           periodLength: habit.periodLength,
           historyLength: habit.historyLength,

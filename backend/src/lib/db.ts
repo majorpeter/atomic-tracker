@@ -21,6 +21,7 @@ export class Habit extends Model<
 > {
   declare id: CreationOptional<number>;
   declare name: string;
+  declare iconName: string;
   declare targetValue: number;
   declare periodLength: number;
   declare historyLength: number;
@@ -37,6 +38,9 @@ Habit.init(
       primaryKey: true,
     },
     name: {
+      type: DataTypes.STRING,
+    },
+    iconName: {
       type: DataTypes.STRING,
     },
     targetValue: {
