@@ -14,10 +14,10 @@ import { Link } from "react-router-dom";
 
 import { journalEditorRoute } from "../pages/JournalEditorModal";
 
-import { useApiQuery } from "../util/api-client";
+import { useApiQuery_journal } from "../util/api-client";
 
 const Journal: React.FC = () => {
-  const { data } = useApiQuery.journal();
+  const { data } = useApiQuery_journal();
 
   return (
     <Card>

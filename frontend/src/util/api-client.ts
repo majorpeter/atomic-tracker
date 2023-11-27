@@ -5,73 +5,71 @@ const API_URL = "http://localhost:8080";
 
 export const queryClient = new QueryClient();
 
-namespace QueryKey {
-  export const Habits = ["habits"];
-  export const Todos = ["todos"];
-  export const Calendar = ["calendar"];
-  export const Journal = ["journal"];
+export const queryKeys = {
+  habits: ["habits"],
+  todos: ["todos"],
+  calendar: ["calendar"],
+  journal: ["journal"],
+};
+
+export function useApiQuery_habits() {
+  return useQuery<Api.Habits.type>({
+    queryKey: queryKeys.habits,
+    queryFn: async () => {
+      return await (await fetch(API_URL + Api.Habits.path)).json();
+    },
+  });
 }
 
-export namespace useApiQuery {
-  export function habits() {
-    return useQuery<Api.Habits.type>({
-      queryKey: QueryKey.Habits,
-      queryFn: async () => {
-        return await (await fetch(API_URL + Api.Habits.path)).json();
-      },
-    });
-  }
-
-  export function todos() {
-    return useQuery<Api.Todos.type>({
-      queryKey: QueryKey.Todos,
-      queryFn: async () => {
-        return await (await fetch(API_URL + Api.Todos.path)).json();
-      },
-    });
-  }
-
-  export function calendar() {
-    return useQuery<Api.Calendar.type>({
-      queryKey: QueryKey.Calendar,
-      queryFn: async () => {
-        return await (await fetch(API_URL + Api.Calendar.path)).json();
-      },
-    });
-  }
-
-  export function journal() {
-    return useQuery<Api.Journal.type>({
-      queryKey: QueryKey.Journal,
-      queryFn: async () => {
-        return await (await fetch(API_URL + Api.Journal.path)).json();
-      },
-    });
-  }
+export function useApiQuery_todos() {
+  return useQuery<Api.Todos.type>({
+    queryKey: queryKeys.todos,
+    queryFn: async () => {
+      return await (await fetch(API_URL + Api.Todos.path)).json();
+    },
+  });
 }
 
-export namespace useApiMutation {
-  export function journal() {
-    return useMutation<unknown, unknown, Api.Journal.type>({
-      mutationFn: async (variables) => {
-        // optimistic update
-        queryClient.setQueryData<Api.Journal.type>(QueryKey.Journal, variables);
+export function useApiQuery_calendar() {
+  return useQuery<Api.Calendar.type>({
+    queryKey: queryKeys.calendar,
+    queryFn: async () => {
+      return await (await fetch(API_URL + Api.Calendar.path)).json();
+    },
+  });
+}
 
-        try {
-          await fetch(API_URL + Api.Journal.path, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(variables),
-          });
-        } catch {}
+export function useApiQuery_journal() {
+  return useQuery<Api.Journal.type>({
+    queryKey: queryKeys.journal,
+    queryFn: async () => {
+      return await (await fetch(API_URL + Api.Journal.path)).json();
+    },
+  });
+}
 
-        // refetch to sync either way
-        queryClient.invalidateQueries(QueryKey.Journal);
-      },
-    });
-  }
+export function useApiMutation_journal() {
+  return useMutation<unknown, unknown, Api.Journal.type>({
+    mutationFn: async (variables) => {
+      // optimistic update
+      queryClient.setQueryData<Api.Journal.type>(queryKeys.journal, variables);
+
+      try {
+        await fetch(API_URL + Api.Journal.path, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(variables),
+        });
+      } catch {
+        // no action (invalidate is called either way)
+      }
+
+      // refetch to sync either way
+      queryClient.invalidateQueries(queryKeys.journal);
+    },
+  });
 }
 
 export async function fetchHabit(id: number): Promise<Api.Habit.type> {

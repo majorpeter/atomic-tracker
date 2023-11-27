@@ -1,10 +1,10 @@
 import { Button, Divider, Typography } from "@mui/joy";
-import { useApiQuery } from "../util/api-client";
+import { useApiQuery_todos } from "../util/api-client";
 
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 const TodosActions: React.FC = () => {
-  const { data } = useApiQuery.todos();
+  const { data } = useApiQuery_todos();
   const countPastDue = data
     ? data.todos.reduce(
         (value, item) =>

@@ -16,7 +16,7 @@ import {
 } from "@mui/joy";
 
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import { useApiQuery } from "../util/api-client";
+import { useApiQuery_calendar } from "../util/api-client";
 import { formatTime } from "../util/formatter";
 import { Api } from "@api";
 
@@ -42,7 +42,7 @@ function formatDateOrTimeForListing(
 }
 
 const Agenda: React.FC = () => {
-  const { data } = useApiQuery.calendar();
+  const { data } = useApiQuery_calendar();
 
   type DataKeys = keyof NonNullable<typeof data>;
   const dataItems: { [k in DataKeys]: string } = {

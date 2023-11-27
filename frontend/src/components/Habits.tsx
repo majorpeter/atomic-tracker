@@ -1,6 +1,6 @@
 import { Grid } from "@mui/joy";
 import Habit, { HabitProps } from "./Habit";
-import { useApiQuery } from "../util/api-client";
+import { useApiQuery_habits } from "../util/api-client";
 
 const DUMMY_DATA: HabitProps[] = [
   {
@@ -38,7 +38,7 @@ const DUMMY_DATA: HabitProps[] = [
 ];
 
 const Habits: React.FC = () => {
-  const { data } = useApiQuery.habits();
+  const { data } = useApiQuery_habits();
 
   return (
     <Grid container spacing={2} sx={{ marginBottom: 1 }}>

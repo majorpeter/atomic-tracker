@@ -1,3 +1,6 @@
+import { useRef } from "react";
+import { RouteObject, useNavigate } from "react-router-dom";
+
 import {
   Button,
   DialogActions,
@@ -8,16 +11,18 @@ import {
   ModalDialog,
   Textarea,
 } from "@mui/joy";
-import { RouteObject, useNavigate } from "react-router-dom";
-import { useApiMutation, useApiQuery } from "../util/api-client";
-import { useRef } from "react";
+
+import {
+  useApiMutation_journal,
+  useApiQuery_journal,
+} from "../util/api-client";
 
 const JournalEditorModal: React.FC = () => {
   const navigate = useNavigate();
 
   const textArea = useRef<HTMLTextAreaElement>(null);
-  const { data } = useApiQuery.journal();
-  const mutation = useApiMutation.journal();
+  const { data } = useApiQuery_journal();
+  const mutation = useApiMutation_journal();
 
   function handleClose() {
     navigate("..");
