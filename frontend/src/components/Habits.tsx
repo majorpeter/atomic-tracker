@@ -4,24 +4,33 @@ import { useApiQuery } from "../util/api-client";
 
 const DUMMY_DATA: HabitProps[] = [
   {
-    title: "Workout",
+    name: "Workout",
     icon: "workout",
     value: 3,
-    target: 5,
+    targetValue: 5,
+    historicalPercent: 30,
   },
   {
-    title: "Reading",
+    name: "Reading",
     icon: "book",
     value: 2,
-    target: 2,
+    targetValue: 2,
+    historicalPercent: 35,
   },
   {
-    title: "Write Journal",
+    name: "Write Journal",
     icon: "journal",
     value: 3,
-    target: 7,
+    targetValue: 7,
+    historicalPercent: 20,
   },
-  { title: "Meditate", icon: "selfImprovement", value: 1, target: 3 },
+  {
+    name: "Meditate",
+    icon: "selfImprovement",
+    value: 1,
+    targetValue: 3,
+    historicalPercent: 10,
+  },
 ];
 
 const Habits: React.FC = () => {
@@ -32,12 +41,7 @@ const Habits: React.FC = () => {
       {data &&
         data.map((item, index) => (
           <Grid key={index} xs="auto" md={3}>
-            <Habit
-              title={item.name}
-              value={item.count}
-              icon={DUMMY_DATA[index].icon}
-              target={DUMMY_DATA[index].target}
-            />
+            <Habit {...item} icon={DUMMY_DATA[index].icon} />
           </Grid>
         ))}
     </Grid>

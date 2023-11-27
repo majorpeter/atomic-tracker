@@ -12,18 +12,50 @@ module.exports = {
     day2_before.setDate(day1_before.getDate() - 2);
 
     await queryInterface.bulkInsert("Habits", [
-      { name: "Workout", owner: USER, createdAt: now, updatedAt: now },
-      { name: "Reading", owner: USER, createdAt: now, updatedAt: now },
-      { name: "Write Journal", owner: USER, createdAt: now, updatedAt: now },
-      { name: "Meditate", owner: USER, createdAt: now, updatedAt: now },
+      {
+        name: "Workout",
+        targetValue: 5,
+        periodLength: 7,
+        historyLength: 14,
+        ownerId: USER,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        name: "Reading",
+        targetValue: 2,
+        periodLength: 7,
+        historyLength: 10,
+        ownerId: USER,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        name: "Write Journal",
+        targetValue: 7,
+        periodLength: 7,
+        historyLength: 7,
+        ownerId: USER,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        name: "Meditate",
+        targetValue: 7,
+        periodLength: 7,
+        historyLength: 7,
+        ownerId: USER,
+        createdAt: now,
+        updatedAt: now,
+      },
     ]);
 
     await queryInterface.bulkInsert("TrackedHabits", [
-      { owner: USER, HabitId: 1, createdAt: now, updatedAt: now },
-      { owner: USER, HabitId: 1, createdAt: day1_before, updatedAt: now },
-      { owner: USER, HabitId: 1, createdAt: day2_before, updatedAt: now },
+      { ownerId: USER, HabitId: 1, createdAt: now, updatedAt: now },
+      { ownerId: USER, HabitId: 1, createdAt: day1_before, updatedAt: now },
+      { ownerId: USER, HabitId: 1, createdAt: day2_before, updatedAt: now },
 
-      { owner: USER, HabitId: 2, createdAt: day2_before, updatedAt: now },
+      { ownerId: USER, HabitId: 2, createdAt: day2_before, updatedAt: now },
     ]);
   },
 

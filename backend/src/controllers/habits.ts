@@ -10,22 +10,45 @@ const USER_ID = 0;
 export default function (app: Express) {
   app.get<{}, Api.Habits.type>(Api.Habits.path, async (_, res) => {
     const result: Api.Habits.type = [];
-    const habits = await Habit.findAll({ where: { owner: USER_ID } });
+    const habits = await Habit.findAll({ where: { ownerId: USER_ID } });
 
     for (const h of habits) {
-      const fromDate = new Date();
-      fromDate.setDate(fromDate.getDate() - 7);
-      const tracked = await TrackedHabit.findAll({
-        where: {
-          owner: USER_ID,
-          HabitId: h.id,
-          createdAt: { [Op.gt]: fromDate },
-        },
-      });
+      const periodStart = new Date();
+      periodStart.setDate(periodStart.getDate() - h.periodLength);
+      const historyStart = new Date();
+      historyStart.setDate(periodStart.getDate() - h.historyLength);
+
+      const trackedInPeriod = (
+        await TrackedHabit.findAll({
+          where: {
+            ownerId: USER_ID,
+            HabitId: h.id,
+            createdAt: { [Op.gt]: periodStart },
+          },
+        })
+      ).length;
+
+      const trackedInHistory = (
+        await TrackedHabit.findAll({
+          where: {
+            ownerId: USER_ID,
+            HabitId: h.id,
+            createdAt: { [Op.gt]: historyStart },
+          },
+        })
+      ).length;
+
+      const historicalPercent = Math.round(
+        (trackedInHistory / h.targetValue) *
+          (h.periodLength / h.historyLength) *
+          100
+      );
 
       result.push({
         name: h.name,
-        count: tracked.length,
+        value: trackedInPeriod,
+        targetValue: h.targetValue,
+        historicalPercent,
       });
     }
 

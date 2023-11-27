@@ -16,34 +16,37 @@ const icons: Record<string, SvgIconComponent> = {
 const fallbackIcon = QuestionMarkIcon;
 
 export type HabitProps = {
-  title: string;
+  name: string;
   icon: string;
   value: number;
-  target: number;
+  targetValue: number;
+  historicalPercent: number;
 };
 
-const Habit: React.FC<HabitProps> = ({ title, icon, value, target }) => {
+const Habit: React.FC<HabitProps> = ({
+  name,
+  icon,
+  value,
+  targetValue,
+  historicalPercent,
+}) => {
   const Icon = icons[icon] || fallbackIcon;
-  let progressPercent = (value / target) * 100;
-  if (progressPercent > 100) {
-    progressPercent = 100;
-  }
 
   return (
     <Card>
       <CardContent orientation="horizontal">
-        <CircularProgress size="lg" determinate value={progressPercent}>
+        <CircularProgress size="lg" determinate value={historicalPercent}>
           <Icon />
         </CircularProgress>
         <CardContent>
           <Typography level="body-md" fontWeight="bold">
-            {title}
+            {name}
           </Typography>
           <Typography level="h3" color="neutral" sx={{ textAlign: "center" }}>
             <Typography color="primary" level="h1" sx={{ paddingRight: 0.3 }}>
               {value}
             </Typography>
-            /{target}
+            /{targetValue}
           </Typography>
         </CardContent>
       </CardContent>

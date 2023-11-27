@@ -4,7 +4,9 @@ export namespace Api {
 
     export type type = {
       name: string;
-      count: number;
+      value: number;
+      targetValue: number;
+      historicalPercent: number;
     }[];
   }
 

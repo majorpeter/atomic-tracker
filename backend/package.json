@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc -b",
     "start": "node dist/app.js",
-    "dev": "tsc-watch --onSuccess 'node dist/app.js'"
+    "dev": "tsc-watch --onSuccess 'node dist/app.js'",
+    "seed": "npx sequelize-cli db:seed:all --debug"
   },
   "keywords": [],
   "author": "",
