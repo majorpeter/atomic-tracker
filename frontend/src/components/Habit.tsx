@@ -6,6 +6,8 @@ import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import ClassIcon from "@mui/icons-material/Class";
 import SelfImprovementIcon from "@mui/icons-material/SelfImprovement";
+import { Link } from "react-router-dom";
+import { habitTrackerRoute } from "../pages/HabitTrackerModal";
 
 const icons: Record<string, SvgIconComponent> = {
   workout: FitnessCenterIcon,
@@ -16,6 +18,7 @@ const icons: Record<string, SvgIconComponent> = {
 const fallbackIcon = QuestionMarkIcon;
 
 export type HabitProps = {
+  id: number;
   name: string;
   icon: string;
   value: number;
@@ -24,6 +27,7 @@ export type HabitProps = {
 };
 
 const Habit: React.FC<HabitProps> = ({
+  id,
   name,
   icon,
   value,
@@ -33,7 +37,18 @@ const Habit: React.FC<HabitProps> = ({
   const Icon = icons[icon] || fallbackIcon;
 
   return (
-    <Card>
+    <Card
+      variant="outlined"
+      sx={{
+        "&:hover": {
+          boxShadow: "md",
+          borderColor: "neutral.outlinedHoverBorder",
+        },
+        textDecoration: "none",
+      }}
+      component={Link}
+      to={habitTrackerRoute.path!.replace(":id", id.toString())}
+    >
       <CardContent orientation="horizontal">
         <CircularProgress size="lg" determinate value={historicalPercent}>
           <Icon />

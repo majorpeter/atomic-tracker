@@ -4,6 +4,7 @@ import { useApiQuery } from "../util/api-client";
 
 const DUMMY_DATA: HabitProps[] = [
   {
+    id: 1,
     name: "Workout",
     icon: "workout",
     value: 3,
@@ -11,6 +12,7 @@ const DUMMY_DATA: HabitProps[] = [
     historicalPercent: 30,
   },
   {
+    id: 2,
     name: "Reading",
     icon: "book",
     value: 2,
@@ -18,6 +20,7 @@ const DUMMY_DATA: HabitProps[] = [
     historicalPercent: 35,
   },
   {
+    id: 3,
     name: "Write Journal",
     icon: "journal",
     value: 3,
@@ -25,6 +28,7 @@ const DUMMY_DATA: HabitProps[] = [
     historicalPercent: 20,
   },
   {
+    id: 4,
     name: "Meditate",
     icon: "selfImprovement",
     value: 1,

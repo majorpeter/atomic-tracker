@@ -45,6 +45,7 @@ export default function (app: Express) {
       );
 
       result.push({
+        id: h.id,
         name: h.name,
         value: trackedInPeriod,
         targetValue: h.targetValue,
@@ -54,4 +55,47 @@ export default function (app: Express) {
 
     res.send(result);
   });
+
+  app.get<Api.Habit.get_params, Api.Habit.type>(
+    Api.Habit.path,
+    async (req, res) => {
+      const habit = await Habit.findOne({ where: { id: req.params.id } });
+      if (habit) {
+        const periodStart = new Date();
+        periodStart.setDate(periodStart.getDate() - habit.periodLength);
+        const historyStart = new Date();
+        historyStart.setDate(periodStart.getDate() - habit.historyLength);
+
+        const trackedInPeriod = await TrackedHabit.count({
+          where: {
+            ownerId: USER_ID,
+            HabitId: habit.id,
+            createdAt: { [Op.gt]: periodStart },
+          },
+        });
+
+        const trackedInHistory = await TrackedHabit.findAll({
+          where: {
+            ownerId: USER_ID,
+            HabitId: habit.id,
+            createdAt: { [Op.gt]: historyStart },
+          },
+          order: [[TrackedHabit.getAttributes().createdAt.field!, "DESC"]],
+        });
+
+        res.send({
+          name: habit.name,
+          targetValue: habit.targetValue,
+          periodLength: habit.periodLength,
+          historyLength: habit.historyLength,
+          trackedInPeriod,
+          history: trackedInHistory.map((item) => ({
+            date: item.createdAt.toISOString(),
+          })),
+        });
+      } else {
+        res.sendStatus(404);
+      }
+    }
+  );
 }

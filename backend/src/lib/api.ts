@@ -3,11 +3,28 @@ export namespace Api {
     export const path = "/habits";
 
     export type type = {
+      id: number;
       name: string;
       value: number;
       targetValue: number;
       historicalPercent: number;
     }[];
+  }
+
+  export namespace Habit {
+    export const path = "/habit/:id";
+    export type get_params = { id: number };
+
+    export type type = {
+      name: string;
+      targetValue: number;
+      periodLength: number;
+      historyLength: number;
+      trackedInPeriod: number;
+      history: {
+        date: string;
+      }[];
+    };
   }
 
   export namespace Todos {

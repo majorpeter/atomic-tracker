@@ -73,3 +73,7 @@ export namespace useApiMutation {
     });
   }
 }
+
+export async function fetchHabit(id: number): Promise<Api.Habit.type> {
+  return (await fetch(API_URL + "/habit/" + id)).json();
+}
