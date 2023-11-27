@@ -64,7 +64,7 @@ export function useApiQuery_journal() {
   });
 }
 
-export function useApiMutation_habit_track(id: number) {
+export function useApiMutation_habit_track() {
   return useMutation<
     Api.Habit.Track.post_resp,
     unknown,
@@ -75,18 +75,32 @@ export function useApiMutation_habit_track(id: number) {
 
       try {
         return (
-          await fetch(
-            API_URL + Api.Habit.Track.path.replace(":id", id.toString()),
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(variables),
-            }
-          )
+          await fetch(API_URL + Api.Habit.Track.path, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(variables),
+          })
         ).json();
       } catch {
         // no check for now
       }
+    },
+  });
+}
+
+export function useApiMutation_habit_track_delete() {
+  return useMutation<unknown, unknown, { id: number }>({
+    mutationFn: async ({ id }) => {
+      queryClient.invalidateQueries(queryKeys.habits);
+
+      try {
+        await fetch(
+          API_URL + Api.Habit.Track.pathWithId.replace(":id", id.toString()),
+          {
+            method: "DELETE",
+          }
+        );
+      } catch {}
     },
   });
 }

@@ -8,3 +8,7 @@ export function formatTime(d: Date, needSeconds: boolean = false) {
     second: needSeconds ? "2-digit" : undefined,
   });
 }
+
+export function formatDate(d: Date) {
+  return d.toLocaleDateString(LANG);
+}

@@ -1,13 +1,19 @@
+import { useRef } from "react";
+
 import {
   Button,
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   Input,
+  List,
+  ListItem,
   Modal,
   ModalClose,
   ModalDialog,
   Table,
+  Typography,
 } from "@mui/joy";
 
 import {
@@ -24,11 +30,14 @@ import {
   apiQuery_habit_n,
   queryClient,
   useApiMutation_habit_track,
+  useApiMutation_habit_track_delete,
   useApiQuery_habit_n,
 } from "../util/api-client";
 
+import { formatDate } from "../util/formatter";
 import { getHabitIconByName } from "../util/habit-icons";
-import { useRef } from "react";
+
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const HabitTrackerModal: React.FC = () => {
   const navigate = useNavigate();
@@ -38,8 +47,13 @@ const HabitTrackerModal: React.FC = () => {
     navigate("..");
   }
 
+  function handleDelete(id: number) {
+    trackDeleteMutate({ id });
+  }
+
   function handleTrack() {
     trackPostMutate({
+      habitId: parseInt(params.id!),
       date: dateInputRef.current!.value,
     });
   }
@@ -50,7 +64,9 @@ const HabitTrackerModal: React.FC = () => {
     mutate: trackPostMutate,
     isLoading: trackPosting,
     data: trackPostedResp,
-  } = useApiMutation_habit_track(parseInt(params.id!));
+  } = useApiMutation_habit_track();
+  const { mutate: trackDeleteMutate, isLoading: trackDeleting } =
+    useApiMutation_habit_track_delete();
 
   const Icon = getHabitIconByName(data?.iconName);
 
@@ -86,22 +102,57 @@ const HabitTrackerModal: React.FC = () => {
                 <tr>
                   <th>Target</th>
                   <td>
-                    {data.targetValue} over a period of {data.periodLength} days
+                    {data.targetValue} times over a period of{" "}
+                    {data.periodLength} days
                   </td>
                 </tr>
               </tbody>
             </Table>
 
-            {data.history.map((item) => (
-              <p
-                key={item.date}
-                style={{
-                  color: trackPostedResp?.id == item.id ? "red" : undefined,
-                }}
-              >
-                {item.date}
-              </p>
-            ))}
+            <List variant="outlined">
+              {data.history.length ? (
+                data.history.map((item) => (
+                  <ListItem
+                    key={item.id}
+                    endAction={
+                      <IconButton
+                        onClick={handleDelete.bind(undefined, item.id)}
+                        disabled={trackDeleting}
+                        aria-label="Delete"
+                        size="sm"
+                        sx={{
+                          "&:hover": {
+                            color: "red",
+                          },
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    }
+                  >
+                    <Typography
+                      sx={{
+                        fontWeight:
+                          trackPostedResp?.id == item.id ? "lg" : undefined,
+                      }}
+                    >
+                      {formatDate(new Date(item.date))}
+                    </Typography>
+                  </ListItem>
+                ))
+              ) : (
+                <ListItem>
+                  <Typography
+                    sx={{
+                      ml: "auto",
+                      mr: "auto",
+                    }}
+                  >
+                    This habit has not been tracked recently.
+                  </Typography>
+                </ListItem>
+              )}
+            </List>
           </DialogContent>
           <DialogActions>
             <Input

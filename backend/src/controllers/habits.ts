@@ -105,18 +105,27 @@ export default function (app: Express) {
     }
   );
 
-  app.post<
-    Api.Habit.get_params,
-    Api.Habit.Track.post_resp,
-    Api.Habit.Track.post_type
-  >(Api.Habit.Track.path, async (req, res) => {
-    const record = await TrackedHabit.create({
-      ownerId: USER_ID,
-      HabitId: req.params.id,
-      createdAt: new Date(req.body.date),
+  app.post<{}, Api.Habit.Track.post_resp, Api.Habit.Track.post_type>(
+    Api.Habit.Track.path,
+    async (req, res) => {
+      const record = await TrackedHabit.create({
+        ownerId: USER_ID,
+        HabitId: req.body.habitId,
+        createdAt: new Date(req.body.date),
+      });
+      res.send({
+        id: record.id,
+      });
+    }
+  );
+
+  app.delete(Api.Habit.Track.pathWithId, async (req, res) => {
+    await TrackedHabit.destroy({
+      where: {
+        id: req.params.id,
+        ownerId: USER_ID,
+      },
     });
-    res.send({
-      id: record.id,
-    });
+    res.sendStatus(200);
   });
 }

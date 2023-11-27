@@ -30,9 +30,12 @@ export namespace Api {
     };
 
     export namespace Track {
-      export const path = "/habit/:id/track";
+      export const path = "/habit/track";
+      export const pathWithId = "/habit/track/:id";
+      export type deleteParams = { id: number };
 
       export type post_type = {
+        habitId: number;
         date: string;
       };
       export type post_resp = {
