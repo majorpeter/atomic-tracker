@@ -14,10 +14,10 @@ import { Link } from "react-router-dom";
 
 import { journalEditorRoute } from "../pages/JournalEditorModal";
 
-import { useApiQuery_journal } from "../util/api-client";
+import { useApiQuery_journal_day } from "../util/api-client";
 
 const Journal: React.FC = () => {
-  const { data } = useApiQuery_journal();
+  const { data } = useApiQuery_journal_day(new Date());
 
   return (
     <Card>
@@ -26,7 +26,8 @@ const Journal: React.FC = () => {
       </Typography>
       <Divider />
       <CardContent>
-        {data && data.items.map((item, index) => <p key={index}>{item}</p>)}
+        {data &&
+          data.text.split("\n").map((item, index) => <p key={index}>{item}</p>)}
       </CardContent>
       <CardOverflow variant="soft">
         <Divider inset="context" />

@@ -1,22 +1,54 @@
 import { Express } from "express";
 import { Api } from "../lib/api";
+import { Journal } from "../lib/db";
 
-let data = {
-  items: [
-    "I saw a cute dog today",
-    "had lunch with a friend",
-    "watched the latest episode of my show",
-    "walk in the park",
-  ],
-};
+//TODO multiuser support
+const USER_ID = 0;
 
 export default function (app: Express) {
-  app.get<{}, Api.Journal.type>(Api.Journal.path, (_, res) => {
-    res.send(data);
-  });
+  app.get<Api.Journal.params, Api.Journal.type>(
+    Api.Journal.pathWithDate,
+    async (req, res) => {
+      const journal = await Journal.findOne({
+        where: {
+          date: req.params.date,
+        },
+      });
 
-  app.post<{}, Api.Journal.type>(Api.Journal.path, (req, res) => {
-    data = req.body;
-    res.sendStatus(200);
-  });
+      if (journal) {
+        res.send({ text: journal?.content });
+      } else {
+        res.send({ text: "" });
+      }
+    }
+  );
+
+  app.post<Api.Journal.params, {}, Api.Journal.type>(
+    Api.Journal.pathWithDate,
+    async (req, res) => {
+      const journal = await Journal.findOne({
+        where: {
+          ownerId: USER_ID,
+          date: req.params.date,
+        },
+      });
+
+      const text = req.body.text;
+      const count = text.split("\n").length;
+      if (journal) {
+        journal.content = text;
+        journal.count = count;
+        await journal.save();
+      } else {
+        Journal.create({
+          date: req.params.date,
+          content: text,
+          count,
+          ownerId: USER_ID,
+        });
+      }
+
+      res.sendStatus(200);
+    }
+  );
 }

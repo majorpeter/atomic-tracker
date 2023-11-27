@@ -86,8 +86,9 @@ export namespace Api {
   }
 
   export namespace Journal {
-    export const path = "/journal";
+    export const pathWithDate = "/journal/:date";
+    export type params = { date: string };
 
-    export type type = { items: string[] };
+    export type type = { text: string };
   }
 }

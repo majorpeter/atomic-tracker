@@ -1,5 +1,6 @@
 import { QueryClient, useMutation, useQuery } from "react-query";
 import { Api } from "@api";
+import { getIsoDate } from "./formatter";
 
 const API_URL = "http://localhost:8080";
 
@@ -10,7 +11,8 @@ export const queryKeys = {
   habit_n: (id: number) => ["habits", id.toString()],
   todos: ["todos"],
   calendar: ["calendar"],
-  journal: ["journal"],
+  journal_all: ["journal"],
+  journal_day: (date: Date) => ["journal", getIsoDate(date)],
 };
 
 export function useApiQuery_habits() {
@@ -55,11 +57,15 @@ export function useApiQuery_calendar() {
   });
 }
 
-export function useApiQuery_journal() {
+export function useApiQuery_journal_day(date: Date) {
   return useQuery<Api.Journal.type>({
-    queryKey: queryKeys.journal,
+    queryKey: queryKeys.journal_day(date),
     queryFn: async () => {
-      return await (await fetch(API_URL + Api.Journal.path)).json();
+      return await (
+        await fetch(
+          API_URL + Api.Journal.pathWithDate.replace(":date", getIsoDate(date))
+        )
+      ).json();
     },
   });
 }
@@ -106,23 +112,27 @@ export function useApiMutation_habit_track_delete() {
 }
 
 export function useApiMutation_journal() {
-  return useMutation<unknown, unknown, Api.Journal.type>({
-    mutationFn: async (variables) => {
-      // optimistic update
-      queryClient.setQueryData<Api.Journal.type>(queryKeys.journal, variables);
-
+  return useMutation<
+    unknown,
+    unknown,
+    { payload: Api.Journal.type; date: Date }
+  >({
+    mutationFn: async ({ payload, date }) => {
       try {
-        await fetch(API_URL + Api.Journal.path, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(variables),
-        });
+        await fetch(
+          API_URL + Api.Journal.pathWithDate.replace(":date", getIsoDate(date)),
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }
+        );
       } catch {
         // no action (invalidate is called either way)
       }
 
       // refetch to sync either way
-      queryClient.invalidateQueries(queryKeys.journal);
+      queryClient.invalidateQueries(queryKeys.journal_day(date));
     },
   });
 }

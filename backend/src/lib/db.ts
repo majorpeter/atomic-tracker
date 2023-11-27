@@ -89,6 +89,30 @@ TrackedHabit.init(
 Habit.hasMany(TrackedHabit);
 TrackedHabit.belongsTo(Habit);
 
+export class Journal extends Model<
+  InferAttributes<Journal>,
+  InferCreationAttributes<Journal>
+> {
+  declare id: CreationOptional<number>;
+  declare date: string;
+  declare content: string;
+  declare count: number;
+  declare ownerId: number; //TODO foreign key later
+  declare createdAt: CreationOptional<Date>;
+}
+
+Journal.init(
+  {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    date: { type: new DataTypes.STRING(10) },
+    content: { type: DataTypes.TEXT },
+    count: { type: DataTypes.INTEGER },
+    ownerId: { type: DataTypes.INTEGER },
+    createdAt: DataTypes.DATE,
+  },
+  { sequelize: db }
+);
+
 (async () => {
   await db.sync({ force: false });
 })();
