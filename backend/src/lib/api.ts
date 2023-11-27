@@ -24,9 +24,21 @@ export namespace Api {
       historyLength: number;
       trackedInPeriod: number;
       history: {
+        id: number;
         date: string;
       }[];
     };
+
+    export namespace Track {
+      export const path = "/habit/:id/track";
+
+      export type post_type = {
+        date: string;
+      };
+      export type post_resp = {
+        id: number;
+      };
+    }
   }
 
   export namespace Todos {

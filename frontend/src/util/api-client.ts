@@ -7,6 +7,7 @@ export const queryClient = new QueryClient();
 
 export const queryKeys = {
   habits: ["habits"],
+  habit_n: (id: number) => ["habits", id.toString()],
   todos: ["todos"],
   calendar: ["calendar"],
   journal: ["journal"],
@@ -19,6 +20,21 @@ export function useApiQuery_habits() {
       return await (await fetch(API_URL + Api.Habits.path)).json();
     },
   });
+}
+
+export function apiQuery_habit_n(id: number) {
+  return {
+    queryKey: queryKeys.habit_n(id),
+    queryFn: async () => {
+      return await (
+        await fetch(API_URL + Api.Habit.path.replace(":id", id.toString()))
+      ).json();
+    },
+  };
+}
+
+export function useApiQuery_habit_n(id: number) {
+  return useQuery<Api.Habit.type>(apiQuery_habit_n(id));
 }
 
 export function useApiQuery_todos() {
@@ -48,6 +64,33 @@ export function useApiQuery_journal() {
   });
 }
 
+export function useApiMutation_habit_track(id: number) {
+  return useMutation<
+    Api.Habit.Track.post_resp,
+    unknown,
+    Api.Habit.Track.post_type
+  >({
+    mutationFn: async (variables) => {
+      queryClient.invalidateQueries(queryKeys.habits);
+
+      try {
+        return (
+          await fetch(
+            API_URL + Api.Habit.Track.path.replace(":id", id.toString()),
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(variables),
+            }
+          )
+        ).json();
+      } catch {
+        // no check for now
+      }
+    },
+  });
+}
+
 export function useApiMutation_journal() {
   return useMutation<unknown, unknown, Api.Journal.type>({
     mutationFn: async (variables) => {
@@ -57,9 +100,7 @@ export function useApiMutation_journal() {
       try {
         await fetch(API_URL + Api.Journal.path, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(variables),
         });
       } catch {
@@ -70,8 +111,4 @@ export function useApiMutation_journal() {
       queryClient.invalidateQueries(queryKeys.journal);
     },
   });
-}
-
-export async function fetchHabit(id: number): Promise<Api.Habit.type> {
-  return (await fetch(API_URL + "/habit/" + id)).json();
 }

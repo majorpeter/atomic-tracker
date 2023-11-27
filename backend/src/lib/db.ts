@@ -68,6 +68,7 @@ export class TrackedHabit extends Model<
   InferAttributes<TrackedHabit>,
   InferCreationAttributes<TrackedHabit>
 > {
+  declare id: CreationOptional<number>;
   declare Habit?: NonAttribute<Habit>;
   declare HabitId: ForeignKey<Habit["id"]>;
   declare ownerId: number; //TODO foreign key later
@@ -77,6 +78,7 @@ export class TrackedHabit extends Model<
 
 TrackedHabit.init(
   {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     ownerId: { type: DataTypes.INTEGER },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,

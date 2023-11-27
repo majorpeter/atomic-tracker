@@ -81,7 +81,10 @@ export default function (app: Express) {
             HabitId: habit.id,
             createdAt: { [Op.gt]: historyStart },
           },
-          order: [[TrackedHabit.getAttributes().createdAt.field!, "DESC"]],
+          order: [
+            [TrackedHabit.getAttributes().createdAt.field!, "DESC"],
+            [TrackedHabit.getAttributes().updatedAt.field!, "DESC"],
+          ],
         });
 
         res.send({
@@ -92,6 +95,7 @@ export default function (app: Express) {
           historyLength: habit.historyLength,
           trackedInPeriod,
           history: trackedInHistory.map((item) => ({
+            id: item.id,
             date: item.createdAt.toISOString(),
           })),
         });
@@ -100,4 +104,19 @@ export default function (app: Express) {
       }
     }
   );
+
+  app.post<
+    Api.Habit.get_params,
+    Api.Habit.Track.post_resp,
+    Api.Habit.Track.post_type
+  >(Api.Habit.Track.path, async (req, res) => {
+    const record = await TrackedHabit.create({
+      ownerId: USER_ID,
+      HabitId: req.params.id,
+      createdAt: new Date(req.body.date),
+    });
+    res.send({
+      id: record.id,
+    });
+  });
 }
