@@ -13,6 +13,7 @@ export const queryKeys = {
   calendar: ["calendar"],
   journal_overview: ["journal"],
   journal_day: (date: Date) => ["journal", getIsoDate(date)],
+  projects_inprogress: ["projects", "inprogress"],
 };
 
 export function useApiQuery_habits() {
@@ -76,6 +77,15 @@ export function useApiQuery_journal_day(date: Date) {
             Api.Journal.Date.pathWithDate.replace(":date", getIsoDate(date))
         )
       ).json();
+    },
+  });
+}
+
+export function useApiQuery_projectsInProgress() {
+  return useQuery<Api.Projects.type>({
+    queryKey: queryKeys.projects_inprogress,
+    queryFn: async () => {
+      return await (await fetch(API_URL + Api.Projects.path)).json();
     },
   });
 }

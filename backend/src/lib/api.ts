@@ -105,4 +105,17 @@ export namespace Api {
       export type type = { text: string };
     }
   }
+
+  export namespace Projects {
+    export const path = "/api/projects/inprogress";
+    export type get_query = { dummy?: unknown };
+
+    export type type = {
+      id: number;
+      subject: string;
+      donePercent: number;
+      createdAt: string;
+      updatedAt: string;
+    }[];
+  }
 }

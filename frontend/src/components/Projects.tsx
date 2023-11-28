@@ -13,30 +13,14 @@ import {
 } from "@mui/joy";
 
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import { useApiQuery_projectsInProgress } from "../util/api-client";
 
 const INACTIVE_TIMEOUT_DAYS = 2;
 const STALE_TIMEOUT_DAYS = 7;
 
-const DUMMY_PROJECTS: {
-  title: string;
-  progressPercent: number;
-  lastChangedDaysAgo: number;
-}[] = [
-  { title: "Read Atomic Habits", lastChangedDaysAgo: 10, progressPercent: 95 },
-  { title: "Reorganize furniture", lastChangedDaysAgo: 6, progressPercent: 30 },
-  {
-    title: "Automate lights in living room",
-    lastChangedDaysAgo: 2,
-    progressPercent: 50,
-  },
-  {
-    title: "Develop habit tracker site",
-    progressPercent: 5,
-    lastChangedDaysAgo: 0,
-  },
-];
-
 const Projects: React.FC = () => {
+  const { data } = useApiQuery_projectsInProgress();
+
   return (
     <Card>
       <Typography fontSize="lg" fontWeight="lg">
@@ -45,49 +29,63 @@ const Projects: React.FC = () => {
       <Divider />
       <CardContent>
         <List>
-          {DUMMY_PROJECTS.map((item, index) => {
-            const isInactive = item.lastChangedDaysAgo >= INACTIVE_TIMEOUT_DAYS;
-            const isStale = item.lastChangedDaysAgo >= STALE_TIMEOUT_DAYS;
+          {data &&
+            data
+              .map((item) => ({
+                ...item,
+                lastChangedDaysAgo:
+                  (new Date().getTime() - new Date(item.updatedAt).getTime()) /
+                  (24 * 3600 * 1000),
+              }))
+              .sort((a, b) => b.lastChangedDaysAgo - a.lastChangedDaysAgo)
+              .map((item) => {
+                const isInactive =
+                  item.lastChangedDaysAgo >= INACTIVE_TIMEOUT_DAYS;
+                const isStale = item.lastChangedDaysAgo >= STALE_TIMEOUT_DAYS;
 
-            return (
-              <ListItem key={index}>
-                <ListItemDecorator sx={{ mr: 1 }}>
-                  <CircularProgress
-                    determinate={isInactive}
-                    value={item.progressPercent}
-                    title={item.progressPercent + "%"}
-                    color={
-                      isStale ? "danger" : isInactive ? "neutral" : "success"
-                    }
-                  >
-                    <Typography fontSize="12px">
-                      {item.progressPercent}%
-                    </Typography>
-                  </CircularProgress>
-                </ListItemDecorator>
-                {item.title}
-                {item.lastChangedDaysAgo > 0 && (
-                  <ListItemDecorator sx={{ ml: "auto" }}>
-                    <Typography
-                      color={isStale ? "danger" : undefined}
-                      fontWeight={isStale ? "lg" : undefined}
-                      sx={{ opacity: Math.min(item.lastChangedDaysAgo, 5) / 5 }}
-                    >
-                      {item.lastChangedDaysAgo} days ago
-                    </Typography>
-                  </ListItemDecorator>
-                )}
-              </ListItem>
-            );
-          })}
+                return (
+                  <ListItem key={item.id}>
+                    <ListItemDecorator sx={{ mr: 1 }}>
+                      <CircularProgress
+                        determinate={isInactive}
+                        value={item.donePercent}
+                        title={item.donePercent + "%"}
+                        color={
+                          isStale
+                            ? "danger"
+                            : isInactive
+                            ? "neutral"
+                            : "success"
+                        }
+                      >
+                        <Typography fontSize="12px">
+                          {item.donePercent}%
+                        </Typography>
+                      </CircularProgress>
+                    </ListItemDecorator>
+                    {item.subject}
+                    {item.lastChangedDaysAgo >= 1 && (
+                      <ListItemDecorator sx={{ ml: "auto" }}>
+                        <Typography
+                          color={isStale ? "danger" : undefined}
+                          fontWeight={isStale ? "lg" : undefined}
+                          sx={{
+                            opacity: Math.min(item.lastChangedDaysAgo, 5) / 5,
+                          }}
+                        >
+                          {Math.floor(item.lastChangedDaysAgo)} days ago
+                        </Typography>
+                      </ListItemDecorator>
+                    )}
+                  </ListItem>
+                );
+              })}
         </List>
       </CardContent>
       <CardOverflow variant="soft">
         <Divider inset="context" />
         <CardActions>
-          <Typography mr="auto">
-            {DUMMY_PROJECTS.length} projects in progress
-          </Typography>
+          <Typography mr="auto">{data?.length} projects in progress</Typography>
           <Button startDecorator={<OpenInNewIcon />}>Open Projects</Button>
         </CardActions>
       </CardOverflow>

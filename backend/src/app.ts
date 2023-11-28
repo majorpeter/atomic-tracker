@@ -5,6 +5,7 @@ import habits from "./controllers/habits";
 import todos from "./controllers/todos";
 import calendar from "./controllers/calendar";
 import journal from "./controllers/journal";
+import projects from "./controllers/projects";
 
 const PORT = 8080;
 const FRONTEND_RELATIVE_PATH = "../../frontend/dist";
@@ -38,6 +39,7 @@ habits(app);
 todos(app);
 calendar(app);
 journal(app);
+projects(app);
 
 /**
  * default route gets frontend's index.html
