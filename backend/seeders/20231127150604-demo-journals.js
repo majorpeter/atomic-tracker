@@ -1,7 +1,10 @@
 "use strict";
 
-function dateToStr(date) {
-  return date.toJSON().substr(0, 10);
+function dateToNumber(date) {
+  const value = date.toJSON();
+  return parseInt(
+    value.substring(0, 4) + value.substring(5, 7) + value.substring(8, 10)
+  );
 }
 
 /** @type {import('sequelize-cli').Migration} */
@@ -15,7 +18,7 @@ module.exports = {
 
     await queryInterface.bulkInsert("Journals", [
       {
-        date: dateToStr(day2_before),
+        date: dateToNumber(day2_before),
         content: "Dummy text for 2 days ago",
         count: 1,
         ownerId: 0,
@@ -23,7 +26,7 @@ module.exports = {
         updatedAt: day2_before,
       },
       {
-        date: dateToStr(day1_before),
+        date: dateToNumber(day1_before),
         content: "Dummy content for yesterday\n2nd line",
         count: 2,
         ownerId: 0,
@@ -31,7 +34,7 @@ module.exports = {
         updatedAt: day1_before,
       },
       {
-        date: dateToStr(today),
+        date: dateToNumber(today),
         content:
           "I saw a cute dog today\nhad lunch with a friend\nwatched the latest episode of my show\nwalk in the park",
         count: 4,

@@ -1,23 +1,28 @@
 import {
+  Box,
   Button,
   Card,
   CardActions,
   CardContent,
   CardOverflow,
+  Chip,
   Divider,
   Typography,
 } from "@mui/joy";
 
 import EditIcon from "@mui/icons-material/Edit";
+import ClearIcon from "@mui/icons-material/Clear";
 
 import { Link } from "react-router-dom";
 
 import { journalEditorRoute } from "../pages/JournalEditorModal";
 
-import { useApiQuery_journal_day } from "../util/api-client";
+import { useApiQuery_journalOverview } from "../util/api-client";
+
+const COUNT_TARGET = 3;
 
 const Journal: React.FC = () => {
-  const { data } = useApiQuery_journal_day(new Date());
+  const { data } = useApiQuery_journalOverview();
 
   return (
     <Card>
@@ -27,12 +32,35 @@ const Journal: React.FC = () => {
       <Divider />
       <CardContent>
         {data &&
-          data.text.split("\n").map((item, index) => <p key={index}>{item}</p>)}
+          data.textToday
+            .split("\n")
+            .map((item, index) => <p key={index}>{item}</p>)}
       </CardContent>
       <CardOverflow variant="soft">
         <Divider inset="context" />
         <CardActions>
-          <div>{/* required for button sizing (not only child) */}</div>
+          <Box sx={{ "& > *": { mr: 1 } }}>
+            {data &&
+              data.history.map((item) =>
+                item.count ? (
+                  <Chip
+                    key={item.date}
+                    size="lg"
+                    color={item.count < COUNT_TARGET ? "primary" : "success"}
+                    title={item.date}
+                  >
+                    <Typography fontSize="lg" fontWeight="lg">
+                      {item.count}
+                    </Typography>
+                  </Chip>
+                ) : (
+                  <Chip key={item.date} color="danger" title={item.date}>
+                    <ClearIcon />
+                  </Chip>
+                )
+              )}
+          </Box>
+
           <Button
             component={Link}
             to={journalEditorRoute.path!}

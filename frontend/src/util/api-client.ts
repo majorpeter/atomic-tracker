@@ -11,7 +11,7 @@ export const queryKeys = {
   habit_n: (id: number) => ["habits", id.toString()],
   todos: ["todos"],
   calendar: ["calendar"],
-  journal_all: ["journal"],
+  journal_overview: ["journal"],
   journal_day: (date: Date) => ["journal", getIsoDate(date)],
 };
 
@@ -57,13 +57,23 @@ export function useApiQuery_calendar() {
   });
 }
 
-export function useApiQuery_journal_day(date: Date) {
+export function useApiQuery_journalOverview() {
   return useQuery<Api.Journal.type>({
+    queryKey: queryKeys.journal_overview,
+    queryFn: async () => {
+      return await (await fetch(API_URL + Api.Journal.path)).json();
+    },
+  });
+}
+
+export function useApiQuery_journal_day(date: Date) {
+  return useQuery<Api.Journal.Date.type>({
     queryKey: queryKeys.journal_day(date),
     queryFn: async () => {
       return await (
         await fetch(
-          API_URL + Api.Journal.pathWithDate.replace(":date", getIsoDate(date))
+          API_URL +
+            Api.Journal.Date.pathWithDate.replace(":date", getIsoDate(date))
         )
       ).json();
     },
@@ -115,12 +125,13 @@ export function useApiMutation_journal() {
   return useMutation<
     unknown,
     unknown,
-    { payload: Api.Journal.type; date: Date }
+    { payload: Api.Journal.Date.type; date: Date }
   >({
     mutationFn: async ({ payload, date }) => {
       try {
         await fetch(
-          API_URL + Api.Journal.pathWithDate.replace(":date", getIsoDate(date)),
+          API_URL +
+            Api.Journal.Date.pathWithDate.replace(":date", getIsoDate(date)),
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -132,7 +143,8 @@ export function useApiMutation_journal() {
       }
 
       // refetch to sync either way
-      queryClient.invalidateQueries(queryKeys.journal_day(date));
+      // invalidate all journals in case 'today' was edited
+      queryClient.invalidateQueries(queryKeys.journal_overview);
     },
   });
 }

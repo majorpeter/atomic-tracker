@@ -86,9 +86,20 @@ export namespace Api {
   }
 
   export namespace Journal {
-    export const pathWithDate = "/journal/:date";
-    export type params = { date: string };
+    export const path = "/journal";
+    export type type = {
+      textToday: string;
+      history: {
+        date: string;
+        count: number;
+      }[];
+    };
 
-    export type type = { text: string };
+    export namespace Date {
+      export const pathWithDate = "/journal/:date";
+      export type params = { date: string };
+
+      export type type = { text: string };
+    }
   }
 }

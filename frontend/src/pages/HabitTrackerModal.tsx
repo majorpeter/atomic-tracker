@@ -34,7 +34,7 @@ import {
   useApiQuery_habit_n,
 } from "../util/api-client";
 
-import { formatDate } from "../util/formatter";
+import { formatDate, getIsoDate } from "../util/formatter";
 import { getHabitIconByName } from "../util/habit-icons";
 
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -69,10 +69,6 @@ const HabitTrackerModal: React.FC = () => {
     useApiMutation_habit_track_delete();
 
   const Icon = getHabitIconByName(data?.iconName);
-
-  const date = new Date();
-  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-  const dateStr = date.toJSON().slice(0, 10);
 
   return (
     data && (
@@ -160,7 +156,7 @@ const HabitTrackerModal: React.FC = () => {
               slotProps={{
                 input: {
                   ref: dateInputRef,
-                  defaultValue: dateStr,
+                  defaultValue: getIsoDate(new Date()),
                   disabled: trackPosting,
                 },
               }}

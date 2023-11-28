@@ -1,17 +1,55 @@
 import { Express } from "express";
 import { Api } from "../lib/api";
 import { Journal } from "../lib/db";
+import { getIsoDate } from "../lib/formatter";
+import { Op } from "sequelize";
 
 //TODO multiuser support
 const USER_ID = 0;
+const HISTORY_LENGTH = 7;
 
 export default function (app: Express) {
-  app.get<Api.Journal.params, Api.Journal.type>(
-    Api.Journal.pathWithDate,
+  app.get<{}, Api.Journal.type>(Api.Journal.path, async (_, res) => {
+    const today = await Journal.findOne({
+      where: {
+        date: Journal.dateToRawValue(getIsoDate(new Date())),
+      },
+    });
+
+    const historyStartDateRaw =
+      Journal.dateToRawValue(getIsoDate(new Date())) - HISTORY_LENGTH;
+    const historyEntries = await Journal.findAll({
+      where: {
+        date: { [Op.gte]: historyStartDateRaw },
+      },
+      attributes: [
+        Journal.getAttributes().date.field!,
+        Journal.getAttributes().count.field!,
+      ],
+      order: [[Journal.getAttributes().date.field!, "ASC"]],
+    });
+
+    res.send({
+      textToday: today ? today.content : "",
+      history: [...Array(HISTORY_LENGTH).keys()].map((item) => {
+        const dateRaw = historyStartDateRaw + item;
+        return {
+          date: Journal.rawToIsoDateValue(dateRaw),
+          count:
+            historyEntries.find(
+              (value) => value.dataValues.date == dateRaw.toString()
+            )?.count || 0,
+        };
+      }),
+    });
+  });
+
+  app.get<Api.Journal.Date.params, Api.Journal.Date.type>(
+    Api.Journal.Date.pathWithDate,
     async (req, res) => {
       const journal = await Journal.findOne({
         where: {
-          date: req.params.date,
+          date: Journal.dateToRawValue(req.params.date),
         },
       });
 
@@ -23,13 +61,13 @@ export default function (app: Express) {
     }
   );
 
-  app.post<Api.Journal.params, {}, Api.Journal.type>(
-    Api.Journal.pathWithDate,
+  app.post<Api.Journal.Date.params, {}, Api.Journal.Date.type>(
+    Api.Journal.Date.pathWithDate,
     async (req, res) => {
       const journal = await Journal.findOne({
         where: {
           ownerId: USER_ID,
-          date: req.params.date,
+          date: Journal.dateToRawValue(req.params.date),
         },
       });
 
