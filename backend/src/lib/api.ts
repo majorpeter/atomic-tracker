@@ -88,7 +88,10 @@ export namespace Api {
   export namespace Journal {
     export const path = "/journal";
     export type type = {
-      textToday: string;
+      today: {
+        text: string;
+        count: number;
+      };
       history: {
         date: string;
         count: number;

@@ -7,6 +7,7 @@ import {
   CardOverflow,
   Chip,
   Divider,
+  Stack,
   Typography,
 } from "@mui/joy";
 
@@ -26,13 +27,18 @@ const Journal: React.FC = () => {
 
   return (
     <Card>
-      <Typography fontSize="lg" fontWeight="lg">
-        Journal
-      </Typography>
+      <Stack direction="row">
+        <Typography fontSize="lg" fontWeight="lg">
+          Journal
+        </Typography>
+        <Typography fontSize="md" sx={{ ml: "auto" }} title="Number of entries">
+          {data?.today.count}
+        </Typography>
+      </Stack>
       <Divider />
       <CardContent>
         {data &&
-          data.textToday
+          data.today.text
             .split("\n")
             .map((item, index) => <p key={index}>{item}</p>)}
       </CardContent>

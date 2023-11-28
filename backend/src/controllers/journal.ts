@@ -30,7 +30,12 @@ export default function (app: Express) {
     });
 
     res.send({
-      textToday: today ? today.content : "",
+      today: today
+        ? {
+            text: today.content,
+            count: today.count,
+          }
+        : { text: "", count: 0 },
       history: [...Array(HISTORY_LENGTH).keys()].map((item) => {
         const dateRaw = historyStartDateRaw + item;
         return {
