@@ -6,6 +6,7 @@ import {
   CardOverflow,
   CircularProgress,
   Divider,
+  Link,
   List,
   ListItem,
   ListItemDecorator,
@@ -30,7 +31,7 @@ const Projects: React.FC = () => {
       <CardContent>
         <List>
           {data &&
-            data
+            data.inprogress
               .map((item) => ({
                 ...item,
                 lastChangedDaysAgo:
@@ -63,7 +64,9 @@ const Projects: React.FC = () => {
                         </Typography>
                       </CircularProgress>
                     </ListItemDecorator>
-                    {item.subject}
+                    <Link href={item.url} target="_blank">
+                      {item.subject}
+                    </Link>
                     {item.lastChangedDaysAgo >= 1 && (
                       <ListItemDecorator sx={{ ml: "auto" }}>
                         <Typography
@@ -85,8 +88,17 @@ const Projects: React.FC = () => {
       <CardOverflow variant="soft">
         <Divider inset="context" />
         <CardActions>
-          <Typography mr="auto">{data?.length} projects in progress</Typography>
-          <Button startDecorator={<OpenInNewIcon />}>Open Projects</Button>
+          <Typography mr="auto">
+            {data && `${data.inprogress.length} projects in progress`}
+          </Typography>
+          <Button
+            component={Link}
+            href={data?.url}
+            target="_blank"
+            startDecorator={<OpenInNewIcon />}
+          >
+            Open Projects
+          </Button>
         </CardActions>
       </CardOverflow>
     </Card>

@@ -23,15 +23,17 @@ function getElementText(key: string, element: any): string {
   return item.elements[0].text;
 }
 
-export async function fetchInProgress(): Promise<
-  {
+export async function fetchInProgress(): Promise<{
+  inprogress: {
     id: number;
     subject: string;
     donePercent: number;
     createdAt: string;
     updatedAt: string;
-  }[]
-> {
+    url: string;
+  }[];
+  url: string;
+}> {
   const config = await getConfig();
   const url =
     config.url +
@@ -51,11 +53,15 @@ export async function fetchInProgress(): Promise<
   const body = resp.body.read().toString();
   const js: any[] = xml2js(body).elements[0].elements;
 
-  return js.map((item) => ({
-    id: parseInt(getElementText("id", item)),
-    subject: getElementText("subject", item),
-    donePercent: parseInt(getElementText("done_ratio", item)),
-    createdAt: getElementText("created_on", item),
-    updatedAt: getElementText("updated_on", item),
-  }));
+  return {
+    inprogress: js.map((item) => ({
+      id: parseInt(getElementText("id", item)),
+      subject: getElementText("subject", item),
+      donePercent: parseInt(getElementText("done_ratio", item)),
+      createdAt: getElementText("created_on", item),
+      updatedAt: getElementText("updated_on", item),
+      url: config.url + "/issues/" + getElementText("id", item),
+    })),
+    url: config.url,
+  };
 }

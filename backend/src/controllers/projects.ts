@@ -27,8 +27,8 @@ export default function (app: Express) {
     if (req.query.dummy === undefined) {
       res.send(await fetchInProgress());
     } else {
-      res.send(
-        DUMMY_PROJECTS.map((item, index) => {
+      res.send({
+        inprogress: DUMMY_PROJECTS.map((item, index) => {
           const date = new Date();
           date.setDate(date.getDate() - item.lastChangedDaysAgo);
           return {
@@ -38,8 +38,8 @@ export default function (app: Express) {
             createdAt: date.toISOString(),
             updatedAt: date.toISOString(),
           };
-        })
-      );
+        }),
+      });
     }
   });
 }

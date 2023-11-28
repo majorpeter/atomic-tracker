@@ -111,11 +111,15 @@ export namespace Api {
     export type get_query = { dummy?: unknown };
 
     export type type = {
-      id: number;
-      subject: string;
-      donePercent: number;
-      createdAt: string;
-      updatedAt: string;
-    }[];
+      inprogress: {
+        id: number;
+        subject: string;
+        donePercent: number;
+        createdAt: string;
+        updatedAt: string;
+        url?: string;
+      }[];
+      url?: string;
+    };
   }
 }
