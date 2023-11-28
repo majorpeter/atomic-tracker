@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 
 import habits from "./controllers/habits";
 import todos from "./controllers/todos";
@@ -6,6 +7,7 @@ import calendar from "./controllers/calendar";
 import journal from "./controllers/journal";
 
 const PORT = 8080;
+const FRONTEND_RELATIVE_PATH = "../../frontend/dist";
 
 const app = express();
 app.listen(PORT, () => {
@@ -30,7 +32,17 @@ app.use((req, _, next) => {
   next();
 });
 
+app.use(express.static(path.resolve(__dirname, FRONTEND_RELATIVE_PATH)));
+
 habits(app);
 todos(app);
 calendar(app);
 journal(app);
+
+/**
+ * default route gets frontend's index.html
+ * @note this is required to allow page reloads on routes that react-router generates
+ */
+app.get("*", (_, res) => {
+  res.sendFile(path.resolve(__dirname, FRONTEND_RELATIVE_PATH, "index.html"));
+});

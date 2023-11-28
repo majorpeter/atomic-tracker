@@ -1,6 +1,6 @@
 export namespace Api {
   export namespace Habits {
-    export const path = "/habits";
+    export const path = "/api/habits";
 
     export type type = {
       id: number;
@@ -13,7 +13,7 @@ export namespace Api {
   }
 
   export namespace Habit {
-    export const path = "/habit/:id";
+    export const path = "/api/habit/:id";
     export type get_params = { id: number };
 
     export type type = {
@@ -30,7 +30,7 @@ export namespace Api {
     };
 
     export namespace Track {
-      export const path = "/habit/track";
+      export const path = "/api/habit/track";
       export const pathWithId = "/habit/track/:id";
       export type deleteParams = { id: number };
 
@@ -45,7 +45,7 @@ export namespace Api {
   }
 
   export namespace Todos {
-    export const path = "/todos";
+    export const path = "/api/todos";
 
     export type type = {
       todos: {
@@ -62,7 +62,7 @@ export namespace Api {
   }
 
   export namespace Calendar {
-    export const path = "/calendar";
+    export const path = "/api/calendar";
 
     type EventList = {
       summary: string;
@@ -86,7 +86,7 @@ export namespace Api {
   }
 
   export namespace Journal {
-    export const path = "/journal";
+    export const path = "/api/journal";
     export type type = {
       today: {
         text: string;
@@ -99,7 +99,7 @@ export namespace Api {
     };
 
     export namespace Date {
-      export const pathWithDate = "/journal/:date";
+      export const pathWithDate = "/api/journal/:date";
       export type params = { date: string };
 
       export type type = { text: string };
