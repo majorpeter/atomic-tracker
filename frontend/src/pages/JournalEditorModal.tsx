@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { RouteObject, useNavigate } from "react-router-dom";
+import { RouteObject, useNavigate, useParams } from "react-router-dom";
 
 import {
   Box,
@@ -27,36 +27,35 @@ import { getIsoDate } from "../util/formatter";
 
 const JournalEditorModal: React.FC = () => {
   const navigate = useNavigate();
+  const params = useParams<{ date: string }>();
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
-  const [date, setDate] = useState<Date>(new Date());
   const [userInput, setUserInput] = useState<string | undefined>();
-  const { data } = useApiQuery_journal_day(date);
+  const { data } = useApiQuery_journal_day(new Date(params.date!));
 
   const { mutate: mutateSave, isLoading: isSaving } = useApiMutation_journal();
 
+  function navigateToDate(date: Date) {
+    navigate(journalEditorRoute.path!.replace(":date", getIsoDate(date)));
+  }
+
   function handleDayPrev() {
-    setDate((prev) => {
-      const d = new Date(prev);
-      d.setDate(d.getDate() - 1);
-      return d;
-    });
+    const d = new Date(params.date!);
+    d.setDate(d.getDate() - 1);
+    navigateToDate(d);
+
     setUserInput(undefined);
   }
 
   function handleDayNext() {
-    setDate((prev) => {
-      const d = new Date(prev);
-      d.setDate(d.getDate() + 1);
-      return d;
-    });
-    setUserInput(undefined);
+    const d = new Date(params.date!);
+    d.setDate(d.getDate() + 1);
+    navigateToDate(d);
   }
 
   function handleDayChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setDate(new Date(event.target.value));
-    setUserInput(undefined);
+    navigateToDate(new Date(event.target.value));
   }
 
   function handleInput(event: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -72,7 +71,7 @@ const JournalEditorModal: React.FC = () => {
   function handleSave() {
     mutateSave({
       payload: { text: textAreaRef.current!.value },
-      date: date,
+      date: new Date(params.date!),
     });
   }
 
@@ -91,7 +90,7 @@ const JournalEditorModal: React.FC = () => {
               slotProps={{
                 input: {
                   type: "date",
-                  value: getIsoDate(date),
+                  value: params.date,
                   onChange: handleDayChange,
                   disabled: isSaving,
                 },
@@ -103,11 +102,18 @@ const JournalEditorModal: React.FC = () => {
           </Box>
 
           <Textarea
-            slotProps={{ textarea: { ref: textAreaRef } }}
-            minRows={3}
+            slotProps={{
+              textarea: {
+                ref: textAreaRef,
+              },
+            }}
             value={userInput || data?.text}
             onChange={handleInput}
             disabled={isSaving}
+            sx={{
+              width: 400,
+              height: 200,
+            }}
           ></Textarea>
         </DialogContent>
         <DialogActions>
@@ -124,7 +130,7 @@ const JournalEditorModal: React.FC = () => {
 };
 
 export const journalEditorRoute: RouteObject = {
-  path: "/journal",
+  path: "/journal/:date",
   element: <JournalEditorModal />,
 };
 

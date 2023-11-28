@@ -19,6 +19,7 @@ import { Link } from "react-router-dom";
 import { journalEditorRoute } from "../pages/JournalEditorModal";
 
 import { useApiQuery_journalOverview } from "../util/api-client";
+import { getIsoDate } from "../util/formatter";
 
 const COUNT_TARGET = 3;
 
@@ -47,29 +48,42 @@ const Journal: React.FC = () => {
         <CardActions>
           <Box sx={{ "& > *": { mr: 1 } }}>
             {data &&
-              data.history.map((item) =>
-                item.count ? (
+              data.history.map((item) => {
+                const to = journalEditorRoute.path!.replace(":date", item.date);
+
+                return item.count ? (
                   <Chip
                     key={item.date}
                     size="lg"
                     color={item.count < COUNT_TARGET ? "primary" : "success"}
                     title={item.date}
+                    component={Link}
+                    to={to}
                   >
                     <Typography fontSize="lg" fontWeight="lg">
                       {item.count}
                     </Typography>
                   </Chip>
                 ) : (
-                  <Chip key={item.date} color="danger" title={item.date}>
+                  <Chip
+                    key={item.date}
+                    color="danger"
+                    title={item.date}
+                    component={Link}
+                    to={to}
+                  >
                     <ClearIcon />
                   </Chip>
-                )
-              )}
+                );
+              })}
           </Box>
 
           <Button
             component={Link}
-            to={journalEditorRoute.path!}
+            to={journalEditorRoute.path!.replace(
+              ":date",
+              getIsoDate(new Date())
+            )}
             sx={{ ml: "auto" }}
           >
             <EditIcon />
