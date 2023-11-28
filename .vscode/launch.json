@@ -7,9 +7,11 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
+      "name": "Launch Backend",
       "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}/backend/dist/app.js",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "dev"],
+      "cwd": "${workspaceFolder}/backend",
       "outFiles": ["${workspaceFolder}/**/*.js"]
     }
   ]
