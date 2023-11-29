@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 
 import { Button, Stack, Typography } from "@mui/joy";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 import { LANG, getIsoDate } from "../../util/formatter";
 import { journalEditorRoute } from "../../pages/Dashboard/JournalEditorModal";
+import { configPageRoute } from "../../pages/ConfigPage";
 
 function greetingForTime(date: Date) {
   const h = date.getHours();
@@ -51,8 +53,12 @@ const GreetingClock: React.FC = () => {
           {time}
         </Typography>
       </Stack>
-      <Stack sx={{ ml: "auto", display: { sm: "none" } }}>
+      <Stack sx={{ ml: "auto" }}>
+        <Button sx={{ mb: 1 }} component={Link} to={configPageRoute.path!}>
+          <SettingsIcon />
+        </Button>
         <Button
+          sx={{ display: { sm: "none" } }}
           component={Link}
           to={journalEditorRoute.path!.replace(":date", getIsoDate(new Date()))}
           endDecorator={<KeyboardArrowRightIcon />}
