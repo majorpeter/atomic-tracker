@@ -6,6 +6,7 @@ import todos from "./controllers/todos";
 import calendar from "./controllers/calendar";
 import journal from "./controllers/journal";
 import projects from "./controllers/projects";
+import config from "./controllers/config";
 
 const PORT = 8080;
 const FRONTEND_RELATIVE_PATH = "../../frontend/dist";
@@ -40,6 +41,7 @@ todos(app);
 calendar(app);
 journal(app);
 projects(app);
+config(app);
 
 /**
  * default route gets frontend's index.html

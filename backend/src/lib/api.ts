@@ -123,4 +123,19 @@ export namespace Api {
       board_url?: string;
     };
   }
+
+  export namespace Config {
+    export namespace Habits {
+      export const path = "/api/config/habits";
+
+      export type type = {
+        id?: number;
+        name: string;
+        iconName: string;
+        targetValue: number;
+        periodLength: number;
+        historyLength: number;
+      }[];
+    }
+  }
 }

@@ -14,6 +14,7 @@ export const queryKeys = {
   journal_overview: ["journal"],
   journal_day: (date: Date) => ["journal", getIsoDate(date)],
   projects_inprogress: ["projects", "inprogress"],
+  config_habits: ["habits", "config"],
 };
 
 export function useApiQuery_habits() {
@@ -86,6 +87,15 @@ export function useApiQuery_projectsInProgress() {
     queryKey: queryKeys.projects_inprogress,
     queryFn: async () => {
       return await (await fetch(API_URL + Api.Projects.path)).json();
+    },
+  });
+}
+
+export function useApiQuery_config_habits() {
+  return useQuery<Api.Config.Habits.type>({
+    queryKey: queryKeys.config_habits,
+    queryFn: async () => {
+      return await (await fetch(API_URL + Api.Config.Habits.path)).json();
     },
   });
 }
