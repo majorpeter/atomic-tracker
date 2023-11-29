@@ -131,30 +131,26 @@ export function useApiMutation_habit_track_delete() {
   });
 }
 
-export function useApiMutation_journal() {
+export function useApiMutation_journal(onSuccess?: () => void) {
   return useMutation<
     unknown,
     unknown,
     { payload: Api.Journal.Date.type; date: Date }
   >({
     mutationFn: async ({ payload, date }) => {
-      try {
-        await fetch(
-          API_URL +
-            Api.Journal.Date.pathWithDate.replace(":date", getIsoDate(date)),
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          }
-        );
-      } catch {
-        // no action (invalidate is called either way)
-      }
+      await fetch(
+        API_URL +
+          Api.Journal.Date.pathWithDate.replace(":date", getIsoDate(date)),
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
 
-      // refetch to sync either way
       // invalidate all journals in case 'today' was edited
       queryClient.invalidateQueries(queryKeys.journal_overview);
     },
+    onSuccess,
   });
 }
