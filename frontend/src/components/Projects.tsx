@@ -92,7 +92,7 @@ const Projects: React.FC = () => {
             {data && `${data.inprogress.length} projects in progress`}
           </Typography>
           <Button
-            component={Link}
+            component="a"
             href={data?.url}
             target="_blank"
             startDecorator={<OpenInNewIcon />}
