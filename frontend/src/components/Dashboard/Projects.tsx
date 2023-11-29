@@ -14,7 +14,7 @@ import {
 } from "@mui/joy";
 
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import { useApiQuery_projectsInProgress } from "../util/api-client";
+import { useApiQuery_projectsInProgress } from "../../util/api-client";
 
 const INACTIVE_TIMEOUT_DAYS = 2;
 const STALE_TIMEOUT_DAYS = 7;

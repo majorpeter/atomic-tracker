@@ -12,7 +12,7 @@ import {
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import RepeatIcon from "@mui/icons-material/Repeat";
 
-import { useApiQuery_todos } from "../util/api-client";
+import { useApiQuery_todos } from "../../util/api-client";
 
 const Todos: React.FC<{ isFullscreen: boolean }> = ({ isFullscreen }) => {
   const { data } = useApiQuery_todos();

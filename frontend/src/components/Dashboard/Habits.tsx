@@ -1,6 +1,6 @@
 import { Grid } from "@mui/joy";
 import Habit from "./Habit";
-import { useApiQuery_habits } from "../util/api-client";
+import { useApiQuery_habits } from "../../util/api-client";
 
 const Habits: React.FC = () => {
   const { data } = useApiQuery_habits();

@@ -1,22 +1,25 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import {
+  RouterProvider,
+  createBrowserRouter,
+  redirect,
+} from "react-router-dom";
 import { QueryClientProvider } from "react-query";
 
 import App from "./App.tsx";
 import "./index.css";
 import { queryClient } from "./util/api-client.ts";
 
-import { habitTrackerRoute } from "./pages/HabitTrackerModal.tsx";
-import { todosModalRoute } from "./pages/TodosModal.tsx";
-import { journalEditorRoute } from "./pages/JournalEditorModal.tsx";
+import { dashboardRoute } from "./pages/Dashboard.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-    children: [todosModalRoute, journalEditorRoute, habitTrackerRoute],
+    loader: () => redirect(dashboardRoute.path!),
   },
+  dashboardRoute,
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

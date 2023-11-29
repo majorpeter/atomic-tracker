@@ -16,10 +16,10 @@ import ClearIcon from "@mui/icons-material/Clear";
 
 import { Link } from "react-router-dom";
 
-import { journalEditorRoute } from "../pages/JournalEditorModal";
+import { journalEditorRoute } from "../../pages/Dashboard/JournalEditorModal";
 
-import { useApiQuery_journalOverview } from "../util/api-client";
-import { getIsoDate } from "../util/formatter";
+import { useApiQuery_journalOverview } from "../../util/api-client";
+import { getIsoDate } from "../../util/formatter";
 
 const COUNT_TARGET = 3;
 

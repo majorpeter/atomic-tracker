@@ -9,8 +9,8 @@ import {
 
 import { RouteObject, useNavigate } from "react-router-dom";
 
-import Todos from "../components/Todos";
-import TodosActions from "../components/TodosActions";
+import Todos from "../../components/Dashboard/Todos";
+import TodosActions from "../../components/Dashboard/TodosActions";
 
 const TodosModal: React.FC = () => {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ const TodosModal: React.FC = () => {
 };
 
 export const todosModalRoute: RouteObject = {
-  path: "/todos",
+  path: "/dashboard/todos",
   element: <TodosModal />,
 };
 export default TodosModal;

@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import { Button, Stack, Typography } from "@mui/joy";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 
-import { LANG, getIsoDate } from "../util/formatter";
-import { journalEditorRoute } from "../pages/JournalEditorModal";
+import { LANG, getIsoDate } from "../../util/formatter";
+import { journalEditorRoute } from "../../pages/Dashboard/JournalEditorModal";
 
 function greetingForTime(date: Date) {
   const h = date.getHours();

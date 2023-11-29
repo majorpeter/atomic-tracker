@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 
 import Todos from "./Todos";
 import TodosActions from "./TodosActions";
-import { todosModalRoute } from "../pages/TodosModal";
+import { todosModalRoute } from "../../pages/Dashboard/TodosModal";
 
 const TodosCard: React.FC = () => {
   return (

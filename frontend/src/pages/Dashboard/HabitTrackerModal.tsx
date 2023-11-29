@@ -32,10 +32,10 @@ import {
   useApiMutation_habit_track,
   useApiMutation_habit_track_delete,
   useApiQuery_habit_n,
-} from "../util/api-client";
+} from "../../util/api-client";
 
-import { formatDate, getIsoDate } from "../util/formatter";
-import { getHabitIconByName } from "../util/habit-icons";
+import { formatDate, getIsoDate } from "../../util/formatter";
+import { getHabitIconByName } from "../../util/habit-icons";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -171,7 +171,7 @@ const HabitTrackerModal: React.FC = () => {
   );
 };
 
-const path = "/habit/:id";
+const path = "/dashboard/habit/:id";
 
 interface LoaderArgs extends LoaderFunctionArgs {
   params: Params<ParamParseKey<typeof path>>;

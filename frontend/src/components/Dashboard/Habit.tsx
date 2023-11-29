@@ -1,8 +1,8 @@
 import { Card, CardContent, CircularProgress, Typography } from "@mui/joy";
 
 import { Link } from "react-router-dom";
-import { habitTrackerRoute } from "../pages/HabitTrackerModal";
-import { getHabitIconByName } from "../util/habit-icons";
+import { habitTrackerRoute } from "../../pages/Dashboard/HabitTrackerModal";
+import { getHabitIconByName } from "../../util/habit-icons";
 
 export type HabitProps = {
   id: number;

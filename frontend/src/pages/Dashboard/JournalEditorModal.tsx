@@ -25,9 +25,9 @@ import WarningIcon from "@mui/icons-material/Warning";
 import {
   useApiMutation_journal,
   useApiQuery_journal_day,
-} from "../util/api-client";
+} from "../../util/api-client";
 
-import { getIsoDate } from "../util/formatter";
+import { getIsoDate } from "../../util/formatter";
 
 const JournalEditorModal: React.FC = () => {
   const navigate = useNavigate();
@@ -165,7 +165,7 @@ const JournalEditorModal: React.FC = () => {
 };
 
 export const journalEditorRoute: RouteObject = {
-  path: "/journal/:date",
+  path: "/dashboard/journal/:date",
   element: <JournalEditorModal />,
 };
 
