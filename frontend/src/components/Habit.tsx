@@ -30,18 +30,37 @@ const Habit: React.FC<HabitProps> = ({
         "&:hover": {
           boxShadow: "md",
           borderColor: "neutral.outlinedHoverBorder",
+          transform: "scale(1.05)",
         },
         textDecoration: "none",
       }}
       component={Link}
       to={habitTrackerRoute.path!.replace(":id", id.toString())}
     >
+      <Typography
+        level="body-md"
+        fontWeight="bold"
+        sx={{ display: { xs: undefined, sm: "none" } }}
+      >
+        {name}
+      </Typography>
       <CardContent orientation="horizontal">
-        <CircularProgress size="lg" determinate value={historicalPercent}>
+        <CircularProgress
+          sx={{
+            "--_root-size": { xs: "32px", sm: "64px" },
+            "--_progress-thickness": { xs: "2px", sm: "8px" },
+          }}
+          determinate
+          value={historicalPercent}
+        >
           <Icon />
         </CircularProgress>
         <CardContent>
-          <Typography level="body-md" fontWeight="bold">
+          <Typography
+            level="body-md"
+            fontWeight="bold"
+            sx={{ display: { xs: "none", sm: "block" } }}
+          >
             {name}
           </Typography>
           <Typography level="h3" color="neutral" sx={{ textAlign: "center" }}>

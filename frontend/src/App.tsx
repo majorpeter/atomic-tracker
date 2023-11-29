@@ -16,7 +16,7 @@ function App() {
       <Outlet />
       <GreetingClock />
       <Habits />
-      <Grid container spacing={2}>
+      <Grid container spacing={2} columns={{ xs: 5, sm: 12 }}>
         <Grid xs={7}>
           <TodosCard />
         </Grid>

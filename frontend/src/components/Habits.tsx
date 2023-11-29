@@ -6,10 +6,15 @@ const Habits: React.FC = () => {
   const { data } = useApiQuery_habits();
 
   return (
-    <Grid container spacing={2} sx={{ marginBottom: 1 }}>
+    <Grid
+      container
+      columns={{ xs: 2, sm: 2, md: 4 }}
+      spacing={{ xs: 1, sm: 2 }}
+      sx={{ marginBottom: 1 }}
+    >
       {data &&
         data.map((item, index) => (
-          <Grid key={index} xs="auto" md={3}>
+          <Grid key={index} xs={1}>
             <Habit {...item} />
           </Grid>
         ))}
