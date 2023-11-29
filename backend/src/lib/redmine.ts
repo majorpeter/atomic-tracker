@@ -6,6 +6,7 @@ import { xml2js } from "xml-js";
 
 async function getConfig(): Promise<{
   url: string;
+  board_url?: string;
   api_key: string;
   inprogress_status_id: number;
 }> {
@@ -33,6 +34,7 @@ export async function fetchInProgress(): Promise<{
     url: string;
   }[];
   url: string;
+  board_url?: string;
 }> {
   const config = await getConfig();
   const url =
@@ -63,5 +65,6 @@ export async function fetchInProgress(): Promise<{
       url: config.url + "/issues/" + getElementText("id", item),
     })),
     url: config.url,
+    board_url: config.board_url,
   };
 }

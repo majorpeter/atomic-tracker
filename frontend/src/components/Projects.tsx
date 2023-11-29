@@ -91,14 +91,26 @@ const Projects: React.FC = () => {
           <Typography mr="auto">
             {data && `${data.inprogress.length} projects in progress`}
           </Typography>
-          <Button
-            component="a"
-            href={data?.url}
-            target="_blank"
-            startDecorator={<OpenInNewIcon />}
-          >
-            Open Projects
-          </Button>
+          {data?.url && (
+            <Button
+              component="a"
+              href={data.url}
+              target="_blank"
+              startDecorator={<OpenInNewIcon />}
+            >
+              Open Projects
+            </Button>
+          )}
+          {data?.board_url && (
+            <Button
+              component="a"
+              href={data.board_url}
+              target="_blank"
+              startDecorator={<OpenInNewIcon />}
+            >
+              Agile board
+            </Button>
+          )}
         </CardActions>
       </CardOverflow>
     </Card>

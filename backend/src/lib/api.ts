@@ -120,6 +120,7 @@ export namespace Api {
         url?: string;
       }[];
       url?: string;
+      board_url?: string;
     };
   }
 }
