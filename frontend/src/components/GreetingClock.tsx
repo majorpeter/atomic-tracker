@@ -1,6 +1,11 @@
-import { Typography } from "@mui/joy";
 import { useEffect, useState } from "react";
-import { LANG } from "../util/formatter";
+import { Link } from "react-router-dom";
+
+import { Button, Stack, Typography } from "@mui/joy";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+
+import { LANG, getIsoDate } from "../util/formatter";
+import { journalEditorRoute } from "../pages/JournalEditorModal";
 
 function greetingForTime(date: Date) {
   const h = date.getHours();
@@ -36,15 +41,26 @@ const GreetingClock: React.FC = () => {
   });
 
   return (
-    <>
-      <Typography level="h3">{greetingForTime(now)}</Typography>
-      <p>
-        <strong>{day}</strong>, {date}
-      </p>
-      <Typography level="body-lg" fontWeight="lg">
-        {time}
-      </Typography>
-    </>
+    <Stack direction="row">
+      <Stack>
+        <Typography level="h3">{greetingForTime(now)}</Typography>
+        <p>
+          <strong>{day}</strong>, {date}
+        </p>
+        <Typography level="body-lg" fontWeight="lg">
+          {time}
+        </Typography>
+      </Stack>
+      <Stack sx={{ ml: "auto", display: { sm: "none" } }}>
+        <Button
+          component={Link}
+          to={journalEditorRoute.path!.replace(":date", getIsoDate(new Date()))}
+          endDecorator={<KeyboardArrowRightIcon />}
+        >
+          Journal
+        </Button>
+      </Stack>
+    </Stack>
   );
 };
 
