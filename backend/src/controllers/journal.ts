@@ -76,14 +76,19 @@ export default function (app: Express) {
         },
       });
 
-      const text = req.body.text;
-      const count = text.split("\n").length;
+      const textLines = req.body.text
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
+      const count = textLines.length;
+      const text = textLines.join("\n");
+
       if (journal) {
         journal.content = text;
         journal.count = count;
         await journal.save();
       } else {
-        Journal.create({
+        await Journal.create({
           date: req.params.date,
           content: text,
           count,
