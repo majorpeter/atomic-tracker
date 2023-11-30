@@ -13,6 +13,19 @@ import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import RepeatIcon from "@mui/icons-material/Repeat";
 
 import { useApiQuery_todos } from "../../util/api-client";
+import { formatDate, formatTime } from "../../util/formatter";
+
+/**
+ * @param due ISO date or datetime string
+ */
+function formatDueDate(due: string) {
+  if (due.includes("T")) {
+    const d = new Date(due);
+    return formatDate(d) + " " + formatTime(d);
+  } else {
+    return formatDate(new Date(due));
+  }
+}
 
 const Todos: React.FC<{ isFullscreen: boolean }> = ({ isFullscreen }) => {
   const { data } = useApiQuery_todos();
@@ -29,7 +42,7 @@ const Todos: React.FC<{ isFullscreen: boolean }> = ({ isFullscreen }) => {
                   color={pastDue ? "danger" : "neutral"}
                   fontWeight={pastDue ? "lg" : ""}
                 >
-                  {item.due}
+                  {formatDueDate(item.due)}
                 </Typography>
               </ListItemDecorator>
             ) : null;
