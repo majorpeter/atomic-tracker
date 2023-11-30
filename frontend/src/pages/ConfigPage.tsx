@@ -3,8 +3,8 @@ import { Link, RouteObject } from "react-router-dom";
 import { Tabs, TabList, Tab, TabPanel, Button, Sheet } from "@mui/joy";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 
-import UserPrefs from "./ConfigPage/UserPrefs";
-import Habits from "./ConfigPage/Habits";
+import UserPrefs from "../components/ConfigPage/UserPrefs";
+import Habits from "../components/ConfigPage/Habits";
 
 import { dashboardRoute } from "./Dashboard";
 
