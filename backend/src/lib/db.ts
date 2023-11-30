@@ -30,6 +30,8 @@ export class Habit extends Model<
   declare sortIndex: number;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+
+  declare Activities?: NonAttribute<Activity[]>;
 }
 
 Habit.init(
@@ -77,19 +79,61 @@ Habit.init(
   { sequelize: db }
 );
 
-export class TrackedHabit extends Model<
-  InferAttributes<TrackedHabit>,
-  InferCreationAttributes<TrackedHabit>
+export class Activity extends Model<
+  InferAttributes<Activity>,
+  InferCreationAttributes<Activity>
+> {
+  declare id: CreationOptional<number>;
+  declare name: string;
+  declare value: number;
+  declare Habit?: NonAttribute<Habit>;
+  declare HabitId: ForeignKey<Habit["id"]>;
+  declare ownerId: number; //TODO foreign key later
+  declare archived: CreationOptional<boolean>;
+}
+
+Activity.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    value: DataTypes.NUMBER,
+    ownerId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    archived: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+  },
+  { sequelize: db }
+);
+
+Habit.hasMany(Activity);
+Activity.belongsTo(Habit);
+
+export class TrackedActivity extends Model<
+  InferAttributes<TrackedActivity>,
+  InferCreationAttributes<TrackedActivity>
 > {
   declare id: CreationOptional<number>;
   declare Habit?: NonAttribute<Habit>;
   declare HabitId: ForeignKey<Habit["id"]>;
+  declare Activity?: NonAttribute<Activity>;
+  declare ActivityId: ForeignKey<Activity["id"]>;
   declare ownerId: number; //TODO foreign key later
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
 
-TrackedHabit.init(
+TrackedActivity.init(
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     ownerId: { type: DataTypes.INTEGER },
@@ -99,8 +143,10 @@ TrackedHabit.init(
   { sequelize: db }
 );
 
-Habit.hasMany(TrackedHabit);
-TrackedHabit.belongsTo(Habit);
+Habit.hasMany(TrackedActivity);
+TrackedActivity.belongsTo(Habit);
+Activity.hasMany(TrackedActivity);
+TrackedActivity.belongsTo(Activity);
 
 export class Journal extends Model<
   InferAttributes<Journal>,

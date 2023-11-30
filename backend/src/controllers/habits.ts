@@ -1,7 +1,7 @@
 import { Express } from "express";
 import { Api } from "../lib/api";
 
-import { Habit, TrackedHabit } from "../lib/db";
+import { Habit, TrackedActivity } from "../lib/db";
 import { Op } from "sequelize";
 
 //TODO multiuser support
@@ -25,7 +25,7 @@ export default function (app: Express) {
       historyStart.setDate(periodStart.getDate() - habit.historyLength);
 
       const trackedInPeriod = (
-        await TrackedHabit.findAll({
+        await TrackedActivity.findAll({
           where: {
             ownerId: USER_ID,
             HabitId: habit.id,
@@ -35,7 +35,7 @@ export default function (app: Express) {
       ).length;
 
       const trackedInHistory = (
-        await TrackedHabit.findAll({
+        await TrackedActivity.findAll({
           where: {
             ownerId: USER_ID,
             HabitId: habit.id,
@@ -78,7 +78,7 @@ export default function (app: Express) {
         const historyStart = new Date();
         historyStart.setDate(periodStart.getDate() - habit.historyLength);
 
-        const trackedInPeriod = await TrackedHabit.count({
+        const trackedInPeriod = await TrackedActivity.count({
           where: {
             ownerId: USER_ID,
             HabitId: habit.id,
@@ -86,15 +86,15 @@ export default function (app: Express) {
           },
         });
 
-        const trackedInHistory = await TrackedHabit.findAll({
+        const trackedInHistory = await TrackedActivity.findAll({
           where: {
             ownerId: USER_ID,
             HabitId: habit.id,
             createdAt: { [Op.gt]: historyStart },
           },
           order: [
-            [TrackedHabit.getAttributes().createdAt.field!, "DESC"],
-            [TrackedHabit.getAttributes().updatedAt.field!, "DESC"],
+            [TrackedActivity.getAttributes().createdAt.field!, "DESC"],
+            [TrackedActivity.getAttributes().updatedAt.field!, "DESC"],
           ],
         });
 
@@ -119,7 +119,7 @@ export default function (app: Express) {
   app.post<{}, Api.Habit.Track.post_resp, Api.Habit.Track.post_type>(
     Api.Habit.Track.path,
     async (req, res) => {
-      const record = await TrackedHabit.create({
+      const record = await TrackedActivity.create({
         ownerId: USER_ID,
         HabitId: req.body.habitId,
         createdAt: new Date(req.body.date),
@@ -131,7 +131,7 @@ export default function (app: Express) {
   );
 
   app.delete(Api.Habit.Track.pathWithId, async (req, res) => {
-    await TrackedHabit.destroy({
+    await TrackedActivity.destroy({
       where: {
         id: req.params.id,
         ownerId: USER_ID,

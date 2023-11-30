@@ -1,6 +1,6 @@
 import { Express } from "express";
 import { Api } from "../lib/api";
-import db, { Habit } from "../lib/db";
+import db, { Activity, Habit } from "../lib/db";
 import { Op } from "sequelize";
 
 //TODO multiuser support
@@ -15,6 +15,7 @@ export default function (app: Express) {
           ownerId: USER_ID,
           archived: false,
         },
+        include: [Activity],
         order: [[Habit.getAttributes().sortIndex.field!, "ASC"]],
       });
       const archived = await Habit.findAll({
@@ -32,7 +33,11 @@ export default function (app: Express) {
           targetValue: item.targetValue,
           periodLength: item.periodLength,
           historyLength: item.historyLength,
-          activities: [],
+          activities: item.Activities!.map((a) => ({
+            id: a.id,
+            name: a.name,
+            value: a.value,
+          })),
           archivedActivites: [],
         })),
         archived: archived.map((item) => ({
@@ -47,16 +52,32 @@ export default function (app: Express) {
     Api.Config.Habits.path,
     async (req, res) => {
       if (req.body.action == "add") {
-        const maxSortIndex = (await Habit.aggregate(
-          "sortIndex",
-          "MAX"
-        )) as number;
+        const { activities, archivedActivites: _, ...habit } = req.body.habit;
 
-        await Habit.create({
-          ...req.body.habit,
-          ownerId: USER_ID,
-          sortIndex: maxSortIndex + 1,
+        await db.transaction(async () => {
+          const maxSortIndex = (await Habit.aggregate(
+            "sortIndex",
+            "MAX"
+          )) as number;
+
+          const h = await Habit.create({
+            ...habit,
+            ownerId: USER_ID,
+            sortIndex: maxSortIndex + 1,
+          });
+
+          for (const a of activities) {
+            await Activity.create({
+              name: a.name,
+              value: a.value,
+              HabitId: h.id,
+              ownerId: USER_ID,
+            });
+          }
+
+          // archived activities cannot be created
         });
+
         res.sendStatus(200);
       } else if (req.body.action == "edit") {
         const habit = await Habit.findOne({
