@@ -15,6 +15,7 @@ export default function (app: Express) {
         ownerId: USER_ID,
         archived: false,
       },
+      order: [[Habit.getAttributes().sortIndex.field!, "ASC"]],
     });
 
     for (const habit of habits) {

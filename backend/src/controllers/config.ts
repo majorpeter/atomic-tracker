@@ -1,6 +1,7 @@
 import { Express } from "express";
 import { Api } from "../lib/api";
-import { Habit } from "../lib/db";
+import db, { Habit } from "../lib/db";
+import { Op } from "sequelize";
 
 //TODO multiuser support
 const USER_ID = 0;
@@ -14,6 +15,7 @@ export default function (app: Express) {
           ownerId: USER_ID,
           archived: false,
         },
+        order: [[Habit.getAttributes().sortIndex.field!, "ASC"]],
       });
       const archived = await Habit.findAll({
         where: {
@@ -43,9 +45,15 @@ export default function (app: Express) {
     Api.Config.Habits.path,
     async (req, res) => {
       if (req.body.action == "add") {
+        const maxSortIndex = (await Habit.aggregate(
+          "sortIndex",
+          "MAX"
+        )) as number;
+
         await Habit.create({
           ...req.body.habit,
           ownerId: USER_ID,
+          sortIndex: maxSortIndex + 1,
         });
         res.sendStatus(200);
       } else if (req.body.action == "edit") {
@@ -78,6 +86,50 @@ export default function (app: Express) {
         } else {
           res.sendStatus(404);
         }
+      } else if (req.body.action == "move") {
+        const { id, direction } = req.body;
+        await db.transaction<boolean>(async () => {
+          const item = await Habit.findOne({
+            where: { id: id, ownerId: USER_ID, archived: false },
+          });
+          if (!item) {
+            return false;
+          } else {
+            let other;
+            if (direction == "up") {
+              other = await Habit.findOne({
+                where: {
+                  sortIndex: { [Op.lt]: item.sortIndex },
+                  ownerId: USER_ID,
+                  archived: false,
+                },
+                order: [[Habit.getAttributes().sortIndex.field!, "DESC"]],
+              });
+            } else if (direction == "down") {
+              other = await Habit.findOne({
+                where: {
+                  sortIndex: { [Op.gt]: item.sortIndex },
+                  ownerId: USER_ID,
+                  archived: false,
+                },
+                order: [[Habit.getAttributes().sortIndex.field!, "ASC"]],
+              });
+            }
+
+            if (!other) {
+              return false;
+            }
+
+            const otherIndex = other.sortIndex;
+            other.sortIndex = item.sortIndex;
+            await other.save();
+            item.sortIndex = otherIndex;
+            await item.save();
+
+            return true;
+          }
+        });
+        res.send(200);
       } else {
         res.sendStatus(400);
       }

@@ -228,3 +228,26 @@ export function useApiMutation_config_habits_unarchive() {
     },
   });
 }
+
+export function useApiMutation_config_habits_move() {
+  return useMutation<
+    unknown,
+    unknown,
+    { id: number; direction: "up" | "down" }
+  >({
+    mutationFn: async ({ id, direction }) => {
+      const body: Api.Config.Habits.post_type = {
+        action: "move",
+        id,
+        direction,
+      };
+      await fetch(API_URL + Api.Config.Habits.path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      queryClient.invalidateQueries(queryKeys.habits);
+    },
+  });
+}

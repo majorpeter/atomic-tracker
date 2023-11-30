@@ -27,6 +27,7 @@ export class Habit extends Model<
   declare historyLength: number;
   declare ownerId: number; //TODO foreign key later
   declare archived: CreationOptional<boolean>;
+  declare sortIndex: number;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -40,9 +41,11 @@ Habit.init(
     },
     name: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
     iconName: {
       type: DataTypes.STRING,
+      allowNull: true,
     },
     targetValue: {
       type: DataTypes.INTEGER,
@@ -58,10 +61,15 @@ Habit.init(
     },
     ownerId: {
       type: DataTypes.INTEGER,
+      allowNull: false,
     },
     archived: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    sortIndex: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,

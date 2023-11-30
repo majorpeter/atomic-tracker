@@ -32,6 +32,7 @@ import {
   useApiMutation_config_habits_add,
   useApiMutation_config_habits_archive,
   useApiMutation_config_habits_edt,
+  useApiMutation_config_habits_move,
   useApiMutation_config_habits_unarchive,
   useApiQuery_config_habits,
 } from "../../util/api-client";
@@ -50,6 +51,7 @@ const Habits: React.FC = () => {
   const { mutate: habitArchiveMuate } = useApiMutation_config_habits_archive();
   const { mutate: habitUnarchiveMuate } =
     useApiMutation_config_habits_unarchive();
+  const { mutate: habitMoveMutate } = useApiMutation_config_habits_move();
 
   let habit: Api.Config.Habits.HabitDescriptor | null = null;
   if (data && selectedHabitId) {
@@ -100,6 +102,14 @@ const Habits: React.FC = () => {
 
   function handleUnarchiveClick(id: number) {
     habitUnarchiveMuate(id);
+  }
+
+  function handleMoveUpClick() {
+    habitMoveMutate({ id: selectedHabitId as number, direction: "up" });
+  }
+
+  function handleMoveDownClick() {
+    habitMoveMutate({ id: selectedHabitId as number, direction: "down" });
   }
 
   return (
@@ -180,10 +190,10 @@ const Habits: React.FC = () => {
               </Typography>
               {habit.id && (
                 <>
-                  <IconButton>
+                  <IconButton onClick={handleMoveUpClick}>
                     <KeyboardArrowUpIcon />
                   </IconButton>
-                  <IconButton>
+                  <IconButton onClick={handleMoveDownClick}>
                     <KeyboardArrowDownIcon />
                   </IconButton>
                   <IconButton

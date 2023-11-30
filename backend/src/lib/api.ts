@@ -146,7 +146,8 @@ export namespace Api {
         | { action: "archive"; id: number }
         | { action: "unarchive"; id: number }
         | { action: "add"; habit: HabitDescriptor }
-        | { action: "edit"; habit: Required<HabitDescriptor> };
+        | { action: "edit"; habit: Required<HabitDescriptor> }
+        | { action: "move"; direction: "up" | "down"; id: number };
     }
   }
 }
