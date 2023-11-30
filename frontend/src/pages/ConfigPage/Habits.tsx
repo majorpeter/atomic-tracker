@@ -18,6 +18,7 @@ import {
   RadioGroup,
   Sheet,
   Stack,
+  Table,
   Typography,
 } from "@mui/joy";
 
@@ -40,9 +41,13 @@ import { getHabitIconByName, getHabitIconNames } from "../../util/habit-icons";
 import { Api } from "@api";
 
 const Habits: React.FC = () => {
-  const [selectedHabitId, setSelectedHabitId] = useState<number | "new" | null>(
-    null
-  );
+  const [state, setState] = useState<{
+    selectedExistingHabitId?: number;
+    isCreatingNew: boolean;
+    habit?: Api.Config.Habits.HabitDescriptor;
+  }>({
+    isCreatingNew: false,
+  });
   const formRef = useRef<HTMLFormElement>(null);
 
   const { data } = useApiQuery_config_habits();
@@ -53,27 +58,36 @@ const Habits: React.FC = () => {
     useApiMutation_config_habits_unarchive();
   const { mutate: habitMoveMutate } = useApiMutation_config_habits_move();
 
-  let habit: Api.Config.Habits.HabitDescriptor | null = null;
-  if (data && selectedHabitId) {
-    if (selectedHabitId == "new") {
-      habit = {
+  function handleHabitSelection(id: number) {
+    if (data) {
+      setState({
+        isCreatingNew: false,
+        selectedExistingHabitId: id,
+        habit: JSON.parse(
+          JSON.stringify(data.habits.find((item) => item.id === id)) // create a deep copy
+        ),
+      });
+    }
+  }
+
+  function handleNewClick() {
+    setState({
+      isCreatingNew: true,
+      habit: {
         name: "New habit",
         iconName: "",
         targetValue: 1,
         periodLength: 7,
         historyLength: 14,
-      };
-    } else {
-      habit = data.habits.find((item) => item.id === selectedHabitId) || null;
-    }
-  }
-
-  function handleHabitSelection(id: number) {
-    setSelectedHabitId(id);
-  }
-
-  function handleNewClick() {
-    setSelectedHabitId("new");
+        activities: [
+          {
+            name: "Activity",
+            value: 1,
+          },
+        ],
+        archivedActivites: [],
+      },
+    });
   }
 
   function collectFormData(): Api.Config.Habits.HabitDescriptor {
@@ -84,20 +98,30 @@ const Habits: React.FC = () => {
       targetValue: parseInt(data.targetValue as string),
       periodLength: parseInt(data.periodLength as string),
       historyLength: parseInt(data.historyLength as string),
+      activities: [], //TODO!
+      archivedActivites: [],
     };
   }
 
   function handleAddClick() {
     habitAddMutate(collectFormData());
-    setSelectedHabitId(null);
+    setState({
+      isCreatingNew: false,
+    });
   }
 
   function handleSaveClick() {
-    habitEditMutate({ ...collectFormData(), id: selectedHabitId as number });
+    habitEditMutate({
+      ...collectFormData(),
+      id: state.selectedExistingHabitId!,
+    });
   }
 
   function handleArchiveClick() {
-    habitArchiveMuate(selectedHabitId as number);
+    habitArchiveMuate(state.selectedExistingHabitId!);
+    setState({
+      isCreatingNew: false,
+    });
   }
 
   function handleUnarchiveClick(id: number) {
@@ -105,18 +129,72 @@ const Habits: React.FC = () => {
   }
 
   function handleMoveUpClick() {
-    habitMoveMutate({ id: selectedHabitId as number, direction: "up" });
+    habitMoveMutate({ id: state.selectedExistingHabitId!, direction: "up" });
   }
 
   function handleMoveDownClick() {
-    habitMoveMutate({ id: selectedHabitId as number, direction: "down" });
+    habitMoveMutate({ id: state.selectedExistingHabitId!, direction: "down" });
+  }
+
+  function addActivityHandler() {
+    setState((prev) => {
+      const s: typeof state = JSON.parse(JSON.stringify(prev));
+      s.habit!.activities.push({
+        name: "New Activity",
+        value: 1,
+        id: s.habit!.activities.reduce(
+          (prev, item) => Math.min(item.id! - 1, prev),
+          -1
+        ),
+      });
+      return s;
+    });
+  }
+
+  function archiveActivityHandler(id: number) {
+    setState((prev) => {
+      const s: typeof state = JSON.parse(JSON.stringify(prev));
+
+      const item = s.habit!.activities.find((item) => item.id === id);
+      if (item?.id && item.id > 0) {
+        s.habit!.archivedActivites.push({
+          id: item.id,
+          name: item.name,
+        });
+      }
+
+      s.habit!.activities.splice(
+        s.habit!.activities.findIndex((item) => item.id! === id),
+        1
+      );
+      return s;
+    });
+  }
+
+  function unarchiveActivityHandler(id: number) {
+    setState((prev) => {
+      const s: typeof state = JSON.parse(JSON.stringify(prev));
+
+      const activity = s.habit!.archivedActivites.find((a) => a.id === id);
+      s.habit!.archivedActivites.splice(
+        s.habit!.archivedActivites.findIndex((a) => a.id === id)
+      );
+
+      s.habit!.activities.push({
+        id: activity!.id,
+        name: activity!.name,
+        value: 1,
+      });
+
+      return s;
+    });
   }
 
   return (
     <>
       <Stack direction="row">
         <Typography level="h2">All Habits</Typography>
-        {selectedHabitId != "new" && (
+        {!state.isCreatingNew && (
           <Button
             size="sm"
             startDecorator={<AddIcon />}
@@ -136,7 +214,7 @@ const Habits: React.FC = () => {
               <ListItemButton
                 key={item.id}
                 onClick={() => handleHabitSelection(item.id!)}
-                selected={item.id == selectedHabitId}
+                selected={item.id == state.selectedExistingHabitId}
               >
                 <ListItemDecorator>
                   <Icon />
@@ -181,14 +259,14 @@ const Habits: React.FC = () => {
         </AccordionGroup>
       )}
 
-      {habit && (
-        <Sheet key={habit.id} variant="outlined" sx={{ p: 3, mt: 3 }}>
+      {state.habit && (
+        <Sheet key={state.habit.id} variant="outlined" sx={{ p: 3, mt: 3 }}>
           <form ref={formRef}>
             <Stack direction="row" alignItems="center">
               <Typography level="h3" sx={{ mr: "auto" }}>
-                {habit.name}
+                {state.habit.name}
               </Typography>
-              {habit.id && (
+              {state.habit.id && (
                 <>
                   <IconButton onClick={handleMoveUpClick}>
                     <KeyboardArrowUpIcon />
@@ -209,12 +287,12 @@ const Habits: React.FC = () => {
             <Stack sx={{ "&>*": { mb: 2 } }}>
               <FormControl>
                 <FormLabel>Name</FormLabel>
-                <Input defaultValue={habit.name} name="name" />
+                <Input defaultValue={state.habit.name} name="name" />
               </FormControl>
               <FormControl>
                 <FormLabel>Target Value</FormLabel>
                 <Input
-                  defaultValue={habit.targetValue}
+                  defaultValue={state.habit.targetValue}
                   type="number"
                   name="targetValue"
                 />
@@ -226,7 +304,7 @@ const Habits: React.FC = () => {
               <FormControl>
                 <FormLabel>Period Length</FormLabel>
                 <Input
-                  defaultValue={habit.periodLength}
+                  defaultValue={state.habit.periodLength}
                   type="number"
                   name="periodLength"
                 />
@@ -235,7 +313,7 @@ const Habits: React.FC = () => {
               <FormControl>
                 <FormLabel>History Length</FormLabel>
                 <Input
-                  defaultValue={habit.historyLength}
+                  defaultValue={state.habit.historyLength}
                   type="number"
                   name="historyLength"
                 />
@@ -251,7 +329,7 @@ const Habits: React.FC = () => {
                   Icon
                 </FormLabel>
                 <RadioGroup
-                  defaultValue={habit.iconName}
+                  defaultValue={state.habit.iconName}
                   sx={{
                     flexDirection: "row",
                     alignItems: "baseline",
@@ -271,7 +349,81 @@ const Habits: React.FC = () => {
                   })}
                 </RadioGroup>
               </FormControl>
-              {habit.id ? (
+
+              <Stack direction="row">
+                <Typography level="h4" sx={{ mr: "auto" }}>
+                  Activities
+                </Typography>
+                <Button
+                  onClick={addActivityHandler}
+                  startDecorator={<AddIcon />}
+                >
+                  Add
+                </Button>
+              </Stack>
+              <Table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Score Value</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {state.habit.activities.map((activity) => (
+                    <tr key={activity.id!}>
+                      <td>
+                        <input
+                          name="activityId[]"
+                          type="hidden"
+                          value={activity.id}
+                        />
+                        <Input
+                          name="activityName[]"
+                          defaultValue={activity.name}
+                        />
+                      </td>
+                      <td>
+                        <Input
+                          name="activityValue[]"
+                          defaultValue={activity.value}
+                          type="number"
+                        />
+                      </td>
+                      <td>
+                        {state.habit!.activities!.length > 1 && (
+                          <IconButton
+                            onClick={() => archiveActivityHandler(activity.id!)}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+              {state.habit.archivedActivites.map((activity) => (
+                <Typography
+                  key={activity.id}
+                  endDecorator={
+                    <>
+                      <IconButton
+                        onClick={() => unarchiveActivityHandler(activity.id)}
+                      >
+                        <UnarchiveIcon />
+                      </IconButton>
+                      <IconButton color="danger">
+                        <DeleteIcon />
+                      </IconButton>
+                    </>
+                  }
+                >
+                  {activity.name}
+                </Typography>
+              ))}
+
+              {!state.isCreatingNew ? (
                 <Button onClick={handleSaveClick} startDecorator={<SaveIcon />}>
                   Save changes
                 </Button>

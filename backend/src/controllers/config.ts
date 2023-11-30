@@ -32,6 +32,8 @@ export default function (app: Express) {
           targetValue: item.targetValue,
           periodLength: item.periodLength,
           historyLength: item.historyLength,
+          activities: [],
+          archivedActivites: [],
         })),
         archived: archived.map((item) => ({
           id: item.id,

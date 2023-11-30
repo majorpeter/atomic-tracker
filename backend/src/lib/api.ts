@@ -135,6 +135,15 @@ export namespace Api {
         targetValue: number;
         periodLength: number;
         historyLength: number;
+        activities: {
+          id?: number;
+          name: string;
+          value: number;
+        }[];
+        archivedActivites: {
+          id: number;
+          name: string;
+        }[];
       };
 
       export type get_type = {
@@ -146,7 +155,10 @@ export namespace Api {
         | { action: "archive"; id: number }
         | { action: "unarchive"; id: number }
         | { action: "add"; habit: HabitDescriptor }
-        | { action: "edit"; habit: Required<HabitDescriptor> }
+        | {
+            action: "edit";
+            habit: HabitDescriptor & Pick<HabitDescriptor, "id">;
+          }
         | { action: "move"; direction: "up" | "down"; id: number };
     }
   }

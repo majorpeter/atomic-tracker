@@ -184,7 +184,8 @@ export function useApiMutation_config_habits_edt() {
   return useMutation<
     unknown,
     unknown,
-    Required<Api.Config.Habits.HabitDescriptor>
+    Api.Config.Habits.HabitDescriptor &
+      Pick<Api.Config.Habits.HabitDescriptor, "id">
   >({
     mutationFn: async (habit) => {
       const body: Api.Config.Habits.post_type = { action: "edit", habit };
