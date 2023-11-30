@@ -60,7 +60,11 @@ export default function (app: Express) {
           thisWeek: filterEvents(events!, tonight, endWeek),
           nextWeek: filterEvents(events!, endWeek, endNextWeek),
           thisMonth: filterEvents(events!, endNextWeek, endThisMonth), // "end < start" maybe
-          nextMonth: filterEvents(events!, endThisMonth, endNextMonth),
+          nextMonth: filterEvents(
+            events!,
+            new Date(Math.max(endNextWeek.getTime(), endThisMonth.getTime())),
+            endNextMonth
+          ),
           later: filterEvents(events!, endNextMonth),
         });
       } else {
