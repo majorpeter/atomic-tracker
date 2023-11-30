@@ -8,7 +8,12 @@ const Habits: React.FC = () => {
   return (
     <Grid
       container
-      columns={{ xs: 2, sm: 2, md: 4 }}
+      columns={{
+        xs: 2,
+        sm: 3,
+        md: 4,
+        lg: Math.min(Math.max(data ? data.length : 4, 4), 6),
+      }}
       spacing={{ xs: 1, sm: 2 }}
       sx={{ marginBottom: 1 }}
     >
