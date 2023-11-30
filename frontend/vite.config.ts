@@ -10,4 +10,22 @@ export default defineConfig({
       "@api": path.resolve(__dirname, "../backend/src/lib/api.ts"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (id.includes("node_modules")) {
+            if (id.includes("icons-material")) {
+              return "vendor_icons";
+            }
+            if (id.includes("@mui") || id.includes("@popperjs")) {
+              return "vendor_mui";
+            }
+
+            return "vendor";
+          }
+        },
+      },
+    },
+  },
 });
