@@ -92,7 +92,7 @@ export function useApiQuery_projectsInProgress() {
 }
 
 export function useApiQuery_config_habits() {
-  return useQuery<Api.Config.Habits.type>({
+  return useQuery<Api.Config.Habits.get_type>({
     queryKey: queryKeys.config_habits,
     queryFn: async () => {
       return await (await fetch(API_URL + Api.Config.Habits.path)).json();
@@ -162,5 +162,20 @@ export function useApiMutation_journal(onSuccess?: () => void) {
       queryClient.invalidateQueries(queryKeys.journal_overview);
     },
     onSuccess,
+  });
+}
+
+export function useApiMutation_config_habits_add() {
+  return useMutation<unknown, unknown, Api.Config.Habits.HabitDescriptor>({
+    mutationFn: async (habit) => {
+      const body: Api.Config.Habits.post_type = { action: "add", habit };
+      await fetch(API_URL + Api.Config.Habits.path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      queryClient.invalidateQueries(queryKeys.habits);
+    },
   });
 }

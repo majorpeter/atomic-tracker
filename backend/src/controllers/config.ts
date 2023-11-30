@@ -6,7 +6,7 @@ import { Habit } from "../lib/db";
 const USER_ID = 0;
 
 export default function (app: Express) {
-  app.get<{}, Api.Config.Habits.type>(
+  app.get<{}, Api.Config.Habits.get_type>(
     Api.Config.Habits.path,
     async (_, res) => {
       const habits = await Habit.findAll({
@@ -24,6 +24,21 @@ export default function (app: Express) {
           historyLength: item.historyLength,
         }))
       );
+    }
+  );
+
+  app.post<{}, {}, Api.Config.Habits.post_type>(
+    Api.Config.Habits.path,
+    async (req, res) => {
+      if (req.body.action == "add") {
+        await Habit.create({
+          ...req.body.habit,
+          ownerId: USER_ID,
+        });
+        res.sendStatus(200);
+        return;
+      }
+      res.sendStatus(400);
     }
   );
 }

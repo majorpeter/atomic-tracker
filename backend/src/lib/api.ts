@@ -5,7 +5,7 @@ export namespace Api {
     export type type = {
       id: number;
       name: string;
-      iconName: string;
+      iconName: string | null;
       value: number;
       targetValue: number;
       historicalPercent: number;
@@ -18,7 +18,7 @@ export namespace Api {
 
     export type type = {
       name: string;
-      iconName: string;
+      iconName: string | null;
       targetValue: number;
       periodLength: number;
       historyLength: number;
@@ -128,14 +128,20 @@ export namespace Api {
     export namespace Habits {
       export const path = "/api/config/habits";
 
-      export type type = {
+      export type HabitDescriptor = {
         id?: number;
         name: string;
-        iconName: string;
+        iconName: string | null;
         targetValue: number;
         periodLength: number;
         historyLength: number;
-      }[];
+      };
+
+      export type get_type = HabitDescriptor[];
+
+      export type post_type =
+        | { action: "delete"; id: number }
+        | { action: "add"; habit: HabitDescriptor };
     }
   }
 }
