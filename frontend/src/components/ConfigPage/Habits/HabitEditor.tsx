@@ -36,15 +36,25 @@ const HabitEditor: React.FC<{
   const formRef = useRef<HTMLFormElement>(null);
 
   function collectFormData(): Api.Config.Habits.HabitDescriptor {
-    const data = Object.fromEntries(new FormData(formRef.current!));
+    const fd = new FormData(formRef.current!);
+    const data = Object.fromEntries(fd);
+
+    const activityId = fd.getAll("activityId[]") as string[];
+    const activityName = fd.getAll("activityName[]") as string[];
+    const activityValue = fd.getAll("activityValue[]") as string[];
+
     return {
       name: data.name as string,
       iconName: (data.iconName as string) || null,
       targetValue: parseInt(data.targetValue as string),
       periodLength: parseInt(data.periodLength as string),
       historyLength: parseInt(data.historyLength as string),
-      activities: [], //TODO!
-      archivedActivites: [],
+      activities: activityId.map((id, index) => ({
+        id: parseInt(id) > 0 ? parseInt(id) : undefined,
+        name: activityName[index],
+        value: parseInt(activityValue[index]),
+      })),
+      archivedActivites: habit.archivedActivites, // this can be retrieved from state since there's no form input for it
     };
   }
 
