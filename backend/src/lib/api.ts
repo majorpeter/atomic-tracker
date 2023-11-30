@@ -145,7 +145,8 @@ export namespace Api {
       export type post_type =
         | { action: "archive"; id: number }
         | { action: "unarchive"; id: number }
-        | { action: "add"; habit: HabitDescriptor };
+        | { action: "add"; habit: HabitDescriptor }
+        | { action: "edit"; habit: Required<HabitDescriptor> };
     }
   }
 }

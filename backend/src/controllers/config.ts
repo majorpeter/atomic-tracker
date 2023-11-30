@@ -48,6 +48,18 @@ export default function (app: Express) {
           ownerId: USER_ID,
         });
         res.sendStatus(200);
+      } else if (req.body.action == "edit") {
+        const habit = await Habit.findOne({
+          where: { id: req.body.habit.id, ownerId: USER_ID },
+        });
+        if (habit) {
+          const { id, ...input } = req.body.habit;
+          habit.setAttributes(input);
+          habit.save();
+          res.sendStatus(200);
+        } else {
+          res.sendStatus(404);
+        }
       } else if (req.body.action == "archive") {
         const habit = await Habit.findOne({ where: { id: req.body.id } });
         if (habit) {

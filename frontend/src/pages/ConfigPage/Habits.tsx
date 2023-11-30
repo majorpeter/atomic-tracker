@@ -13,6 +13,7 @@ import {
   List,
   ListItem,
   ListItemButton,
+  ListItemDecorator,
   Radio,
   RadioGroup,
   Sheet,
@@ -30,6 +31,7 @@ import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import {
   useApiMutation_config_habits_add,
   useApiMutation_config_habits_archive,
+  useApiMutation_config_habits_edt,
   useApiMutation_config_habits_unarchive,
   useApiQuery_config_habits,
 } from "../../util/api-client";
@@ -44,6 +46,7 @@ const Habits: React.FC = () => {
 
   const { data } = useApiQuery_config_habits();
   const { mutate: habitAddMutate } = useApiMutation_config_habits_add();
+  const { mutate: habitEditMutate } = useApiMutation_config_habits_edt();
   const { mutate: habitArchiveMuate } = useApiMutation_config_habits_archive();
   const { mutate: habitUnarchiveMuate } =
     useApiMutation_config_habits_unarchive();
@@ -71,16 +74,24 @@ const Habits: React.FC = () => {
     setSelectedHabitId("new");
   }
 
-  function handleAddClick() {
+  function collectFormData(): Api.Config.Habits.HabitDescriptor {
     const data = Object.fromEntries(new FormData(formRef.current!));
-    habitAddMutate({
+    return {
       name: data.name as string,
       iconName: (data.iconName as string) || null,
       targetValue: parseInt(data.targetValue as string),
       periodLength: parseInt(data.periodLength as string),
       historyLength: parseInt(data.historyLength as string),
-    });
+    };
+  }
+
+  function handleAddClick() {
+    habitAddMutate(collectFormData());
     setSelectedHabitId(null);
+  }
+
+  function handleSaveClick() {
+    habitEditMutate({ ...collectFormData(), id: selectedHabitId as number });
   }
 
   function handleArchiveClick() {
@@ -109,15 +120,21 @@ const Habits: React.FC = () => {
 
       <List variant="outlined">
         {data &&
-          data.habits.map((item) => (
-            <ListItemButton
-              key={item.id}
-              onClick={() => handleHabitSelection(item.id!)}
-              selected={item.id == selectedHabitId}
-            >
-              {item.name}
-            </ListItemButton>
-          ))}
+          data.habits.map((item) => {
+            const Icon = getHabitIconByName(item.iconName);
+            return (
+              <ListItemButton
+                key={item.id}
+                onClick={() => handleHabitSelection(item.id!)}
+                selected={item.id == selectedHabitId}
+              >
+                <ListItemDecorator>
+                  <Icon />
+                </ListItemDecorator>
+                {item.name}
+              </ListItemButton>
+            );
+          })}
       </List>
 
       {data && data.archived.length > 0 && (
@@ -245,7 +262,9 @@ const Habits: React.FC = () => {
                 </RadioGroup>
               </FormControl>
               {habit.id ? (
-                <Button startDecorator={<SaveIcon />}>Save changes</Button>
+                <Button onClick={handleSaveClick} startDecorator={<SaveIcon />}>
+                  Save changes
+                </Button>
               ) : (
                 <Button onClick={handleAddClick} startDecorator={<AddIcon />}>
                   Add
