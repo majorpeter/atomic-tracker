@@ -2,6 +2,7 @@ import { Button, IconButton, Input, Stack, Table, Typography } from "@mui/joy";
 
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ArchiveIcon from "@mui/icons-material/Archive";
 import UnarchiveIcon from "@mui/icons-material/Unarchive";
 
 import { Api } from "@api";
@@ -53,7 +54,7 @@ const Activities: React.FC<{
                       handlers.archiveActivityHandler(activity.id!)
                     }
                   >
-                    <DeleteIcon />
+                    {activity.id! > 0 ? <ArchiveIcon /> : <DeleteIcon />}
                   </IconButton>
                 )}
               </td>
@@ -71,7 +72,10 @@ const Activities: React.FC<{
               >
                 <UnarchiveIcon />
               </IconButton>
-              <IconButton color="danger">
+              <IconButton
+                onClick={() => handlers.deleteActivityHandler(activity.id)}
+                color="danger"
+              >
                 <DeleteIcon />
               </IconButton>
             </>

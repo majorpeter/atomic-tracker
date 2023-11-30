@@ -40,6 +40,7 @@ export type Handlers = {
   addActivityHandler: () => void;
   archiveActivityHandler: (id: number) => void;
   unarchiveActivityHandler: (id: number) => void;
+  deleteActivityHandler: (id: number) => void;
 };
 
 const Habits: React.FC = () => {
@@ -126,6 +127,7 @@ const Habits: React.FC = () => {
         s.habit!.activities.push({
           name: "New Activity",
           value: 1,
+          // this generates a "random" invalid negative ID that is required for UI key
           id: s.habit!.activities.reduce(
             (prev, item) => Math.min(item.id! - 1, prev),
             -1
@@ -170,6 +172,19 @@ const Habits: React.FC = () => {
 
         return s;
       });
+    },
+    deleteActivityHandler(id: number) {
+      if (
+        confirm("This cannot be undone (after saving below). Are you sure?")
+      ) {
+        setState((prev) => {
+          const s: typeof state = JSON.parse(JSON.stringify(prev));
+          s.habit!.archivedActivites = s.habit!.archivedActivites.filter(
+            (item) => item.id != id
+          );
+          return s;
+        });
+      }
     },
   };
 
