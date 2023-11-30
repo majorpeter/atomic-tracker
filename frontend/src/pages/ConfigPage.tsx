@@ -3,7 +3,9 @@ import { Link, RouteObject } from "react-router-dom";
 import { Tabs, TabList, Tab, TabPanel, Button, Sheet } from "@mui/joy";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 
+import UserPrefs from "./ConfigPage/UserPrefs";
 import Habits from "./ConfigPage/Habits";
+
 import { dashboardRoute } from "./Dashboard";
 
 const ConfigPage: React.FC = () => {
@@ -18,15 +20,17 @@ const ConfigPage: React.FC = () => {
           Dashboard
         </Button>
       </Sheet>
-      <Tabs defaultValue={0}>
+      <Tabs defaultValue="user">
         <TabList>
-          <Tab>Habits</Tab>
-          <Tab>TODO</Tab>
+          <Tab value="user">User Preferences</Tab>
+          <Tab value="habits">Habits</Tab>
         </TabList>
-        <TabPanel value={0}>
+        <TabPanel value="user">
+          <UserPrefs />
+        </TabPanel>
+        <TabPanel value="habits">
           <Habits />
         </TabPanel>
-        <TabPanel value={1}>TODO</TabPanel>
       </Tabs>
     </>
   );

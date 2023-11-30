@@ -1,8 +1,7 @@
-//TODO
-export const LANG = "en";
+import { AppLocalStorage } from "./local-storage";
 
 export function formatTime(d: Date, needSeconds: boolean = false) {
-  return d.toLocaleTimeString(LANG, {
+  return d.toLocaleTimeString(AppLocalStorage.getLanguage(), {
     hour: "2-digit",
     minute: "2-digit",
     second: needSeconds ? "2-digit" : undefined,
@@ -10,7 +9,7 @@ export function formatTime(d: Date, needSeconds: boolean = false) {
 }
 
 export function formatDate(d: Date) {
-  return d.toLocaleDateString(LANG);
+  return d.toLocaleDateString(AppLocalStorage.getLanguage());
 }
 
 /**

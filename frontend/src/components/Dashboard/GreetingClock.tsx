@@ -5,9 +5,10 @@ import { Button, Stack, Typography } from "@mui/joy";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import SettingsIcon from "@mui/icons-material/Settings";
 
-import { LANG, getIsoDate } from "../../util/formatter";
+import { getIsoDate } from "../../util/formatter";
 import { journalEditorRoute } from "../../pages/Dashboard/JournalEditorModal";
 import { configPageRoute } from "../../pages/ConfigPage";
+import { AppLocalStorage } from "../../util/local-storage";
 
 function greetingForTime(date: Date) {
   const h = date.getHours();
@@ -31,6 +32,7 @@ const GreetingClock: React.FC = () => {
     };
   }, []);
 
+  const LANG = AppLocalStorage.getLanguage();
   const day = now.toLocaleDateString(LANG, { weekday: "long" });
   const date = now.toLocaleDateString(LANG, {
     month: "numeric",
