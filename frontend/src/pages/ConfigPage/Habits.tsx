@@ -120,7 +120,7 @@ const Habits: React.FC = () => {
           ))}
       </List>
 
-      {data?.archived.length && (
+      {data && data.archived.length > 0 && (
         <AccordionGroup size="md" sx={{ mt: 2 }}>
           <Accordion>
             <AccordionSummary>
