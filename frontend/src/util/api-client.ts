@@ -179,3 +179,33 @@ export function useApiMutation_config_habits_add() {
     },
   });
 }
+
+export function useApiMutation_config_habits_archive() {
+  return useMutation<unknown, unknown, number>({
+    mutationFn: async (id) => {
+      const body: Api.Config.Habits.post_type = { action: "archive", id };
+      await fetch(API_URL + Api.Config.Habits.path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      queryClient.invalidateQueries(queryKeys.habits);
+    },
+  });
+}
+
+export function useApiMutation_config_habits_unarchive() {
+  return useMutation<unknown, unknown, number>({
+    mutationFn: async (id) => {
+      const body: Api.Config.Habits.post_type = { action: "unarchive", id };
+      await fetch(API_URL + Api.Config.Habits.path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      queryClient.invalidateQueries(queryKeys.habits);
+    },
+  });
+}

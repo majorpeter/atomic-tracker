@@ -7,7 +7,7 @@ import { getHabitIconByName } from "../../util/habit-icons";
 export type HabitProps = {
   id: number;
   name: string;
-  iconName: string;
+  iconName: string | null;
   value: number;
   targetValue: number;
   historicalPercent: number;

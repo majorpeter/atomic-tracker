@@ -137,10 +137,14 @@ export namespace Api {
         historyLength: number;
       };
 
-      export type get_type = HabitDescriptor[];
+      export type get_type = {
+        habits: HabitDescriptor[];
+        archived: { id: number; name: string }[];
+      };
 
       export type post_type =
-        | { action: "delete"; id: number }
+        | { action: "archive"; id: number }
+        | { action: "unarchive"; id: number }
         | { action: "add"; habit: HabitDescriptor };
     }
   }

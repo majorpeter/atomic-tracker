@@ -12,18 +12,30 @@ export default function (app: Express) {
       const habits = await Habit.findAll({
         where: {
           ownerId: USER_ID,
+          archived: false,
         },
       });
-      res.send(
-        habits.map((item) => ({
+      const archived = await Habit.findAll({
+        where: {
+          ownerId: USER_ID,
+          archived: true,
+        },
+      });
+
+      res.send({
+        habits: habits.map((item) => ({
           id: item.id,
           name: item.name,
           iconName: item.iconName,
           targetValue: item.targetValue,
           periodLength: item.periodLength,
           historyLength: item.historyLength,
-        }))
-      );
+        })),
+        archived: archived.map((item) => ({
+          id: item.id,
+          name: item.name,
+        })),
+      });
     }
   );
 
@@ -36,9 +48,27 @@ export default function (app: Express) {
           ownerId: USER_ID,
         });
         res.sendStatus(200);
-        return;
+      } else if (req.body.action == "archive") {
+        const habit = await Habit.findOne({ where: { id: req.body.id } });
+        if (habit) {
+          habit.archived = true;
+          await habit.save();
+          res.sendStatus(200);
+        } else {
+          res.sendStatus(404);
+        }
+      } else if (req.body.action == "unarchive") {
+        const habit = await Habit.findOne({ where: { id: req.body.id } });
+        if (habit) {
+          habit.archived = false;
+          await habit.save();
+          res.sendStatus(200);
+        } else {
+          res.sendStatus(404);
+        }
+      } else {
+        res.sendStatus(400);
       }
-      res.sendStatus(400);
     }
   );
 }

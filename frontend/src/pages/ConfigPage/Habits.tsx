@@ -1,5 +1,9 @@
 import { useRef, useState } from "react";
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionGroup,
+  AccordionSummary,
   Button,
   FormControl,
   FormHelperText,
@@ -7,6 +11,7 @@ import {
   IconButton,
   Input,
   List,
+  ListItem,
   ListItemButton,
   Radio,
   RadioGroup,
@@ -20,9 +25,12 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from "@mui/icons-material/Add";
+import UnarchiveIcon from "@mui/icons-material/Unarchive";
 
 import {
   useApiMutation_config_habits_add,
+  useApiMutation_config_habits_archive,
+  useApiMutation_config_habits_unarchive,
   useApiQuery_config_habits,
 } from "../../util/api-client";
 import { getHabitIconByName, getHabitIconNames } from "../../util/habit-icons";
@@ -36,6 +44,9 @@ const Habits: React.FC = () => {
 
   const { data } = useApiQuery_config_habits();
   const { mutate: habitAddMutate } = useApiMutation_config_habits_add();
+  const { mutate: habitArchiveMuate } = useApiMutation_config_habits_archive();
+  const { mutate: habitUnarchiveMuate } =
+    useApiMutation_config_habits_unarchive();
 
   let habit: Api.Config.Habits.HabitDescriptor | null = null;
   if (data && selectedHabitId) {
@@ -48,8 +59,12 @@ const Habits: React.FC = () => {
         historyLength: 14,
       };
     } else {
-      habit = data.find((item) => item.id === selectedHabitId) || null;
+      habit = data.habits.find((item) => item.id === selectedHabitId) || null;
     }
+  }
+
+  function handleHabitSelection(id: number) {
+    setSelectedHabitId(id);
   }
 
   function handleNewClick() {
@@ -65,10 +80,15 @@ const Habits: React.FC = () => {
       periodLength: parseInt(data.periodLength as string),
       historyLength: parseInt(data.historyLength as string),
     });
+    setSelectedHabitId(null);
   }
 
-  function handleHabitClick(id: number) {
-    setSelectedHabitId(id);
+  function handleArchiveClick() {
+    habitArchiveMuate(selectedHabitId as number);
+  }
+
+  function handleUnarchiveClick(id: number) {
+    habitUnarchiveMuate(id);
   }
 
   return (
@@ -86,18 +106,53 @@ const Habits: React.FC = () => {
           </Button>
         )}
       </Stack>
+
       <List variant="outlined">
         {data &&
-          data.map((item) => (
+          data.habits.map((item) => (
             <ListItemButton
               key={item.id}
-              onClick={() => handleHabitClick(item.id!)}
+              onClick={() => handleHabitSelection(item.id!)}
               selected={item.id == selectedHabitId}
             >
               {item.name}
             </ListItemButton>
           ))}
       </List>
+
+      {data?.archived.length && (
+        <AccordionGroup size="md" sx={{ mt: 2 }}>
+          <Accordion>
+            <AccordionSummary>
+              <Typography fontWeight="lg">Archived</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <List>
+                {data.archived.map((item) => (
+                  <ListItem
+                    key={item.id}
+                    endAction={
+                      <>
+                        <IconButton
+                          title="Unarchive"
+                          onClick={() => handleUnarchiveClick(item.id)}
+                        >
+                          <UnarchiveIcon />
+                        </IconButton>
+                        <IconButton color="danger" title="Delete">
+                          <DeleteIcon />
+                        </IconButton>
+                      </>
+                    }
+                  >
+                    {item.name}
+                  </ListItem>
+                ))}
+              </List>
+            </AccordionDetails>
+          </Accordion>
+        </AccordionGroup>
+      )}
 
       {habit && (
         <Sheet key={habit.id} variant="outlined" sx={{ p: 3, mt: 3 }}>
@@ -114,7 +169,11 @@ const Habits: React.FC = () => {
                   <IconButton>
                     <KeyboardArrowDownIcon />
                   </IconButton>
-                  <IconButton color="danger">
+                  <IconButton
+                    color="danger"
+                    title="Archive"
+                    onClick={handleArchiveClick}
+                  >
                     <DeleteIcon />
                   </IconButton>
                 </>

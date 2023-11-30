@@ -19,7 +19,7 @@ export function getHabitIconNames() {
   return Object.keys(icons);
 }
 
-export function getHabitIconByName(name?: string) {
+export function getHabitIconByName(name?: string | null) {
   if (name) {
     return icons[name] || fallbackIcon;
   }

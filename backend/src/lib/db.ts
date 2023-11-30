@@ -26,6 +26,7 @@ export class Habit extends Model<
   declare periodLength: number;
   declare historyLength: number;
   declare ownerId: number; //TODO foreign key later
+  declare archived: CreationOptional<boolean>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -57,6 +58,10 @@ Habit.init(
     },
     ownerId: {
       type: DataTypes.INTEGER,
+    },
+    archived: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,

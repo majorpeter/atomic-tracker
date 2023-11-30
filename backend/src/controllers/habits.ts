@@ -10,7 +10,12 @@ const USER_ID = 0;
 export default function (app: Express) {
   app.get<{}, Api.Habits.type>(Api.Habits.path, async (_, res) => {
     const result: Api.Habits.type = [];
-    const habits = await Habit.findAll({ where: { ownerId: USER_ID } });
+    const habits = await Habit.findAll({
+      where: {
+        ownerId: USER_ID,
+        archived: false,
+      },
+    });
 
     for (const habit of habits) {
       const periodStart = new Date();
@@ -60,7 +65,12 @@ export default function (app: Express) {
   app.get<Api.Habit.get_params, Api.Habit.type>(
     Api.Habit.path,
     async (req, res) => {
-      const habit = await Habit.findOne({ where: { id: req.params.id } });
+      const habit = await Habit.findOne({
+        where: {
+          id: req.params.id,
+          archived: false,
+        },
+      });
       if (habit) {
         const periodStart = new Date();
         periodStart.setDate(periodStart.getDate() - habit.periodLength);
