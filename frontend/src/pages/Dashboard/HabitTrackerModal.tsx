@@ -10,6 +10,7 @@ import {
   Input,
   List,
   ListItem,
+  ListItemButton,
   ListItemDecorator,
   Modal,
   ModalClose,
@@ -117,9 +118,20 @@ const HabitTrackerModal: React.FC = () => {
             <List variant="outlined">
               {data.history.length ? (
                 data.history.map((item) => (
-                  <ListItem
+                  <ListItemButton
                     key={item.id}
-                    endAction={
+                    selected={trackPostedResp?.id == item.id}
+                  >
+                    <ListItemDecorator>
+                      {formatDate(new Date(item.date))}
+                    </ListItemDecorator>
+
+                    <Typography fontWeight="lg" sx={{ ml: 2 }}>
+                      {item.activityName}
+                    </Typography>
+                    <Chip color="success">+{item.value}</Chip>
+
+                    <ListItemDecorator sx={{ ml: "auto" }}>
                       <IconButton
                         onClick={handleDelete.bind(undefined, item.id)}
                         disabled={trackDeleting}
@@ -133,24 +145,8 @@ const HabitTrackerModal: React.FC = () => {
                       >
                         <DeleteIcon />
                       </IconButton>
-                    }
-                  >
-                    <ListItemDecorator>
-                      <Typography
-                        sx={{
-                          fontWeight:
-                            trackPostedResp?.id == item.id ? "lg" : undefined,
-                        }}
-                      >
-                        {formatDate(new Date(item.date))}
-                      </Typography>
                     </ListItemDecorator>
-
-                    <Typography fontWeight="lg" sx={{ ml: 2 }}>
-                      {item.activityName}
-                    </Typography>
-                    <Chip color="success">+{item.value}</Chip>
-                  </ListItem>
+                  </ListItemButton>
                 ))
               ) : (
                 <ListItem>
