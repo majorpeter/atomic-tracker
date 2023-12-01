@@ -1,7 +1,7 @@
 import { Express } from "express";
 import { Api } from "../lib/api";
 
-import { Habit, TrackedActivity } from "../lib/db";
+import db, { Activity, Habit, TrackedActivity } from "../lib/db";
 import { Op } from "sequelize";
 
 //TODO multiuser support
@@ -71,19 +71,18 @@ export default function (app: Express) {
           id: req.params.id,
           archived: false,
         },
+        include: [Activity],
       });
       if (habit) {
         const periodStart = new Date();
         periodStart.setDate(periodStart.getDate() - habit.periodLength);
         const historyStart = new Date();
-        historyStart.setDate(periodStart.getDate() - habit.historyLength);
+        historyStart.setDate(historyStart.getDate() - habit.historyLength);
 
-        const trackedInPeriod = await TrackedActivity.count({
-          where: {
-            ownerId: USER_ID,
-            HabitId: habit.id,
-            createdAt: { [Op.gt]: periodStart },
-          },
+        const trackedInPeriod = await TrackedActivity.getSummarized({
+          ownerId: USER_ID,
+          HabitId: habit.id,
+          createdAt: { [Op.gt]: periodStart },
         });
 
         const trackedInHistory = await TrackedActivity.findAll({
@@ -96,6 +95,7 @@ export default function (app: Express) {
             [TrackedActivity.getAttributes().createdAt.field!, "DESC"],
             [TrackedActivity.getAttributes().updatedAt.field!, "DESC"],
           ],
+          include: [Activity],
         });
 
         res.send({
@@ -104,9 +104,22 @@ export default function (app: Express) {
           targetValue: habit.targetValue,
           periodLength: habit.periodLength,
           historyLength: habit.historyLength,
-          trackedInPeriod,
+          trackedInPeriod: {
+            count: trackedInPeriod.count,
+            value: trackedInPeriod.sumValue,
+          },
+          activities: habit.Activities
+            ? habit.Activities.sort((a, b) => b.value - a.value).map(
+                (activity) => ({
+                  id: activity.id,
+                  name: activity.name,
+                })
+              )
+            : [],
           history: trackedInHistory.map((item) => ({
             id: item.id,
+            activityName: item.Activity!.name,
+            value: item.Activity!.value,
             date: item.createdAt.toISOString(),
           })),
         });
@@ -119,14 +132,25 @@ export default function (app: Express) {
   app.post<{}, Api.Habit.Track.post_resp, Api.Habit.Track.post_type>(
     Api.Habit.Track.path,
     async (req, res) => {
-      const record = await TrackedActivity.create({
-        ownerId: USER_ID,
-        HabitId: req.body.habitId,
-        createdAt: new Date(req.body.date),
+      const activity = await Activity.findOne({
+        where: {
+          id: req.body.activityId,
+          ownerId: USER_ID,
+        },
       });
-      res.send({
-        id: record.id,
-      });
+      if (activity) {
+        const record = await TrackedActivity.create({
+          ownerId: USER_ID,
+          ActivityId: activity.id,
+          HabitId: activity.HabitId,
+          createdAt: new Date(req.body.date),
+        });
+        res.send({
+          id: record.id,
+        });
+      } else {
+        res.sendStatus(400);
+      }
     }
   );
 

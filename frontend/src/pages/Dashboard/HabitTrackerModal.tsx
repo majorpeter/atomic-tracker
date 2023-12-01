@@ -2,6 +2,7 @@ import { useRef } from "react";
 
 import {
   Button,
+  Chip,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -9,6 +10,7 @@ import {
   Input,
   List,
   ListItem,
+  ListItemDecorator,
   Modal,
   ModalClose,
   ModalDialog,
@@ -51,9 +53,9 @@ const HabitTrackerModal: React.FC = () => {
     trackDeleteMutate({ id });
   }
 
-  function handleTrack() {
+  function handleTrack(activityId: number) {
     trackPostMutate({
-      habitId: parseInt(params.id!),
+      activityId,
       date: dateInputRef.current!.value,
     });
   }
@@ -85,21 +87,28 @@ const HabitTrackerModal: React.FC = () => {
                 <tr>
                   <th>Tracked</th>
                   <td>
+                    <Chip
+                      color={
+                        data.trackedInPeriod.value >= data.targetValue
+                          ? "success"
+                          : "warning"
+                      }
+                    >
+                      {data.trackedInPeriod.value}
+                    </Chip>{" "}
+                    over {data.trackedInPeriod.count} activites in the last{" "}
+                    {data.periodLength} days
                     <p>
-                      {data.trackedInPeriod} in the last {data.periodLength}{" "}
-                      days
-                    </p>
-                    <p>
-                      {data.history.length} in the last {data.historyLength}{" "}
-                      days
+                      {data.history.length} activities in the last{" "}
+                      {data.historyLength} days
                     </p>
                   </td>
                 </tr>
                 <tr>
                   <th>Target</th>
                   <td>
-                    {data.targetValue} times over a period of{" "}
-                    {data.periodLength} days
+                    <Chip color="primary">{data.targetValue}</Chip> over a
+                    period of {data.periodLength} days
                   </td>
                 </tr>
               </tbody>
@@ -126,14 +135,21 @@ const HabitTrackerModal: React.FC = () => {
                       </IconButton>
                     }
                   >
-                    <Typography
-                      sx={{
-                        fontWeight:
-                          trackPostedResp?.id == item.id ? "lg" : undefined,
-                      }}
-                    >
-                      {formatDate(new Date(item.date))}
+                    <ListItemDecorator>
+                      <Typography
+                        sx={{
+                          fontWeight:
+                            trackPostedResp?.id == item.id ? "lg" : undefined,
+                        }}
+                      >
+                        {formatDate(new Date(item.date))}
+                      </Typography>
+                    </ListItemDecorator>
+
+                    <Typography fontWeight="lg" sx={{ ml: 2 }}>
+                      {item.activityName}
                     </Typography>
+                    <Chip color="success">+{item.value}</Chip>
                   </ListItem>
                 ))
               ) : (
@@ -150,7 +166,24 @@ const HabitTrackerModal: React.FC = () => {
               )}
             </List>
           </DialogContent>
-          <DialogActions>
+          <DialogActions
+            sx={{
+              flexDirection: {
+                xs: "column",
+                md: "row",
+              },
+              alignItems: { xs: "normal" },
+            }}
+          >
+            {data.activities.map((activity) => (
+              <Button
+                key={activity.id}
+                onClick={() => handleTrack(activity.id)}
+                loading={trackPosting}
+              >
+                Track "{activity.name}"
+              </Button>
+            ))}
             <Input
               type="date"
               slotProps={{
@@ -160,10 +193,8 @@ const HabitTrackerModal: React.FC = () => {
                   disabled: trackPosting,
                 },
               }}
+              sx={{ ml: { md: "auto" } }}
             />
-            <Button onClick={handleTrack} loading={trackPosting}>
-              Track Activity
-            </Button>
           </DialogActions>
         </ModalDialog>
       </Modal>

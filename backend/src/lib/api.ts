@@ -22,9 +22,15 @@ export namespace Api {
       targetValue: number;
       periodLength: number;
       historyLength: number;
-      trackedInPeriod: number;
+      activities: { id: number; name: string }[];
+      trackedInPeriod: {
+        value: number;
+        count: number;
+      };
       history: {
         id: number;
+        activityName: string;
+        value: number;
         date: string;
       }[];
     };
@@ -35,7 +41,7 @@ export namespace Api {
       export type deleteParams = { id: number };
 
       export type post_type = {
-        habitId: number;
+        activityId: number;
         date: string;
       };
       export type post_resp = {

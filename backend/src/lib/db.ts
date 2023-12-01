@@ -1,4 +1,5 @@
 import {
+  Attributes,
   CreationOptional,
   DataTypes,
   ForeignKey,
@@ -8,6 +9,7 @@ import {
   Model,
   NonAttribute,
   Sequelize,
+  WhereOptions,
 } from "sequelize";
 import path from "path";
 
@@ -134,6 +136,46 @@ export class TrackedActivity extends Model<
   declare ownerId: number; //TODO foreign key later
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+
+  static async getSummarized(
+    where: WhereOptions<Attributes<TrackedActivity>>
+  ): Promise<{ count: number; sumValue: number }> {
+    // for type safety
+    type Columns = {
+      Count: number;
+      SumValue: number;
+    };
+    const columnName = (k: keyof Columns) => k;
+
+    const result = (await TrackedActivity.findOne({
+      where,
+      include: [Activity],
+      attributes: [
+        [
+          db.fn(
+            "COUNT",
+            db.col(
+              `${TrackedActivity.name}.${TrackedActivity.getAttributes().id
+                .field!}`
+            )
+          ),
+          columnName("Count"),
+        ],
+        [
+          db.fn(
+            "SUM",
+            db.col(`${Activity.name}.${Activity.getAttributes().value.field!}`)
+          ),
+          columnName("SumValue"),
+        ],
+      ],
+    })) as unknown as { dataValues: Columns };
+
+    return {
+      count: result.dataValues.Count,
+      sumValue: result.dataValues.SumValue ?? 0,
+    };
+  }
 }
 
 TrackedActivity.init(
