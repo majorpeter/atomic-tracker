@@ -21,7 +21,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import {
   useApiMutation_config_habits_add,
   useApiMutation_config_habits_archive,
-  useApiMutation_config_habits_edt,
+  useApiMutation_config_habits_edit,
   useApiMutation_config_habits_move,
   useApiMutation_config_habits_unarchive,
   useApiQuery_config_habits,
@@ -48,26 +48,33 @@ const Habits: React.FC = () => {
     selectedExistingHabitId?: number;
     isCreatingNew: boolean;
     habit?: Api.Config.Habits.HabitDescriptor;
+    isHabitRefreshRequired: boolean;
   }>({
     isCreatingNew: false,
+    isHabitRefreshRequired: false,
   });
 
-  const { data } = useApiQuery_config_habits();
+  const { data } = useApiQuery_config_habits((newData) => {
+    if (state.isHabitRefreshRequired && state.selectedExistingHabitId) {
+      handleHabitSelection(state.selectedExistingHabitId, newData);
+    }
+  });
   const { mutate: habitAddMutate } = useApiMutation_config_habits_add();
-  const { mutate: habitEditMutate } = useApiMutation_config_habits_edt();
+  const { mutate: habitEditMutate } = useApiMutation_config_habits_edit();
   const { mutate: habitArchiveMutate } = useApiMutation_config_habits_archive();
   const { mutate: habitUnarchiveMuate } =
     useApiMutation_config_habits_unarchive();
   const { mutate: habitMoveMutate } = useApiMutation_config_habits_move();
 
-  function handleHabitSelection(id: number) {
-    if (data) {
+  function handleHabitSelection(id: number, _data = data) {
+    if (_data) {
       setState({
         isCreatingNew: false,
         selectedExistingHabitId: id,
         habit: JSON.parse(
-          JSON.stringify(data.habits.find((item) => item.id === id)) // create a deep copy
+          JSON.stringify(_data.habits.find((item) => item.id === id)) // create a deep copy
         ),
+        isHabitRefreshRequired: false,
       });
     }
   }
@@ -75,6 +82,7 @@ const Habits: React.FC = () => {
   function handleNewClick() {
     setState({
       isCreatingNew: true,
+      isHabitRefreshRequired: false,
       habit: {
         name: "New habit",
         iconName: "",
@@ -98,9 +106,11 @@ const Habits: React.FC = () => {
       habitAddMutate(formData);
       setState({
         isCreatingNew: false,
+        isHabitRefreshRequired: false,
       });
     },
-    handleSaveClick(formData: Api.Config.Habits.HabitDescriptor) {
+    async handleSaveClick(formData: Api.Config.Habits.HabitDescriptor) {
+      setState((prev) => ({ ...prev, isHabitRefreshRequired: true }));
       habitEditMutate({
         ...formData,
         id: state.selectedExistingHabitId!,
@@ -120,6 +130,7 @@ const Habits: React.FC = () => {
       habitArchiveMutate(state.selectedExistingHabitId!);
       setState({
         isCreatingNew: false,
+        isHabitRefreshRequired: false,
       });
     },
     addActivityHandler() {

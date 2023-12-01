@@ -33,12 +33,20 @@ export default function (app: Express) {
           targetValue: item.targetValue,
           periodLength: item.periodLength,
           historyLength: item.historyLength,
-          activities: item.Activities!.map((a) => ({
-            id: a.id,
-            name: a.name,
-            value: a.value,
-          })),
-          archivedActivites: [],
+          activities: item
+            .Activities!.filter((a) => !a.archived)
+            .sort((a, b) => b.value - a.value)
+            .map((a) => ({
+              id: a.id,
+              name: a.name,
+              value: a.value,
+            })),
+          archivedActivites: item
+            .Activities!.filter((a) => a.archived)
+            .map((a) => ({
+              id: a.id,
+              name: a.name,
+            })),
         })),
         archived: archived.map((item) => ({
           id: item.id,
@@ -80,17 +88,67 @@ export default function (app: Express) {
 
         res.sendStatus(200);
       } else if (req.body.action == "edit") {
-        const habit = await Habit.findOne({
-          where: { id: req.body.habit.id, ownerId: USER_ID },
-        });
-        if (habit) {
-          const { id, ...input } = req.body.habit;
+        const { id, activities, archivedActivites, ...input } = req.body.habit;
+
+        const statusCode = await db.transaction(async () => {
+          const habit = await Habit.findOne({
+            where: { id: id, ownerId: USER_ID },
+          });
+          if (!habit) {
+            return 404;
+          }
+
           habit.setAttributes(input);
           habit.save();
-          res.sendStatus(200);
-        } else {
-          res.sendStatus(404);
-        }
+
+          const storedActivites = await habit.getActivities();
+
+          // update non-archived items
+          for (const activity of activities.filter((a) => a.id !== undefined)) {
+            const stored = storedActivites.find((s) => s.id === activity.id);
+            stored!.setAttributes({
+              name: activity.name,
+              value: activity.value,
+              archived: false,
+            });
+            stored!.save();
+          }
+
+          // update archived
+          for (const activity of archivedActivites) {
+            const stored = storedActivites.find((s) => s.id === activity.id);
+            stored!.setAttributes({
+              archived: true,
+            });
+            stored?.save();
+          }
+
+          // create new activities if any
+          for (const activity of activities.filter((a) => a.id === undefined)) {
+            await Activity.create({
+              name: activity.name,
+              value: activity.value,
+              HabitId: id,
+              ownerId: USER_ID,
+            });
+          }
+
+          // delete deleted
+          for (const activity of storedActivites.filter((activity) => {
+            if (activities.find((a) => a.id === activity.id)) {
+              return false;
+            }
+            if (archivedActivites.find((a) => a.id === activity.id)) {
+              return false;
+            }
+            return true;
+          })) {
+            await activity.destroy();
+          }
+
+          return 200;
+        });
+        res.sendStatus(statusCode);
       } else if (req.body.action == "archive") {
         const habit = await Habit.findOne({ where: { id: req.body.id } });
         if (habit) {

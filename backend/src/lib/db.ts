@@ -2,6 +2,7 @@ import {
   CreationOptional,
   DataTypes,
   ForeignKey,
+  HasManyGetAssociationsMixin,
   InferAttributes,
   InferCreationAttributes,
   Model,
@@ -31,6 +32,7 @@ export class Habit extends Model<
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
+  declare getActivities: HasManyGetAssociationsMixin<Activity>;
   declare Activities?: NonAttribute<Activity[]>;
 }
 

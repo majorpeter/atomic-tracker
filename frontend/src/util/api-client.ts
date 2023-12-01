@@ -91,12 +91,15 @@ export function useApiQuery_projectsInProgress() {
   });
 }
 
-export function useApiQuery_config_habits() {
+export function useApiQuery_config_habits(
+  onSuccess?: (data: Api.Config.Habits.get_type) => void
+) {
   return useQuery<Api.Config.Habits.get_type>({
     queryKey: queryKeys.config_habits,
     queryFn: async () => {
       return await (await fetch(API_URL + Api.Config.Habits.path)).json();
     },
+    onSuccess,
   });
 }
 
@@ -180,7 +183,7 @@ export function useApiMutation_config_habits_add() {
   });
 }
 
-export function useApiMutation_config_habits_edt() {
+export function useApiMutation_config_habits_edit() {
   return useMutation<
     unknown,
     unknown,

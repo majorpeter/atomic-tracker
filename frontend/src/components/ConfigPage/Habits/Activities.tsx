@@ -62,28 +62,34 @@ const Activities: React.FC<{
           ))}
         </tbody>
       </Table>
-      {habit.archivedActivites.map((activity) => (
-        <Typography
-          key={activity.id}
-          endDecorator={
-            <>
-              <IconButton
-                onClick={() => handlers.unarchiveActivityHandler(activity.id)}
-              >
-                <UnarchiveIcon />
-              </IconButton>
-              <IconButton
-                onClick={() => handlers.deleteActivityHandler(activity.id)}
-                color="danger"
-              >
-                <DeleteIcon />
-              </IconButton>
-            </>
-          }
-        >
-          {activity.name}
-        </Typography>
-      ))}
+      {habit.archivedActivites
+        .sort((a, b) => {
+          if (a.name < b.name) return -1;
+          if (a.name > b.name) return 1;
+          return 0;
+        })
+        .map((activity) => (
+          <Typography
+            key={activity.id}
+            endDecorator={
+              <>
+                <IconButton
+                  onClick={() => handlers.unarchiveActivityHandler(activity.id)}
+                >
+                  <UnarchiveIcon />
+                </IconButton>
+                <IconButton
+                  onClick={() => handlers.deleteActivityHandler(activity.id)}
+                  color="danger"
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </>
+            }
+          >
+            {activity.name}
+          </Typography>
+        ))}
     </>
   );
 };
