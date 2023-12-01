@@ -58,12 +58,79 @@ module.exports = {
       },
     ]);
 
-    await queryInterface.bulkInsert("TrackedHabits", [
-      { ownerId: USER, HabitId: 1, createdAt: now, updatedAt: now },
-      { ownerId: USER, HabitId: 1, createdAt: day1_before, updatedAt: now },
-      { ownerId: USER, HabitId: 1, createdAt: day2_before, updatedAt: now },
+    await queryInterface.bulkInsert("Activities", [
+      {
+        name: "Light workout",
+        value: 1,
+        ownerId: USER,
+        HabitId: 1,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        name: "Running 5k",
+        value: 3,
+        ownerId: USER,
+        HabitId: 1,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        name: "Reading",
+        value: 1,
+        ownerId: USER,
+        HabitId: 2,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        name: "Daily Journal",
+        value: 1,
+        ownerId: USER,
+        HabitId: 3,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        name: "Morning 5 min",
+        value: 1,
+        ownerId: USER,
+        HabitId: 4,
+        createdAt: now,
+        updatedAt: now,
+      },
+    ]);
 
-      { ownerId: USER, HabitId: 2, createdAt: day2_before, updatedAt: now },
+    await queryInterface.bulkInsert("TrackedActivities", [
+      {
+        ownerId: USER,
+        ActivityId: 1,
+        HabitId: 1,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        ownerId: USER,
+        ActivityId: 2,
+        HabitId: 1,
+        createdAt: day1_before,
+        updatedAt: now,
+      },
+      {
+        ownerId: USER,
+        ActivityId: 1,
+        HabitId: 1,
+        createdAt: day2_before,
+        updatedAt: now,
+      },
+
+      {
+        ownerId: USER,
+        ActivityId: 3,
+        HabitId: 2,
+        createdAt: day2_before,
+        updatedAt: now,
+      },
     ]);
   },
 
