@@ -4,7 +4,7 @@ import db, { Activity, Habit } from "../lib/db";
 import { Op } from "sequelize";
 
 //TODO multiuser support
-const USER_ID = 0;
+const USER_ID = 1;
 
 export default function (app: Express) {
   app.get<{}, Api.Config.Habits.get_type>(

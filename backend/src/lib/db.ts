@@ -4,6 +4,7 @@ import {
   DataTypes,
   ForeignKey,
   HasManyGetAssociationsMixin,
+  HasOneGetAssociationMixin,
   InferAttributes,
   InferCreationAttributes,
   Model,
@@ -18,6 +19,34 @@ const db = new Sequelize({
   storage: path.resolve(__dirname, "..", "db.sqlite3"),
 });
 
+export class User extends Model<
+  InferAttributes<User>,
+  InferCreationAttributes<User>
+> {
+  declare id: CreationOptional<number>;
+  declare name: string;
+  declare passwordHash: string;
+}
+
+User.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    passwordHash: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  { sequelize: db }
+);
+
 export class Habit extends Model<
   InferAttributes<Habit>,
   InferCreationAttributes<Habit>
@@ -28,12 +57,14 @@ export class Habit extends Model<
   declare targetValue: number;
   declare periodLength: number;
   declare historyLength: number;
-  declare ownerId: number; //TODO foreign key later
+  declare Owner: NonAttribute<User>;
+  declare ownerId: ForeignKey<User["id"]>;
   declare archived: CreationOptional<boolean>;
   declare sortIndex: number;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
+  declare getOwner: HasOneGetAssociationMixin<User>;
   declare getActivities: HasManyGetAssociationsMixin<Activity>;
   declare Activities?: NonAttribute<Activity[]>;
 }
@@ -83,6 +114,11 @@ Habit.init(
   { sequelize: db }
 );
 
+Habit.belongsTo(User, {
+  as: "Owner",
+  foreignKey: Habit.getAttributes().ownerId.field!,
+});
+
 export class Activity extends Model<
   InferAttributes<Activity>,
   InferCreationAttributes<Activity>
@@ -92,7 +128,7 @@ export class Activity extends Model<
   declare value: number;
   declare Habit?: NonAttribute<Habit>;
   declare HabitId: ForeignKey<Habit["id"]>;
-  declare ownerId: number; //TODO foreign key later
+  declare ownerId: ForeignKey<User["id"]>;
   declare archived: CreationOptional<boolean>;
 }
 
@@ -121,6 +157,10 @@ Activity.init(
   { sequelize: db }
 );
 
+Activity.belongsTo(User, {
+  as: "Owner",
+  foreignKey: Activity.getAttributes().ownerId.field!,
+});
 Habit.hasMany(Activity);
 Activity.belongsTo(Habit);
 
@@ -190,6 +230,10 @@ TrackedActivity.init(
   { sequelize: db }
 );
 
+TrackedActivity.belongsTo(User, {
+  as: "Owner",
+  foreignKey: TrackedActivity.getAttributes().ownerId.field!,
+});
 Habit.hasMany(TrackedActivity);
 TrackedActivity.belongsTo(Habit);
 Activity.hasMany(TrackedActivity);
@@ -203,7 +247,7 @@ export class Journal extends Model<
   declare date: string;
   declare content: string;
   declare count: number;
-  declare ownerId: number; //TODO foreign key later
+  declare ownerId: ForeignKey<User["id"]>;
   declare createdAt: CreationOptional<Date>;
 
   public static dateToRawValue(value: string) {
@@ -243,11 +287,16 @@ Journal.init(
     },
     content: { type: DataTypes.TEXT },
     count: { type: DataTypes.INTEGER },
-    ownerId: { type: DataTypes.INTEGER },
+    ownerId: { type: DataTypes.INTEGER, allowNull: false },
     createdAt: DataTypes.DATE,
   },
   { sequelize: db }
 );
+
+Journal.belongsTo(User, {
+  as: "Owner",
+  foreignKey: Journal.getAttributes().ownerId.field!,
+});
 
 (async () => {
   await db.sync({ force: false });

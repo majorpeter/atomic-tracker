@@ -1,5 +1,7 @@
 "use strict";
 
+const USER = 1;
+
 function dateToNumber(date) {
   const value = date.toJSON();
   return parseInt(
@@ -21,7 +23,7 @@ module.exports = {
         date: dateToNumber(day2_before),
         content: "Dummy text for 2 days ago",
         count: 1,
-        ownerId: 0,
+        ownerId: USER,
         createdAt: day2_before,
         updatedAt: day2_before,
       },
@@ -29,7 +31,7 @@ module.exports = {
         date: dateToNumber(day1_before),
         content: "Dummy content for yesterday\n2nd line",
         count: 2,
-        ownerId: 0,
+        ownerId: USER,
         createdAt: day1_before,
         updatedAt: day1_before,
       },
@@ -38,7 +40,7 @@ module.exports = {
         content:
           "I saw a cute dog today\nhad lunch with a friend\nwatched the latest episode of my show\nwalk in the park",
         count: 4,
-        ownerId: 0,
+        ownerId: USER,
         createdAt: today,
         updatedAt: today,
       },

@@ -1,6 +1,6 @@
 "use strict";
 
-const USER = 0;
+const USER = 1;
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {

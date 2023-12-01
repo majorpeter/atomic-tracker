@@ -5,7 +5,7 @@ import { getIsoDate } from "../lib/formatter";
 import { Op } from "sequelize";
 
 //TODO multiuser support
-const USER_ID = 0;
+const USER_ID = 1;
 const HISTORY_LENGTH = 7;
 
 export default function (app: Express) {
@@ -13,6 +13,7 @@ export default function (app: Express) {
     const today = await Journal.findOne({
       where: {
         date: Journal.dateToRawValue(getIsoDate(new Date())),
+        ownerId: USER_ID,
       },
     });
 
@@ -21,6 +22,7 @@ export default function (app: Express) {
     const historyEntries = await Journal.findAll({
       where: {
         date: { [Op.gte]: historyStartDateRaw },
+        ownerId: USER_ID,
       },
       attributes: [
         Journal.getAttributes().date.field!,
@@ -55,6 +57,7 @@ export default function (app: Express) {
       const journal = await Journal.findOne({
         where: {
           date: Journal.dateToRawValue(req.params.date),
+          ownerId: USER_ID,
         },
       });
 

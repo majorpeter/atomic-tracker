@@ -1,11 +1,11 @@
 import { Express } from "express";
 import { Api } from "../lib/api";
 
-import db, { Activity, Habit, TrackedActivity } from "../lib/db";
+import db, { Activity, Habit, TrackedActivity, User } from "../lib/db";
 import { Op } from "sequelize";
 
 //TODO multiuser support
-const USER_ID = 0;
+const USER_ID = 1;
 
 export default function (app: Express) {
   app.get<{}, Api.Habits.type>(Api.Habits.path, async (_, res) => {
