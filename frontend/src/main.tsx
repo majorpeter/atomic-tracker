@@ -13,6 +13,7 @@ import { queryClient } from "./util/api-client.ts";
 
 import { dashboardRoute } from "./pages/Dashboard.tsx";
 import { configPageRoute } from "./pages/ConfigPage.tsx";
+import { loginRoute } from "./pages/LoginPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
     element: <App />,
     loader: () => redirect(dashboardRoute.path!),
   },
+  loginRoute,
   dashboardRoute,
   configPageRoute,
 ]);

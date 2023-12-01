@@ -6,23 +6,28 @@ export default function (app: Express) {
   app.post<{}, {}, Api.Auth.Login.post_type>(
     Api.Auth.Login.path,
     async (req, res) => {
-      const user = await User.findOne({
-        where: {
-          name: req.body.userName,
-        },
-      });
-
-      if (user) {
-        // TODO passwd check: else 400
-
-        req.session.userName = user.name;
-        req.session.interfaceLanguage = "en"; //TODO
-
-        req.session.regenerate(() => {
-          res.sendStatus(200);
+      try {
+        const user = await User.findOne({
+          where: {
+            name: req.body.userName,
+          },
         });
-      } else {
-        res.send(400);
+
+        if (user) {
+          // TODO passwd check: else 400
+
+          req.session.userId = user.id;
+          req.session.userName = user.name;
+          req.session.interfaceLanguage = "en"; //TODO
+
+          //TODO req.session.regenerate(() => {
+          res.sendStatus(200);
+          //});
+        } else {
+          res.sendStatus(400);
+        }
+      } catch {
+        res.sendStatus(500);
       }
     }
   );

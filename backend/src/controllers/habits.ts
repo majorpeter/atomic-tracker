@@ -1,18 +1,15 @@
 import { Express } from "express";
 import { Api } from "../lib/api";
 
-import db, { Activity, Habit, TrackedActivity, User } from "../lib/db";
+import { Activity, Habit, TrackedActivity } from "../lib/db";
 import { Op } from "sequelize";
 
-//TODO multiuser support
-const USER_ID = 1;
-
 export default function (app: Express) {
-  app.get<{}, Api.Habits.type>(Api.Habits.path, async (_, res) => {
+  app.get<{}, Api.Habits.type>(Api.Habits.path, async (req, res) => {
     const result: Api.Habits.type = [];
     const habits = await Habit.findAll({
       where: {
-        ownerId: USER_ID,
+        ownerId: req.session.userId,
         archived: false,
       },
       order: [[Habit.getAttributes().sortIndex.field!, "ASC"]],
@@ -25,13 +22,13 @@ export default function (app: Express) {
       historyStart.setDate(historyStart.getDate() - habit.historyLength);
 
       const trackedInPeriod = await TrackedActivity.getSummarized({
-        ownerId: USER_ID,
+        ownerId: req.session.userId,
         HabitId: habit.id,
         createdAt: { [Op.gt]: periodStart },
       });
 
       const trackedInHistory = await TrackedActivity.getSummarized({
-        ownerId: USER_ID,
+        ownerId: req.session.userId,
         HabitId: habit.id,
         createdAt: { [Op.gt]: historyStart },
       });
@@ -75,14 +72,14 @@ export default function (app: Express) {
         historyStart.setDate(historyStart.getDate() - habit.historyLength);
 
         const trackedInPeriod = await TrackedActivity.getSummarized({
-          ownerId: USER_ID,
+          ownerId: req.session.userId,
           HabitId: habit.id,
           createdAt: { [Op.gt]: periodStart },
         });
 
         const trackedInHistory = await TrackedActivity.findAll({
           where: {
-            ownerId: USER_ID,
+            ownerId: req.session.userId,
             HabitId: habit.id,
             createdAt: { [Op.gt]: historyStart },
           },
@@ -130,12 +127,12 @@ export default function (app: Express) {
       const activity = await Activity.findOne({
         where: {
           id: req.body.activityId,
-          ownerId: USER_ID,
+          ownerId: req.session.userId,
         },
       });
       if (activity) {
         const record = await TrackedActivity.create({
-          ownerId: USER_ID,
+          ownerId: req.session.userId!, //TODO validate user logged in
           ActivityId: activity.id,
           HabitId: activity.HabitId,
           createdAt: new Date(req.body.date),
@@ -153,7 +150,7 @@ export default function (app: Express) {
     await TrackedActivity.destroy({
       where: {
         id: req.params.id,
-        ownerId: USER_ID,
+        ownerId: req.session.userId,
       },
     });
     res.sendStatus(200);
