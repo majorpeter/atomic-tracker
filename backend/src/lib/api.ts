@@ -1,4 +1,22 @@
 export namespace Api {
+  export namespace Auth {
+    export namespace Login {
+      export const path = "/api/auth/login";
+      export type post_type = {
+        userName: string;
+        password: string;
+      };
+    }
+
+    export namespace Me {
+      export const path = "/api/auth/me";
+      export type type = {
+        name: string;
+        language: string;
+      };
+    }
+  }
+
   export namespace Habits {
     export const path = "/api/habits";
 

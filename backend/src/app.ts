@@ -1,6 +1,8 @@
 import express from "express";
+import session from "express-session";
 import path from "path";
 
+import auth from "./controllers/auth";
 import habits from "./controllers/habits";
 import todos from "./controllers/todos";
 import calendar from "./controllers/calendar";
@@ -12,9 +14,15 @@ const PORT = 8080;
 const FRONTEND_RELATIVE_PATH = "../../frontend/dist";
 
 const app = express();
-app.listen(PORT, () => {
-  console.log(`Backend listening on localhost:${PORT}!`);
-});
+
+app.use(
+  session({
+    secret: Math.random().toString(),
+    resave: false,
+    saveUninitialized: false,
+    //TODO limit store memory usage
+  })
+);
 
 app.use(express.json());
 
@@ -36,6 +44,7 @@ app.use((req, _, next) => {
 
 app.use(express.static(path.resolve(__dirname, FRONTEND_RELATIVE_PATH)));
 
+auth(app);
 habits(app);
 todos(app);
 calendar(app);
@@ -49,4 +58,8 @@ config(app);
  */
 app.get("*", (_, res) => {
   res.sendFile(path.resolve(__dirname, FRONTEND_RELATIVE_PATH, "index.html"));
+});
+
+app.listen(PORT, () => {
+  console.log(`Backend listening on localhost:${PORT}!`);
 });
