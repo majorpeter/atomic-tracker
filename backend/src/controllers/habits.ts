@@ -22,39 +22,34 @@ export default function (app: Express) {
       const periodStart = new Date();
       periodStart.setDate(periodStart.getDate() - habit.periodLength);
       const historyStart = new Date();
-      historyStart.setDate(periodStart.getDate() - habit.historyLength);
+      historyStart.setDate(historyStart.getDate() - habit.historyLength);
 
-      const trackedInPeriod = (
-        await TrackedActivity.findAll({
-          where: {
-            ownerId: USER_ID,
-            HabitId: habit.id,
-            createdAt: { [Op.gt]: periodStart },
-          },
-        })
-      ).length;
+      const trackedInPeriod = await TrackedActivity.getSummarized({
+        ownerId: USER_ID,
+        HabitId: habit.id,
+        createdAt: { [Op.gt]: periodStart },
+      });
 
-      const trackedInHistory = (
-        await TrackedActivity.findAll({
-          where: {
-            ownerId: USER_ID,
-            HabitId: habit.id,
-            createdAt: { [Op.gt]: historyStart },
-          },
-        })
-      ).length;
+      const trackedInHistory = await TrackedActivity.getSummarized({
+        ownerId: USER_ID,
+        HabitId: habit.id,
+        createdAt: { [Op.gt]: historyStart },
+      });
 
-      const historicalPercent = Math.round(
-        (trackedInHistory / habit.targetValue) *
-          (habit.periodLength / habit.historyLength) *
-          100
+      const historicalPercent = Math.min(
+        Math.round(
+          (trackedInHistory.sumValue / habit.targetValue) *
+            (habit.periodLength / habit.historyLength) *
+            100
+        ),
+        100
       );
 
       result.push({
         id: habit.id,
         name: habit.name,
         iconName: habit.iconName,
-        value: trackedInPeriod,
+        value: trackedInPeriod.sumValue,
         targetValue: habit.targetValue,
         historicalPercent,
       });
