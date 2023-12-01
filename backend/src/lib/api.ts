@@ -159,7 +159,8 @@ export namespace Api {
             action: "edit";
             habit: HabitDescriptor & Pick<HabitDescriptor, "id">;
           }
-        | { action: "move"; direction: "up" | "down"; id: number };
+        | { action: "move"; direction: "up" | "down"; id: number }
+        | { action: "delete"; id: number };
     }
   }
 }

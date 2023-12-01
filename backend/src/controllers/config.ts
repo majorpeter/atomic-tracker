@@ -211,6 +211,19 @@ export default function (app: Express) {
           }
         });
         res.send(200);
+      } else if (req.body.action == "delete") {
+        const h = await Habit.findOne({
+          where: {
+            id: req.body.id,
+            ownerId: USER_ID,
+          },
+        });
+        if (h) {
+          await h.destroy();
+          res.send(200);
+        } else {
+          res.send(404);
+        }
       } else {
         res.sendStatus(400);
       }

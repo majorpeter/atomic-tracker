@@ -21,6 +21,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import {
   useApiMutation_config_habits_add,
   useApiMutation_config_habits_archive,
+  useApiMutation_config_habits_delete,
   useApiMutation_config_habits_edit,
   useApiMutation_config_habits_move,
   useApiMutation_config_habits_unarchive,
@@ -65,6 +66,7 @@ const Habits: React.FC = () => {
   const { mutate: habitUnarchiveMuate } =
     useApiMutation_config_habits_unarchive();
   const { mutate: habitMoveMutate } = useApiMutation_config_habits_move();
+  const { mutate: habitDeleteMutate } = useApiMutation_config_habits_delete();
 
   function handleHabitSelection(id: number, _data = data) {
     if (_data) {
@@ -204,6 +206,12 @@ const Habits: React.FC = () => {
     habitUnarchiveMuate(id);
   }
 
+  function handleDeleteClick(id: number) {
+    if (confirm("This cannot be undone. Are you sure?")) {
+      habitDeleteMutate({ id });
+    }
+  }
+
   return (
     <>
       <Stack direction="row">
@@ -258,7 +266,11 @@ const Habits: React.FC = () => {
                         >
                           <UnarchiveIcon />
                         </IconButton>
-                        <IconButton color="danger" title="Delete">
+                        <IconButton
+                          color="danger"
+                          title="Delete"
+                          onClick={() => handleDeleteClick(item.id)}
+                        >
                           <DeleteIcon />
                         </IconButton>
                       </>

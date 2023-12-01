@@ -110,6 +110,7 @@ Activity.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    HabitId: { type: DataTypes.INTEGER, allowNull: false },
     archived: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
@@ -139,6 +140,8 @@ TrackedActivity.init(
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     ownerId: { type: DataTypes.INTEGER },
+    HabitId: { type: DataTypes.INTEGER, allowNull: false },
+    ActivityId: { type: DataTypes.INTEGER, allowNull: false },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },

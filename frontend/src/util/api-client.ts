@@ -255,3 +255,21 @@ export function useApiMutation_config_habits_move() {
     },
   });
 }
+
+export function useApiMutation_config_habits_delete() {
+  return useMutation<unknown, unknown, { id: number }>({
+    mutationFn: async ({ id }) => {
+      const body: Api.Config.Habits.post_type = {
+        action: "delete",
+        id,
+      };
+      await fetch(API_URL + Api.Config.Habits.path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      queryClient.invalidateQueries(queryKeys.habits);
+    },
+  });
+}
