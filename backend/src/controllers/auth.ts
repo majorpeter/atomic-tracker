@@ -2,6 +2,27 @@ import { Express, NextFunction, Request, Response } from "express";
 import { Api } from "../lib/api";
 import { User } from "../lib/db";
 
+import crypto from "node:crypto";
+
+function hashAndSaltPassword(password: string): string {
+  const salt = crypto.randomBytes(64);
+  const hash = crypto.createHash("sha256");
+  hash.update(password);
+  hash.update(salt);
+  return salt.toString("base64") + ":" + hash.digest("base64");
+}
+
+function verifyHashedAndSaltedPassword(
+  password: string,
+  saltedAndHash: string
+): boolean {
+  const salt = Buffer.from(saltedAndHash.split(":")[0], "base64");
+  const hash = crypto.createHash("sha256");
+  hash.update(password);
+  hash.update(salt);
+  return hash.digest("base64") == saltedAndHash.split(":")[1];
+}
+
 /**
  *can be put in express get()/post() functions before the handler to enforce a logged in user
  * @note any types are required to be compatible with generic usage in controllers (i.e. Request is Request<Api...,...>)
@@ -30,7 +51,18 @@ export default function (app: Express) {
         });
 
         if (user) {
-          // TODO passwd check: else 400
+          // allow empty password if empty in db also
+          if (user.passwordHash != "") {
+            if (
+              !verifyHashedAndSaltedPassword(
+                req.body.password,
+                user.passwordHash
+              )
+            ) {
+              res.sendStatus(400);
+              return;
+            }
+          }
 
           req.session.userId = user.id;
           req.session.userName = user.name;
