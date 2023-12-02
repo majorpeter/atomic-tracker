@@ -135,8 +135,14 @@ export function useApiQuery_config_habits(
   });
 }
 
-export function useApiMutation_login(onSuccess: () => void) {
-  return useMutation<unknown, unknown, Api.Auth.Login.post_type>({
+export function useApiMutation_login(
+  onSuccess?: (me: Required<Api.Auth.Me.type>) => void
+) {
+  return useMutation<
+    Required<Api.Auth.Me.type>,
+    unknown,
+    Api.Auth.Login.post_type
+  >({
     mutationFn: async (payload) => {
       // not using apiFetchJson, we're not getting a JSON back
       const resp = await fetch(API_URL + Api.Auth.Login.path, {
@@ -147,6 +153,7 @@ export function useApiMutation_login(onSuccess: () => void) {
       if (!resp.ok) {
         throw new Error("Failed to log in");
       }
+      return resp.json();
     },
     onSuccess,
   });
@@ -233,6 +240,21 @@ export function useApiMutation_journal(onSuccess?: () => void) {
 
       // invalidate all journals in case 'today' was edited
       queryClient.invalidateQueries(queryKeys.journal_overview);
+    },
+    onSuccess,
+  });
+}
+
+export function useApiMutation_config_user(
+  onSuccess: (me: Required<Api.Auth.Me.type>) => void
+) {
+  return useMutation<Required<Api.Auth.Me.type>, unknown, Api.Auth.Me.type>({
+    mutationFn: async (me) => {
+      return apiFetchJson(Api.Auth.Me.path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(me),
+      });
     },
     onSuccess,
   });

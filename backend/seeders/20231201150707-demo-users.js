@@ -8,7 +8,8 @@ module.exports = {
     await queryInterface.bulkInsert("Users", [
       {
         name: "admin",
-        passwordHash: "?",
+        passwordHash: "",
+        language: "en",
         createdAt: now,
         updatedAt: now,
       },

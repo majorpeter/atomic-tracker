@@ -26,6 +26,7 @@ export class User extends Model<
   declare id: CreationOptional<number>;
   declare name: string;
   declare passwordHash: string;
+  declare language: string;
 }
 
 User.init(
@@ -43,6 +44,7 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    language: { type: new DataTypes.STRING(5), allowNull: false },
   },
   { sequelize: db }
 );

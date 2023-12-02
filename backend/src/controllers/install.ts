@@ -16,6 +16,7 @@ export default function (app: Express) {
       await User.create({
         name: req.body.userName,
         passwordHash: hashAndSaltPassword(req.body.password),
+        language: "en",
       });
 
       res.sendStatus(200);

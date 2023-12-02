@@ -22,11 +22,13 @@ import {
 } from "../util/api-client";
 import { dashboardRoute } from "./Dashboard";
 import { installRoute } from "./InstallPage";
+import { AppLocalStorage } from "../util/local-storage";
 
 const LoginPage: React.FC = () => {
   const formRef = useRef<HTMLFormElement>(null);
   const navigate = useNavigate();
-  const { mutate: loginMutate, isError } = useApiMutation_login(() => {
+  const { mutate: loginMutate, isError } = useApiMutation_login((me) => {
+    AppLocalStorage.setLanguage(me.language);
     navigate(dashboardRoute.path!);
   });
 

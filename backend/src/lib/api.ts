@@ -29,8 +29,8 @@ export namespace Api {
     export namespace Me {
       export const path = "/api/auth/me";
       export type type = {
-        name: string;
-        language: string;
+        name?: string;
+        language?: string;
       };
     }
   }

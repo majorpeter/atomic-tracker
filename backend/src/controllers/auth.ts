@@ -47,7 +47,7 @@ export default function (app: Express) {
     });
   });
 
-  app.post<{}, {}, Api.Auth.Login.post_type>(
+  app.post<{}, Api.Auth.Me.type, Api.Auth.Login.post_type>(
     Api.Auth.Login.path,
     async (req, res) => {
       try {
@@ -75,8 +75,12 @@ export default function (app: Express) {
           req.session.regenerate(() => {
             req.session.userId = user.id;
             req.session.userName = user.name;
-            req.session.interfaceLanguage = "en"; //TODO
-            res.sendStatus(200);
+            req.session.interfaceLanguage = user.language;
+
+            res.send({
+              name: user.name,
+              language: user.language,
+            });
           });
         } else {
           res.sendStatus(400);
@@ -93,10 +97,35 @@ export default function (app: Express) {
     });
   });
 
-  app.get<{}, Api.Auth.Me.type>(Api.Auth.Me.path, (req, res) => {
-    res.send({
-      name: req.session.userName!,
-      language: req.session.interfaceLanguage!,
-    });
-  });
+  app.get<{}, Api.Auth.Me.type>(
+    Api.Auth.Me.path,
+    isLoggedInMiddleware,
+    (req, res) => {
+      res.send({
+        name: req.session.userName!,
+        language: req.session.interfaceLanguage!,
+      });
+    }
+  );
+
+  app.post<{}, Required<Api.Auth.Me.type>, Api.Auth.Me.type>(
+    Api.Auth.Me.path,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      const user = await User.findOne({ where: { id: req.session.userId! } });
+      if (user) {
+        if (req.body.language) {
+          user.language = req.body.language;
+          req.session.interfaceLanguage = req.body.language;
+          await user.save();
+        }
+        res.send({
+          name: req.session.userName!,
+          language: req.session.interfaceLanguage!,
+        });
+      } else {
+        res.sendStatus(500);
+      }
+    }
+  );
 }
