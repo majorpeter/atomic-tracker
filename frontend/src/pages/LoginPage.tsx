@@ -13,9 +13,9 @@ import {
 
 import ErrorIcon from "@mui/icons-material/Error";
 
-import { RouteObject, useNavigate } from "react-router-dom";
+import { RouteObject, redirect, useNavigate } from "react-router-dom";
 import { Api } from "@api";
-import { useApiMutation_login } from "../util/api-client";
+import { apiFetchLogout, useApiMutation_login } from "../util/api-client";
 import { dashboardRoute } from "./Dashboard";
 
 const LoginPage: React.FC = () => {
@@ -62,6 +62,16 @@ const LoginPage: React.FC = () => {
 export const loginRoute: RouteObject = {
   path: "/login",
   element: <LoginPage />,
+};
+
+export const logoutRoute: RouteObject = {
+  path: "/logout",
+  loader: async () => {
+    if (await apiFetchLogout()) {
+      return redirect(loginRoute.path!);
+    }
+    return redirect("/");
+  },
 };
 
 export default LoginPage;

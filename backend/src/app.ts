@@ -46,6 +46,10 @@ journal(app);
 projects(app);
 config(app);
 
+app.get("/api/*", (_, res) => {
+  res.sendStatus(404);
+});
+
 /**
  * default route gets frontend's index.html
  * @note this is required to allow page reloads on routes that react-router generates

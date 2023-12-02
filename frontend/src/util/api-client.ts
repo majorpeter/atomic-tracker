@@ -152,6 +152,11 @@ export function useApiMutation_login(onSuccess: () => void) {
   });
 }
 
+export async function apiFetchLogout(): Promise<boolean> {
+  const resp = await fetch(API_URL + Api.Auth.Logout.path);
+  return resp.ok;
+}
+
 export function useApiMutation_habit_track() {
   return useMutation<
     Api.Habit.Track.post_resp,

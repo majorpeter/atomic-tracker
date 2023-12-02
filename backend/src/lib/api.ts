@@ -8,6 +8,10 @@ export namespace Api {
       };
     }
 
+    export namespace Logout {
+      export const path = "/api/auth/logout";
+    }
+
     export namespace Me {
       export const path = "/api/auth/me";
       export type type = {

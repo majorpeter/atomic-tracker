@@ -48,6 +48,12 @@ export default function (app: Express) {
     }
   );
 
+  app.get(Api.Auth.Logout.path, (req, res) => {
+    req.session.destroy((err) => {
+      res.sendStatus(err ? 500 : 200);
+    });
+  });
+
   app.get<{}, Api.Auth.Me.type>(Api.Auth.Me.path, (req, res) => {
     res.send({
       name: req.session.userName!,
