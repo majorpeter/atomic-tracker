@@ -71,13 +71,13 @@ export default function (app: Express) {
             }
           }
 
-          req.session.userId = user.id;
-          req.session.userName = user.name;
-          req.session.interfaceLanguage = "en"; //TODO
-
-          //TODO req.session.regenerate(() => {
-          res.sendStatus(200);
-          //});
+          // regenerate to protect against session fixation
+          req.session.regenerate(() => {
+            req.session.userId = user.id;
+            req.session.userName = user.name;
+            req.session.interfaceLanguage = "en"; //TODO
+            res.sendStatus(200);
+          });
         } else {
           res.sendStatus(400);
         }
