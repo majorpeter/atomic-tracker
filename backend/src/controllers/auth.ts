@@ -4,7 +4,7 @@ import { User } from "../lib/db";
 
 import crypto from "node:crypto";
 
-function hashAndSaltPassword(password: string): string {
+export function hashAndSaltPassword(password: string): string {
   const salt = crypto.randomBytes(64);
   const hash = crypto.createHash("sha256");
   hash.update(password);
@@ -40,6 +40,13 @@ export const isLoggedInMiddleware = (
 };
 
 export default function (app: Express) {
+  app.get<{}, Api.Auth.Login.get_resp>(Api.Auth.Login.path, async (_, res) => {
+    const hasUser = (await User.findOne()) !== null;
+    res.send({
+      installed: hasUser,
+    });
+  });
+
   app.post<{}, {}, Api.Auth.Login.post_type>(
     Api.Auth.Login.path,
     async (req, res) => {

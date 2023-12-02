@@ -152,9 +152,31 @@ export function useApiMutation_login(onSuccess: () => void) {
   });
 }
 
+export async function apiFetchLoginParams(): Promise<Api.Auth.Login.get_resp> {
+  const resp = await fetch(API_URL + Api.Auth.Login.path);
+  if (!resp.ok) {
+    throw new Error();
+  }
+  return resp.json();
+}
+
 export async function apiFetchLogout(): Promise<boolean> {
+  queryClient.clear();
   const resp = await fetch(API_URL + Api.Auth.Logout.path);
   return resp.ok;
+}
+
+export function useApiMutation_install(onSuccess: () => void) {
+  return useMutation<unknown, unknown, Api.Install.post_type>({
+    mutationFn: async (payload) => {
+      return fetch(API_URL + Api.Install.path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    },
+    onSuccess,
+  });
 }
 
 export function useApiMutation_habit_track() {

@@ -1,7 +1,21 @@
 export namespace Api {
+  export namespace Install {
+    export const path = "/api/install";
+
+    export type post_type = {
+      userName: string;
+      password: string;
+    };
+  }
+
   export namespace Auth {
     export namespace Login {
       export const path = "/api/auth/login";
+
+      export type get_resp = {
+        installed: boolean;
+      };
+
       export type post_type = {
         userName: string;
         password: string;

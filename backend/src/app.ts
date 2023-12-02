@@ -3,6 +3,7 @@ import session from "express-session";
 import path from "path";
 
 import auth from "./controllers/auth";
+import install from "./controllers/install";
 import habits from "./controllers/habits";
 import todos from "./controllers/todos";
 import calendar from "./controllers/calendar";
@@ -39,6 +40,7 @@ app.use((req, _, next) => {
 app.use(express.static(path.resolve(__dirname, FRONTEND_RELATIVE_PATH)));
 
 auth(app);
+install(app);
 habits(app);
 todos(app);
 calendar(app);

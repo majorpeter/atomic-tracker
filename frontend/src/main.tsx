@@ -14,6 +14,7 @@ import { queryClient } from "./util/api-client.ts";
 import { dashboardRoute } from "./pages/Dashboard.tsx";
 import { configPageRoute } from "./pages/ConfigPage.tsx";
 import { loginRoute, logoutRoute } from "./pages/LoginPage.tsx";
+import { installRoute } from "./pages/InstallPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
   logoutRoute,
   dashboardRoute,
   configPageRoute,
+  installRoute,
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

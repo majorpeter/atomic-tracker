@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { RouteObject, redirect, useNavigate } from "react-router-dom";
 
 import {
   Alert,
@@ -13,10 +14,14 @@ import {
 
 import ErrorIcon from "@mui/icons-material/Error";
 
-import { RouteObject, redirect, useNavigate } from "react-router-dom";
 import { Api } from "@api";
-import { apiFetchLogout, useApiMutation_login } from "../util/api-client";
+import {
+  apiFetchLoginParams,
+  apiFetchLogout,
+  useApiMutation_login,
+} from "../util/api-client";
 import { dashboardRoute } from "./Dashboard";
+import { installRoute } from "./InstallPage";
 
 const LoginPage: React.FC = () => {
   const formRef = useRef<HTMLFormElement>(null);
@@ -62,6 +67,13 @@ const LoginPage: React.FC = () => {
 export const loginRoute: RouteObject = {
   path: "/login",
   element: <LoginPage />,
+  loader: async () => {
+    const loginParams = await apiFetchLoginParams();
+    if (!loginParams.installed) {
+      return redirect(installRoute.path!);
+    }
+    return null;
+  },
 };
 
 export const logoutRoute: RouteObject = {
