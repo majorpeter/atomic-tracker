@@ -6,6 +6,7 @@ import path from "path";
 
 import { Api } from "../lib/api";
 import { DUMMY_TODOS } from "../misc/dummy_data";
+import { isLoggedInMiddleware } from "./auth";
 
 async function getConfig(): Promise<{
   serverUrl: string;
@@ -113,6 +114,7 @@ function sortConvFn(todo: Api.Todos.type["todos"][0]): number {
 export default function (app: Express) {
   app.get<{}, Api.Todos.type, {}, Api.Todos.get_query>(
     Api.Todos.path,
+    isLoggedInMiddleware,
     async (req, res) => {
       const config = await getConfig();
 

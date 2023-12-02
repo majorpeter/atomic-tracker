@@ -4,6 +4,7 @@ import { listEvents } from "../lib/google-account";
 import { calendar_v3 } from "googleapis";
 
 import { DUMMY_CALENDAR } from "../misc/dummy_data";
+import { isLoggedInMiddleware } from "./auth";
 
 function filterEvents(
   events: calendar_v3.Schema$Event[],
@@ -28,6 +29,7 @@ function filterEvents(
 export default function (app: Express) {
   app.get<{}, Api.Calendar.type, {}, Api.Calendar.get_query>(
     Api.Calendar.path,
+    isLoggedInMiddleware,
     async (req, res) => {
       if (req.query.dummy === undefined) {
         const events = await listEvents();

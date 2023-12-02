@@ -3,61 +3,65 @@ import { Api } from "../lib/api";
 import { Journal } from "../lib/db";
 import { getIsoDate } from "../lib/formatter";
 import { Op } from "sequelize";
+import { isLoggedInMiddleware } from "./auth";
 
-//TODO multiuser support
-const USER_ID = 1;
 const HISTORY_LENGTH = 7;
 
 export default function (app: Express) {
-  app.get<{}, Api.Journal.type>(Api.Journal.path, async (_, res) => {
-    const today = await Journal.findOne({
-      where: {
-        date: Journal.dateToRawValue(getIsoDate(new Date())),
-        ownerId: USER_ID,
-      },
-    });
+  app.get<{}, Api.Journal.type>(
+    Api.Journal.path,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      const today = await Journal.findOne({
+        where: {
+          date: Journal.dateToRawValue(getIsoDate(new Date())),
+          ownerId: req.session.userId!,
+        },
+      });
 
-    const historyStartDateRaw =
-      Journal.dateToRawValue(getIsoDate(new Date())) - HISTORY_LENGTH;
-    const historyEntries = await Journal.findAll({
-      where: {
-        date: { [Op.gte]: historyStartDateRaw },
-        ownerId: USER_ID,
-      },
-      attributes: [
-        Journal.getAttributes().date.field!,
-        Journal.getAttributes().count.field!,
-      ],
-      order: [[Journal.getAttributes().date.field!, "ASC"]],
-    });
+      const historyStartDateRaw =
+        Journal.dateToRawValue(getIsoDate(new Date())) - HISTORY_LENGTH;
+      const historyEntries = await Journal.findAll({
+        where: {
+          date: { [Op.gte]: historyStartDateRaw },
+          ownerId: req.session.userId!,
+        },
+        attributes: [
+          Journal.getAttributes().date.field!,
+          Journal.getAttributes().count.field!,
+        ],
+        order: [[Journal.getAttributes().date.field!, "ASC"]],
+      });
 
-    res.send({
-      today: today
-        ? {
-            text: today.content,
-            count: today.count,
-          }
-        : { text: "", count: 0 },
-      history: [...Array(HISTORY_LENGTH).keys()].map((item) => {
-        const dateRaw = historyStartDateRaw + item;
-        return {
-          date: Journal.rawToIsoDateValue(dateRaw),
-          count:
-            historyEntries.find(
-              (value) => value.dataValues.date == dateRaw.toString()
-            )?.count || 0,
-        };
-      }),
-    });
-  });
+      res.send({
+        today: today
+          ? {
+              text: today.content,
+              count: today.count,
+            }
+          : { text: "", count: 0 },
+        history: [...Array(HISTORY_LENGTH).keys()].map((item) => {
+          const dateRaw = historyStartDateRaw + item;
+          return {
+            date: Journal.rawToIsoDateValue(dateRaw),
+            count:
+              historyEntries.find(
+                (value) => value.dataValues.date == dateRaw.toString()
+              )?.count || 0,
+          };
+        }),
+      });
+    }
+  );
 
   app.get<Api.Journal.Date.params, Api.Journal.Date.type>(
     Api.Journal.Date.pathWithDate,
+    isLoggedInMiddleware,
     async (req, res) => {
       const journal = await Journal.findOne({
         where: {
           date: Journal.dateToRawValue(req.params.date),
-          ownerId: USER_ID,
+          ownerId: req.session.userId!,
         },
       });
 
@@ -71,10 +75,11 @@ export default function (app: Express) {
 
   app.post<Api.Journal.Date.params, {}, Api.Journal.Date.type>(
     Api.Journal.Date.pathWithDate,
+    isLoggedInMiddleware,
     async (req, res) => {
       const journal = await Journal.findOne({
         where: {
-          ownerId: USER_ID,
+          ownerId: req.session.userId!,
           date: Journal.dateToRawValue(req.params.date),
         },
       });
@@ -95,7 +100,7 @@ export default function (app: Express) {
           date: req.params.date,
           content: text,
           count,
-          ownerId: USER_ID,
+          ownerId: req.session.userId!,
         });
       }
 

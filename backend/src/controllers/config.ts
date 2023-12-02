@@ -2,17 +2,16 @@ import { Express } from "express";
 import { Api } from "../lib/api";
 import db, { Activity, Habit } from "../lib/db";
 import { Op } from "sequelize";
-
-//TODO multiuser support
-const USER_ID = 1;
+import { isLoggedInMiddleware } from "./auth";
 
 export default function (app: Express) {
   app.get<{}, Api.Config.Habits.get_type>(
     Api.Config.Habits.path,
-    async (_, res) => {
+    isLoggedInMiddleware,
+    async (req, res) => {
       const habits = await Habit.findAll({
         where: {
-          ownerId: USER_ID,
+          ownerId: req.session.userId!,
           archived: false,
         },
         include: [Activity],
@@ -20,7 +19,7 @@ export default function (app: Express) {
       });
       const archived = await Habit.findAll({
         where: {
-          ownerId: USER_ID,
+          ownerId: req.session.userId!,
           archived: true,
         },
       });
@@ -58,6 +57,7 @@ export default function (app: Express) {
 
   app.post<{}, {}, Api.Config.Habits.post_type>(
     Api.Config.Habits.path,
+    isLoggedInMiddleware,
     async (req, res) => {
       if (req.body.action == "add") {
         const { activities, archivedActivites: _, ...habit } = req.body.habit;
@@ -70,7 +70,7 @@ export default function (app: Express) {
 
           const h = await Habit.create({
             ...habit,
-            ownerId: USER_ID,
+            ownerId: req.session.userId!,
             sortIndex: maxSortIndex + 1,
           });
 
@@ -79,7 +79,7 @@ export default function (app: Express) {
               name: a.name,
               value: a.value,
               HabitId: h.id,
-              ownerId: USER_ID,
+              ownerId: req.session.userId!,
             });
           }
 
@@ -92,7 +92,7 @@ export default function (app: Express) {
 
         const statusCode = await db.transaction(async () => {
           const habit = await Habit.findOne({
-            where: { id: id, ownerId: USER_ID },
+            where: { id: id, ownerId: req.session.userId! },
           });
           if (!habit) {
             return 404;
@@ -129,7 +129,7 @@ export default function (app: Express) {
               name: activity.name,
               value: activity.value,
               HabitId: id,
-              ownerId: USER_ID,
+              ownerId: req.session.userId!,
             });
           }
 
@@ -171,7 +171,7 @@ export default function (app: Express) {
         const { id, direction } = req.body;
         await db.transaction<boolean>(async () => {
           const item = await Habit.findOne({
-            where: { id: id, ownerId: USER_ID, archived: false },
+            where: { id: id, ownerId: req.session.userId!, archived: false },
           });
           if (!item) {
             return false;
@@ -181,7 +181,7 @@ export default function (app: Express) {
               other = await Habit.findOne({
                 where: {
                   sortIndex: { [Op.lt]: item.sortIndex },
-                  ownerId: USER_ID,
+                  ownerId: req.session.userId!,
                   archived: false,
                 },
                 order: [[Habit.getAttributes().sortIndex.field!, "DESC"]],
@@ -190,7 +190,7 @@ export default function (app: Express) {
               other = await Habit.findOne({
                 where: {
                   sortIndex: { [Op.gt]: item.sortIndex },
-                  ownerId: USER_ID,
+                  ownerId: req.session.userId!,
                   archived: false,
                 },
                 order: [[Habit.getAttributes().sortIndex.field!, "ASC"]],
@@ -215,7 +215,7 @@ export default function (app: Express) {
         const h = await Habit.findOne({
           where: {
             id: req.body.id,
-            ownerId: USER_ID,
+            ownerId: req.session.userId!,
           },
         });
         if (h) {

@@ -2,6 +2,7 @@ import { Express } from "express";
 
 import { fetchInProgress } from "../lib/redmine";
 import { Api } from "../lib/api";
+import { isLoggedInMiddleware } from "./auth";
 
 const DUMMY_PROJECTS: {
   title: string;
@@ -23,23 +24,27 @@ const DUMMY_PROJECTS: {
 ];
 
 export default function (app: Express) {
-  app.get<{}, Api.Projects.type>(Api.Projects.path, async (req, res) => {
-    if (req.query.dummy === undefined) {
-      res.send(await fetchInProgress());
-    } else {
-      res.send({
-        inprogress: DUMMY_PROJECTS.map((item, index) => {
-          const date = new Date();
-          date.setDate(date.getDate() - item.lastChangedDaysAgo);
-          return {
-            id: index,
-            subject: item.title,
-            donePercent: item.progressPercent,
-            createdAt: date.toISOString(),
-            updatedAt: date.toISOString(),
-          };
-        }),
-      });
+  app.get<{}, Api.Projects.type>(
+    Api.Projects.path,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      if (req.query.dummy === undefined) {
+        res.send(await fetchInProgress());
+      } else {
+        res.send({
+          inprogress: DUMMY_PROJECTS.map((item, index) => {
+            const date = new Date();
+            date.setDate(date.getDate() - item.lastChangedDaysAgo);
+            return {
+              id: index,
+              subject: item.title,
+              donePercent: item.progressPercent,
+              createdAt: date.toISOString(),
+              updatedAt: date.toISOString(),
+            };
+          }),
+        });
+      }
     }
-  });
+  );
 }
