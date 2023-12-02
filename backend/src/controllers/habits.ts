@@ -3,60 +3,66 @@ import { Api } from "../lib/api";
 
 import { Activity, Habit, TrackedActivity } from "../lib/db";
 import { Op } from "sequelize";
+import { isLoggedInMiddleware } from "./auth";
 
 export default function (app: Express) {
-  app.get<{}, Api.Habits.type>(Api.Habits.path, async (req, res) => {
-    const result: Api.Habits.type = [];
-    const habits = await Habit.findAll({
-      where: {
-        ownerId: req.session.userId,
-        archived: false,
-      },
-      order: [[Habit.getAttributes().sortIndex.field!, "ASC"]],
-    });
-
-    for (const habit of habits) {
-      const periodStart = new Date();
-      periodStart.setDate(periodStart.getDate() - habit.periodLength);
-      const historyStart = new Date();
-      historyStart.setDate(historyStart.getDate() - habit.historyLength);
-
-      const trackedInPeriod = await TrackedActivity.getSummarized({
-        ownerId: req.session.userId,
-        HabitId: habit.id,
-        createdAt: { [Op.gt]: periodStart },
+  app.get<{}, Api.Habits.type>(
+    Api.Habits.path,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      const result: Api.Habits.type = [];
+      const habits = await Habit.findAll({
+        where: {
+          ownerId: req.session.userId,
+          archived: false,
+        },
+        order: [[Habit.getAttributes().sortIndex.field!, "ASC"]],
       });
 
-      const trackedInHistory = await TrackedActivity.getSummarized({
-        ownerId: req.session.userId,
-        HabitId: habit.id,
-        createdAt: { [Op.gt]: historyStart },
-      });
+      for (const habit of habits) {
+        const periodStart = new Date();
+        periodStart.setDate(periodStart.getDate() - habit.periodLength);
+        const historyStart = new Date();
+        historyStart.setDate(historyStart.getDate() - habit.historyLength);
 
-      const historicalPercent = Math.min(
-        Math.round(
-          (trackedInHistory.sumValue / habit.targetValue) *
-            (habit.periodLength / habit.historyLength) *
-            100
-        ),
-        100
-      );
+        const trackedInPeriod = await TrackedActivity.getSummarized({
+          ownerId: req.session.userId,
+          HabitId: habit.id,
+          createdAt: { [Op.gt]: periodStart },
+        });
 
-      result.push({
-        id: habit.id,
-        name: habit.name,
-        iconName: habit.iconName,
-        value: trackedInPeriod.sumValue,
-        targetValue: habit.targetValue,
-        historicalPercent,
-      });
+        const trackedInHistory = await TrackedActivity.getSummarized({
+          ownerId: req.session.userId,
+          HabitId: habit.id,
+          createdAt: { [Op.gt]: historyStart },
+        });
+
+        const historicalPercent = Math.min(
+          Math.round(
+            (trackedInHistory.sumValue / habit.targetValue) *
+              (habit.periodLength / habit.historyLength) *
+              100
+          ),
+          100
+        );
+
+        result.push({
+          id: habit.id,
+          name: habit.name,
+          iconName: habit.iconName,
+          value: trackedInPeriod.sumValue,
+          targetValue: habit.targetValue,
+          historicalPercent,
+        });
+      }
+
+      res.send(result);
     }
-
-    res.send(result);
-  });
+  );
 
   app.get<Api.Habit.get_params, Api.Habit.type>(
     Api.Habit.path,
+    isLoggedInMiddleware,
     async (req, res) => {
       const habit = await Habit.findOne({
         where: {
@@ -123,6 +129,7 @@ export default function (app: Express) {
 
   app.post<{}, Api.Habit.Track.post_resp, Api.Habit.Track.post_type>(
     Api.Habit.Track.path,
+    isLoggedInMiddleware,
     async (req, res) => {
       const activity = await Activity.findOne({
         where: {
@@ -146,13 +153,17 @@ export default function (app: Express) {
     }
   );
 
-  app.delete(Api.Habit.Track.pathWithId, async (req, res) => {
-    await TrackedActivity.destroy({
-      where: {
-        id: req.params.id,
-        ownerId: req.session.userId,
-      },
-    });
-    res.sendStatus(200);
-  });
+  app.delete(
+    Api.Habit.Track.pathWithId,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      await TrackedActivity.destroy({
+        where: {
+          id: req.params.id,
+          ownerId: req.session.userId,
+        },
+      });
+      res.sendStatus(200);
+    }
+  );
 }

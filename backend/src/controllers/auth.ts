@@ -1,6 +1,22 @@
-import { Express } from "express";
+import { Express, NextFunction, Request, Response } from "express";
 import { Api } from "../lib/api";
 import { User } from "../lib/db";
+
+/**
+ *can be put in express get()/post() functions before the handler to enforce a logged in user
+ * @note any types are required to be compatible with generic usage in controllers (i.e. Request is Request<Api...,...>)
+ */
+export const isLoggedInMiddleware = (
+  req: any,
+  res: any,
+  next: NextFunction
+) => {
+  if ((req as Request).session.userId) {
+    next();
+  } else {
+    (res as Response).sendStatus(401);
+  }
+};
 
 export default function (app: Express) {
   app.post<{}, {}, Api.Auth.Login.post_type>(
