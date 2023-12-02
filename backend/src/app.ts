@@ -9,6 +9,7 @@ import todos from "./controllers/todos";
 import calendar from "./controllers/calendar";
 import journal from "./controllers/journal";
 import projects from "./controllers/projects";
+import weather from "./controllers/weather";
 import config from "./controllers/config";
 
 const PORT = 8080;
@@ -46,6 +47,7 @@ todos(app);
 calendar(app);
 journal(app);
 projects(app);
+weather(app);
 config(app);
 
 app.get("/api/*", (_, res) => {

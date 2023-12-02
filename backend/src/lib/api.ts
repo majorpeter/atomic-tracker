@@ -1,3 +1,5 @@
+import { WeatherSymbolCode } from "./weatherapi";
+
 export namespace Api {
   export namespace Install {
     export const path = "/api/install";
@@ -163,6 +165,14 @@ export namespace Api {
       }[];
       url?: string;
       board_url?: string;
+    };
+  }
+
+  export namespace Weather {
+    export const path = "/api/weather";
+    export type type = {
+      temp_celsius: number;
+      weather_symbol: WeatherSymbolCode;
     };
   }
 

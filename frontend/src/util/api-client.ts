@@ -51,6 +51,7 @@ export const queryKeys = {
   journal_overview: ["journal"],
   journal_day: (date: Date) => ["journal", getIsoDate(date)],
   projects_inprogress: ["projects", "inprogress"],
+  weather: ["weather"],
   config_habits: ["habits", "config"],
 };
 
@@ -119,6 +120,15 @@ export function useApiQuery_projectsInProgress() {
     queryKey: queryKeys.projects_inprogress,
     queryFn: async () => {
       return apiFetchJson(Api.Projects.path);
+    },
+  });
+}
+
+export function useApiQuery_weather() {
+  return useQuery<Api.Weather.type>({
+    queryKey: queryKeys.weather,
+    queryFn: async () => {
+      return apiFetchJson(Api.Weather.path);
     },
   });
 }

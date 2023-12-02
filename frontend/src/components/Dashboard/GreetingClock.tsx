@@ -22,6 +22,7 @@ import { configPageRoute } from "../../pages/ConfigPage";
 import { logoutRoute } from "../../pages/LoginPage";
 
 import { AppLocalStorage } from "../../util/local-storage";
+import WeatherBlock from "./WeatherBlock";
 
 function greetingForTime(date: Date) {
   const h = date.getHours();
@@ -68,6 +69,7 @@ const GreetingClock: React.FC = () => {
           {time}
         </Typography>
       </Stack>
+      <WeatherBlock />
       <Stack sx={{ ml: "auto" }}>
         <Dropdown>
           <MenuButton sx={{ mb: 1 }} variant="solid" color="primary">
