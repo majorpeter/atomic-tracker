@@ -55,7 +55,7 @@ export namespace Api {
 
     export namespace Track {
       export const path = "/api/habit/track";
-      export const pathWithId = "/habit/track/:id";
+      export const pathWithId = "/api/habit/track/:id";
       export type deleteParams = { id: number };
 
       export type post_type = {

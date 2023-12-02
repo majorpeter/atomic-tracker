@@ -26,7 +26,7 @@ app.use(
 
 app.use(express.json());
 
-app.use((req, res, next) => {
+app.use((_, res, next) => {
   res.header("Access-Control-Allow-Methods", "*");
   next();
 });
