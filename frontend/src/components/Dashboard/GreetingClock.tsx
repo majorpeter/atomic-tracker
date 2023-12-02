@@ -1,13 +1,26 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { Button, Stack, Typography } from "@mui/joy";
+import {
+  Button,
+  Dropdown,
+  ListItemDecorator,
+  Menu,
+  MenuButton,
+  MenuItem,
+  Stack,
+  Typography,
+} from "@mui/joy";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SettingsIcon from "@mui/icons-material/Settings";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 import { getIsoDate } from "../../util/formatter";
 import { journalEditorRoute } from "../../pages/Dashboard/JournalEditorModal";
 import { configPageRoute } from "../../pages/ConfigPage";
+import { logoutRoute } from "../../pages/LoginPage";
+
 import { AppLocalStorage } from "../../util/local-storage";
 
 function greetingForTime(date: Date) {
@@ -56,9 +69,25 @@ const GreetingClock: React.FC = () => {
         </Typography>
       </Stack>
       <Stack sx={{ ml: "auto" }}>
-        <Button sx={{ mb: 1 }} component={Link} to={configPageRoute.path!}>
-          <SettingsIcon />
-        </Button>
+        <Dropdown>
+          <MenuButton sx={{ mb: 1 }} variant="solid" color="primary">
+            <MoreVertIcon />
+          </MenuButton>
+          <Menu placement="bottom-end">
+            <MenuItem component={Link} to={configPageRoute.path!}>
+              <ListItemDecorator>
+                <SettingsIcon />
+              </ListItemDecorator>
+              Configuration
+            </MenuItem>
+            <MenuItem component={Link} to={logoutRoute.path!}>
+              <ListItemDecorator>
+                <LogoutIcon />
+              </ListItemDecorator>
+              Log out
+            </MenuItem>
+          </Menu>
+        </Dropdown>
         <Button
           sx={{ display: { sm: "none" } }}
           component={Link}
