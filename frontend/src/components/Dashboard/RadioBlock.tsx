@@ -1,14 +1,14 @@
 import { useRef, useState } from "react";
-import { Button, ButtonGroup, IconButton, Stack } from "@mui/joy";
+import { Button, ButtonGroup, Stack } from "@mui/joy";
 
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useApiQuery_radio } from "../../util/api-client";
 
 const RadioBlock: React.FC = () => {
   const [playing, setPlaying] = useState<boolean>(false);
   const { data } = useApiQuery_radio();
+
   const audioPlayer = useRef<HTMLAudioElement>(null);
 
   async function handlePlayPauseClick() {
@@ -27,14 +27,14 @@ const RadioBlock: React.FC = () => {
   return (
     <Stack>
       <audio ref={audioPlayer} />
-      <ButtonGroup variant="solid" color="primary">
-        <Button onClick={handlePlayPauseClick}>
-          {playing ? <PauseIcon /> : <PlayArrowIcon />}
-        </Button>
-        <IconButton>
-          <ArrowDropDownIcon />
-        </IconButton>
-      </ButtonGroup>
+      {data && (
+        <ButtonGroup variant="solid" color="primary">
+          <Button>{data?.stations[0].name}</Button>
+          <Button onClick={handlePlayPauseClick}>
+            {playing ? <PauseIcon /> : <PlayArrowIcon />}
+          </Button>
+        </ButtonGroup>
+      )}
     </Stack>
   );
 };
