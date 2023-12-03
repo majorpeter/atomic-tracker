@@ -14,9 +14,11 @@ import {
 } from "sequelize";
 import path from "path";
 
+const CONFIG_DIR = process.env.CONFIG_DIR || path.resolve(__dirname, "..");
+
 const db = new Sequelize({
   dialect: "sqlite",
-  storage: path.resolve(__dirname, "..", "db.sqlite3"),
+  storage: path.resolve(CONFIG_DIR, "db.sqlite3"),
 });
 
 export class User extends Model<
