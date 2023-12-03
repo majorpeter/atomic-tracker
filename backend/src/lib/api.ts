@@ -176,6 +176,13 @@ export namespace Api {
     };
   }
 
+  export namespace Radio {
+    export const path = "/api/radio";
+    export type type = {
+      stations: { name: string; url: string }[];
+    };
+  }
+
   export namespace Config {
     export namespace Habits {
       export const path = "/api/config/habits";

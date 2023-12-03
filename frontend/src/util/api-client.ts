@@ -52,6 +52,7 @@ export const queryKeys = {
   journal_day: (date: Date) => ["journal", getIsoDate(date)],
   projects_inprogress: ["projects", "inprogress"],
   weather: ["weather"],
+  radio: ["radio"],
   config_habits: ["habits", "config"],
 };
 
@@ -129,6 +130,15 @@ export function useApiQuery_weather() {
     queryKey: queryKeys.weather,
     queryFn: async () => {
       return apiFetchJson(Api.Weather.path);
+    },
+  });
+}
+
+export function useApiQuery_radio() {
+  return useQuery<Api.Radio.type>({
+    queryKey: queryKeys.radio,
+    queryFn: async () => {
+      return apiFetchJson(Api.Radio.path);
     },
   });
 }

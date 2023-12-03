@@ -23,6 +23,7 @@ import { logoutRoute } from "../../pages/LoginPage";
 
 import { AppLocalStorage } from "../../util/local-storage";
 import WeatherBlock from "./WeatherBlock";
+import RadioBlock from "./RadioBlock";
 
 function greetingForTime(date: Date) {
   const h = date.getHours();
@@ -70,34 +71,40 @@ const GreetingClock: React.FC = () => {
         </Typography>
       </Stack>
       <WeatherBlock />
-      <Stack sx={{ ml: "auto" }}>
-        <Dropdown>
-          <MenuButton sx={{ mb: 1 }} variant="solid" color="primary">
-            <MoreVertIcon />
-          </MenuButton>
-          <Menu placement="bottom-end">
-            <MenuItem component={Link} to={configPageRoute.path!}>
-              <ListItemDecorator>
-                <SettingsIcon />
-              </ListItemDecorator>
-              Configuration
-            </MenuItem>
-            <MenuItem component={Link} to={logoutRoute.path!}>
-              <ListItemDecorator>
-                <LogoutIcon />
-              </ListItemDecorator>
-              Log out
-            </MenuItem>
-          </Menu>
-        </Dropdown>
-        <Button
-          sx={{ display: { sm: "none" } }}
-          component={Link}
-          to={journalEditorRoute.path!.replace(":date", getIsoDate(new Date()))}
-          endDecorator={<KeyboardArrowRightIcon />}
-        >
-          Journal
-        </Button>
+      <Stack sx={{ ml: "auto" }} direction="row">
+        <RadioBlock />
+        <Stack sx={{ ml: 1 }}>
+          <Dropdown>
+            <MenuButton sx={{ mb: 1 }} variant="solid" color="primary">
+              <MoreVertIcon />
+            </MenuButton>
+            <Menu placement="bottom-end">
+              <MenuItem component={Link} to={configPageRoute.path!}>
+                <ListItemDecorator>
+                  <SettingsIcon />
+                </ListItemDecorator>
+                Configuration
+              </MenuItem>
+              <MenuItem component={Link} to={logoutRoute.path!}>
+                <ListItemDecorator>
+                  <LogoutIcon />
+                </ListItemDecorator>
+                Log out
+              </MenuItem>
+            </Menu>
+          </Dropdown>
+          <Button
+            sx={{ display: { sm: "none" } }}
+            component={Link}
+            to={journalEditorRoute.path!.replace(
+              ":date",
+              getIsoDate(new Date())
+            )}
+            endDecorator={<KeyboardArrowRightIcon />}
+          >
+            Journal
+          </Button>
+        </Stack>
       </Stack>
     </Stack>
   );

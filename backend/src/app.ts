@@ -10,6 +10,7 @@ import calendar from "./controllers/calendar";
 import journal from "./controllers/journal";
 import projects from "./controllers/projects";
 import weather from "./controllers/weather";
+import radio from "./controllers/radio";
 import config from "./controllers/config";
 
 const PORT = 8080;
@@ -48,6 +49,7 @@ calendar(app);
 journal(app);
 projects(app);
 weather(app);
+radio(app);
 config(app);
 
 app.get("/api/*", (_, res) => {
