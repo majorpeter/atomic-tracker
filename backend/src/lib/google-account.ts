@@ -49,33 +49,40 @@ async function saveCredentials(client: OAuth2Client) {
  * Load or request or authorization to call APIs.
  *
  */
-async function authorize() {
-  let client = await loadSavedCredentialsIfExist();
-  if (client) {
+async function authorize(): Promise<OAuth2Client | null> {
+  try {
+    let client = await loadSavedCredentialsIfExist();
+    if (client) {
+      return client;
+    }
+    client = await authenticate({
+      scopes: SCOPES,
+      keyfilePath: CREDENTIALS_PATH,
+    });
+    if (client.credentials) {
+      await saveCredentials(client);
+    }
     return client;
+  } catch {
+    return null;
   }
-  client = await authenticate({
-    scopes: SCOPES,
-    keyfilePath: CREDENTIALS_PATH,
-  });
-  if (client.credentials) {
-    await saveCredentials(client);
-  }
-  return client;
 }
 
 /**
- * Lists the next 10 events on the user's primary calendar.
+ * Lists the next 100 events on the user's primary calendar.
  */
 export async function listEvents() {
   const auth = await authorize();
-  const calendar = google.calendar({ version: "v3", auth });
-  const res = await calendar.events.list({
-    calendarId: "primary",
-    timeMin: new Date().toISOString(),
-    maxResults: 100,
-    singleEvents: true,
-    orderBy: "startTime",
-  });
-  return res.data.items;
+  if (auth) {
+    const calendar = google.calendar({ version: "v3", auth });
+    const res = await calendar.events.list({
+      calendarId: "primary",
+      timeMin: new Date().toISOString(),
+      maxResults: 100,
+      singleEvents: true,
+      orderBy: "startTime",
+    });
+    return res.data.items;
+  }
+  return [];
 }

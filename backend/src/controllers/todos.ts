@@ -13,10 +13,16 @@ async function getConfig(): Promise<{
   user: string;
   token: string;
   webuiUrl: string;
-}> {
-  return JSON.parse(
-    (await fs.readFile(path.resolve(__dirname, "..", "todos.json"))).toString()
-  );
+} | null> {
+  try {
+    return JSON.parse(
+      (
+        await fs.readFile(path.resolve(__dirname, "..", "todos.json"))
+      ).toString()
+    );
+  } catch {
+    return null;
+  }
 }
 
 function findAttribute(object: DAVObject, path: string[]): string | undefined {
@@ -73,31 +79,34 @@ function timestampToIso(t: string | undefined): string | undefined {
 async function fetchCalendarObjects(): Promise<DAVObject[]> {
   const config = await getConfig();
 
-  const client = await createDAVClient({
-    serverUrl: config.serverUrl,
-    credentials: {
-      username: config.user,
-      password: config.token,
-    },
-    authMethod: "Basic",
-    defaultAccountType: "caldav",
-  });
+  if (config) {
+    const client = await createDAVClient({
+      serverUrl: config.serverUrl,
+      credentials: {
+        username: config.user,
+        password: config.token,
+      },
+      authMethod: "Basic",
+      defaultAccountType: "caldav",
+    });
 
-  const calendars = await client.fetchCalendars();
-  const calendarObjects = await client.fetchCalendarObjects({
-    calendar: calendars[0],
-    filters: [
-      {
-        "comp-filter": {
-          _attributes: {
-            name: "VCALENDAR",
+    const calendars = await client.fetchCalendars();
+    const calendarObjects = await client.fetchCalendarObjects({
+      calendar: calendars[0],
+      filters: [
+        {
+          "comp-filter": {
+            _attributes: {
+              name: "VCALENDAR",
+            },
           },
         },
-      },
-    ],
-  });
+      ],
+    });
 
-  return calendarObjects;
+    return calendarObjects;
+  }
+  return [];
 }
 
 function sortConvFn(todo: Api.Todos.type["todos"][0]): number {
@@ -140,7 +149,7 @@ export default function (app: Express) {
           .filter((i) => !i.done)
           .sort((a, b) => sortConvFn(a) - sortConvFn(b));
 
-        res.send({ todos, webui: config.webuiUrl });
+        res.send({ todos, webui: config?.webuiUrl });
       } else {
         res.send(DUMMY_TODOS);
       }

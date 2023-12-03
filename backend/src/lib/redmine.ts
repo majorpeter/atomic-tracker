@@ -9,14 +9,18 @@ async function getConfig(): Promise<{
   board_url?: string;
   api_key: string;
   inprogress_status_id: number;
-}> {
-  return JSON.parse(
-    (
-      await fs.readFile(
-        path.resolve(__dirname, "..", "..", "dist", "redmine.json")
-      )
-    ).toString()
-  );
+} | null> {
+  try {
+    return JSON.parse(
+      (
+        await fs.readFile(
+          path.resolve(__dirname, "..", "..", "dist", "redmine.json")
+        )
+      ).toString()
+    );
+  } catch {
+    return null;
+  }
 }
 
 function getElementText(key: string, element: any): string {
@@ -35,36 +39,39 @@ export async function fetchInProgress(): Promise<{
   }[];
   url: string;
   board_url?: string;
-}> {
+} | null> {
   const config = await getConfig();
-  const url =
-    config.url +
-    "/issues.xml?" +
-    new URLSearchParams({
-      status_id: config.inprogress_status_id.toString(),
-    });
-  const resp = await fetch(
-    url,
+  if (config) {
+    const url =
+      config.url +
+      "/issues.xml?" +
+      new URLSearchParams({
+        status_id: config.inprogress_status_id.toString(),
+      });
+    const resp = await fetch(
+      url,
 
-    {
-      headers: {
-        "X-Redmine-API-Key": config.api_key,
-      },
-    }
-  );
-  const body = resp.body.read().toString();
-  const js: any[] = xml2js(body).elements[0].elements;
+      {
+        headers: {
+          "X-Redmine-API-Key": config.api_key,
+        },
+      }
+    );
+    const body = resp.body.read().toString();
+    const js: any[] = xml2js(body).elements[0].elements;
 
-  return {
-    inprogress: js.map((item) => ({
-      id: parseInt(getElementText("id", item)),
-      subject: getElementText("subject", item),
-      donePercent: parseInt(getElementText("done_ratio", item)),
-      createdAt: getElementText("created_on", item),
-      updatedAt: getElementText("updated_on", item),
-      url: config.url + "/issues/" + getElementText("id", item),
-    })),
-    url: config.url,
-    board_url: config.board_url,
-  };
+    return {
+      inprogress: js.map((item) => ({
+        id: parseInt(getElementText("id", item)),
+        subject: getElementText("subject", item),
+        donePercent: parseInt(getElementText("done_ratio", item)),
+        createdAt: getElementText("created_on", item),
+        updatedAt: getElementText("updated_on", item),
+        url: config.url + "/issues/" + getElementText("id", item),
+      })),
+      url: config.url,
+      board_url: config.board_url,
+    };
+  }
+  return null;
 }

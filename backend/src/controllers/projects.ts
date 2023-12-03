@@ -29,7 +29,12 @@ export default function (app: Express) {
     isLoggedInMiddleware,
     async (req, res) => {
       if (req.query.dummy === undefined) {
-        res.send(await fetchInProgress());
+        const data = await fetchInProgress();
+        if (data) {
+          res.send(data);
+        } else {
+          res.sendStatus(404);
+        }
       } else {
         res.send({
           inprogress: DUMMY_PROJECTS.map((item, index) => {

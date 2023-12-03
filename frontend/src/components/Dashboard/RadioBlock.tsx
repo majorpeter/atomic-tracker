@@ -29,7 +29,9 @@ const RadioBlock: React.FC = () => {
       <audio ref={audioPlayer} />
       {data && (
         <ButtonGroup variant="solid" color="primary">
-          <Button>{data?.stations[0].name}</Button>
+          <Button>
+            {data.stations.length > 0 ? data.stations[0].name : "No stations"}
+          </Button>
           <Button onClick={handlePlayPauseClick}>
             {playing ? <PauseIcon /> : <PlayArrowIcon />}
           </Button>

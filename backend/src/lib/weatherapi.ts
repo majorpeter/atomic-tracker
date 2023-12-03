@@ -5,14 +5,18 @@ import path from "path";
 async function getConfig(): Promise<{
   lat: number;
   lon: number;
-}> {
-  return JSON.parse(
-    (
-      await fs.readFile(
-        path.resolve(__dirname, "..", "..", "dist", "weather.json")
-      )
-    ).toString()
-  );
+} | null> {
+  try {
+    return JSON.parse(
+      (
+        await fs.readFile(
+          path.resolve(__dirname, "..", "..", "dist", "weather.json")
+        )
+      ).toString()
+    );
+  } catch {
+    return null;
+  }
 }
 
 export type WeatherSymbolCode =
@@ -106,44 +110,47 @@ export type WeatherSymbolCode =
  */
 export async function getForecast() {
   const config = await getConfig();
-  const resp = await fetch(
-    "https://api.met.no/weatherapi/locationforecast/2.0/compact?" +
-      new URLSearchParams({
-        lat: config.lat.toString(),
-        lon: config.lon.toString(),
-      }),
-    {
-      headers: {
-        "User-Agent": "atomic-tracker github.com/majorpeter/atomic-tracker",
-      },
-    }
-  );
-  if (resp.ok) {
-    const data = (await resp.json()) as {
-      properties: {
-        meta: {
-          updated_at: string;
-          units: {
-            air_temperature: "celsius" | string;
-            precipitation_amount: "mm" | string;
-          };
-        };
-        timeseries: [
-          {
-            time: string;
-            data: {
-              instant: { details: { air_temperature: number } };
-              next_6_hours: { summary: { symbol_code: WeatherSymbolCode } };
+  if (config) {
+    const resp = await fetch(
+      "https://api.met.no/weatherapi/locationforecast/2.0/compact?" +
+        new URLSearchParams({
+          lat: config.lat.toString(),
+          lon: config.lon.toString(),
+        }),
+      {
+        headers: {
+          "User-Agent": "atomic-tracker github.com/majorpeter/atomic-tracker",
+        },
+      }
+    );
+    if (resp.ok) {
+      const data = (await resp.json()) as {
+        properties: {
+          meta: {
+            updated_at: string;
+            units: {
+              air_temperature: "celsius" | string;
+              precipitation_amount: "mm" | string;
             };
-          }
-        ];
+          };
+          timeseries: [
+            {
+              time: string;
+              data: {
+                instant: { details: { air_temperature: number } };
+                next_6_hours: { summary: { symbol_code: WeatherSymbolCode } };
+              };
+            }
+          ];
+        };
       };
-    };
 
-    return {
-      temp: data.properties.timeseries[0].data.instant.details.air_temperature,
-      symbol:
-        data.properties.timeseries[0].data.next_6_hours.summary.symbol_code,
-    };
+      return {
+        temp: data.properties.timeseries[0].data.instant.details
+          .air_temperature,
+        symbol:
+          data.properties.timeseries[0].data.next_6_hours.summary.symbol_code,
+      };
+    }
   }
 }

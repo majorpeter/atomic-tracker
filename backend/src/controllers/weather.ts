@@ -12,7 +12,7 @@ export default function (app: Express) {
         weather_symbol: fc.symbol,
       });
     } else {
-      res.sendStatus(500);
+      res.sendStatus(404);
     }
   });
 }
