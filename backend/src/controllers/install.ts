@@ -1,6 +1,6 @@
 import { Express } from "express";
 import { Api } from "../lib/api";
-import { User } from "../lib/db";
+import { User } from "../models/user";
 import { hashAndSaltPassword } from "./auth";
 
 export default function (app: Express) {

@@ -2,6 +2,8 @@ import express from "express";
 import session from "express-session";
 import path from "path";
 
+import { init as initDb } from "./lib/db";
+
 import auth from "./controllers/auth";
 import install from "./controllers/install";
 import habits from "./controllers/habits";
@@ -63,6 +65,8 @@ app.get("/api/*", (_, res) => {
 app.get("*", (_, res) => {
   res.sendFile(path.resolve(__dirname, FRONTEND_RELATIVE_PATH, "index.html"));
 });
+
+initDb();
 
 app.listen(PORT, () => {
   console.log(`Backend listening on localhost:${PORT}!`);

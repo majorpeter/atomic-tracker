@@ -1,6 +1,6 @@
 import { Express } from "express";
 import { Api } from "../lib/api";
-import { Journal } from "../lib/db";
+import { Journal } from "../models/journal";
 import { getIsoDate } from "../lib/formatter";
 import { Op } from "sequelize";
 import { isLoggedInMiddleware } from "./auth";

@@ -1,6 +1,6 @@
 import { Express, NextFunction, Request, Response } from "express";
 import { Api } from "../lib/api";
-import { User } from "../lib/db";
+import { User } from "../models/user";
 
 import crypto from "node:crypto";
 

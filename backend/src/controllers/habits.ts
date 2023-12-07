@@ -1,7 +1,7 @@
 import { Express } from "express";
 import { Api } from "../lib/api";
 
-import { Activity, Habit, TrackedActivity } from "../lib/db";
+import { Activity, Habit, TrackedActivity } from "../models/habit";
 import { Op } from "sequelize";
 import { isLoggedInMiddleware } from "./auth";
 

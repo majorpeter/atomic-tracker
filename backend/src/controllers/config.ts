@@ -1,8 +1,10 @@
 import { Express } from "express";
 import { Api } from "../lib/api";
-import db, { Activity, Habit } from "../lib/db";
 import { Op } from "sequelize";
 import { isLoggedInMiddleware } from "./auth";
+
+import { Habit, Activity } from "../models/habit";
+import db from "../lib/db";
 
 export default function (app: Express) {
   app.get<{}, Api.Config.Habits.get_type>(
