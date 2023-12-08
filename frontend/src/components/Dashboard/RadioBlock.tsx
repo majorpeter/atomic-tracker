@@ -25,7 +25,11 @@ const RadioBlock: React.FC = () => {
   }
 
   return (
-    <Stack>
+    <Stack
+      sx={{
+        display: { xs: "none", sm: "flex" },
+      }}
+    >
       <audio ref={audioPlayer} />
       {data && (
         <ButtonGroup variant="solid" color="primary">
