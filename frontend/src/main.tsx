@@ -5,7 +5,8 @@ import {
   createBrowserRouter,
   redirect,
 } from "react-router-dom";
-import { QueryClientProvider } from "react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 
 import App from "./App.tsx";
 import "./index.css";
@@ -29,10 +30,17 @@ const router = createBrowserRouter([
   installRoute,
 ]);
 
+const persister = createSyncStoragePersister({
+  storage: window.localStorage,
+});
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{ persister }}
+    >
       <RouterProvider router={router} />
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   </React.StrictMode>
 );

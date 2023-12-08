@@ -15,7 +15,7 @@ const Radios: React.FC = () => {
   const { data } = useApiQuery_config_radios();
   const [stations, setStations] =
     useState<{ name: string; url: string; id: number }[]>();
-  const { mutate, isLoading: isSaving } = useApiMutation_config_radios();
+  const { mutate, isPending: isSaving } = useApiMutation_config_radios();
 
   // initial loading only!
   if (!stations && data) {

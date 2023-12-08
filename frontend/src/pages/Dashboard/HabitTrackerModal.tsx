@@ -65,10 +65,10 @@ const HabitTrackerModal: React.FC = () => {
   const { data } = useApiQuery_habit_n(parseInt(params.id!));
   const {
     mutate: trackPostMutate,
-    isLoading: trackPosting,
+    isPending: trackPosting,
     data: trackPostedResp,
   } = useApiMutation_habit_track();
-  const { mutate: trackDeleteMutate, isLoading: trackDeleting } =
+  const { mutate: trackDeleteMutate, isPending: trackDeleting } =
     useApiMutation_habit_track_delete();
 
   const Icon = getHabitIconByName(data?.iconName);

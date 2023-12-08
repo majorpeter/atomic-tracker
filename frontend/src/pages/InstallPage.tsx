@@ -23,7 +23,7 @@ import { loginRoute } from "./LoginPage";
 
 const InstallPage: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
-  const { mutate: mutateInstall, isLoading } = useApiMutation_install(() => {
+  const { mutate: mutateInstall, isPending } = useApiMutation_install(() => {
     navigate(loginRoute.path!);
   });
   const navigate = useNavigate();
@@ -71,22 +71,22 @@ const InstallPage: React.FC = () => {
 
           <FormControl>
             <FormLabel>User name</FormLabel>
-            <Input name="userName" autoFocus disabled={isLoading} />
+            <Input name="userName" autoFocus disabled={isPending} />
           </FormControl>
           <FormControl>
             <FormLabel>Password</FormLabel>
-            <Input name="password" type="password" disabled={isLoading} />
+            <Input name="password" type="password" disabled={isPending} />
           </FormControl>
           <FormControl>
             <FormLabel>Repeat Password</FormLabel>
-            <Input name="password2" type="password" disabled={isLoading} />
+            <Input name="password2" type="password" disabled={isPending} />
           </FormControl>
         </CardContent>
         <CardActions>
           <Button
             type="submit"
             endDecorator={<KeyboardArrowRight />}
-            loading={isLoading}
+            loading={isPending}
           >
             Create Account
           </Button>

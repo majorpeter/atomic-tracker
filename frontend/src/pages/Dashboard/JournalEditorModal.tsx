@@ -40,7 +40,7 @@ const JournalEditorModal: React.FC = () => {
 
   const {
     mutate: mutateSave,
-    isLoading: isSaving,
+    isPending: isSaving,
     isError: saveFailed,
   } = useApiMutation_journal(onSaveSuccessful);
 

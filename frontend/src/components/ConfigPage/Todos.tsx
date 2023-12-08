@@ -23,7 +23,7 @@ import { Api } from "@api";
 
 const Todos: React.FC = () => {
   const { data } = useApiQuery_config_todos();
-  const { mutate, isLoading: isSaving } = useApiMutation_config_todos();
+  const { mutate, isPending: isSaving } = useApiMutation_config_todos();
   const [provider, setProvider] = useState<"none" | "nextcloud">();
 
   function handleProviderChange(e: ChangeEvent<HTMLInputElement>) {

@@ -23,7 +23,7 @@ import { Api } from "@api";
 
 const Projects: React.FC = () => {
   const { data } = useApiQuery_config_projects();
-  const { mutate, isLoading: isSaving } = useApiMutation_config_projects();
+  const { mutate, isPending: isSaving } = useApiMutation_config_projects();
   const [issueTracker, setIssueTracker] = useState<"none" | "redmine">();
 
   function handleIssueTrackerChange(e: ChangeEvent<HTMLInputElement>) {

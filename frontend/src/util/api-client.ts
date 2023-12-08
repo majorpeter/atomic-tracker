@@ -1,4 +1,9 @@
-import { QueryClient, useMutation, useQuery } from "react-query";
+import {
+  QueryCache,
+  QueryClient,
+  useMutation,
+  useQuery,
+} from "@tanstack/react-query";
 import { Api } from "@api";
 import { getIsoDate } from "./formatter";
 import { loginRoute } from "../pages/LoginPage";
@@ -33,14 +38,16 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,
-      onError: (err) => {
-        if (err instanceof AuthorizationError) {
-          // repload the whole appication by navigating this way
-          window.location.href = loginRoute.path!;
-        }
-      },
     },
   },
+  queryCache: new QueryCache({
+    onError: (err) => {
+      if (err instanceof AuthorizationError) {
+        // repload the whole appication by navigating this way
+        window.location.href = loginRoute.path!;
+      }
+    },
+  }),
 });
 
 export const queryKeys = {
@@ -153,9 +160,12 @@ export function useApiQuery_config_habits(
   return useQuery<Api.Config.Habits.get_type>({
     queryKey: queryKeys.config_habits,
     queryFn: async () => {
-      return apiFetchJson(Api.Config.Habits.path);
+      const result = await apiFetchJson(Api.Config.Habits.path);
+      if (onSuccess) {
+        onSuccess(result);
+      }
+      return result;
     },
-    onSuccess,
   });
 }
 
@@ -244,7 +254,7 @@ export function useApiMutation_habit_track() {
     Api.Habit.Track.post_type
   >({
     mutationFn: async (variables) => {
-      queryClient.invalidateQueries(queryKeys.habits);
+      queryClient.invalidateQueries({ queryKey: queryKeys.habits });
 
       return apiFetchJson(Api.Habit.Track.path, {
         method: "POST",
@@ -258,7 +268,7 @@ export function useApiMutation_habit_track() {
 export function useApiMutation_habit_track_delete() {
   return useMutation<unknown, unknown, { id: number }>({
     mutationFn: async ({ id }) => {
-      queryClient.invalidateQueries(queryKeys.habits);
+      queryClient.invalidateQueries({ queryKey: queryKeys.habits });
 
       try {
         await fetch(
@@ -290,7 +300,7 @@ export function useApiMutation_journal(onSuccess?: () => void) {
       );
 
       // invalidate all journals in case 'today' was edited
-      queryClient.invalidateQueries(queryKeys.journal_overview);
+      queryClient.invalidateQueries({ queryKey: queryKeys.journal_overview });
     },
     onSuccess,
   });
@@ -321,7 +331,7 @@ export function useApiMutation_config_habits_add() {
         body: JSON.stringify(body),
       });
 
-      queryClient.invalidateQueries(queryKeys.habits);
+      queryClient.invalidateQueries({ queryKey: queryKeys.habits });
     },
   });
 }
@@ -341,7 +351,7 @@ export function useApiMutation_config_habits_edit() {
         body: JSON.stringify(body),
       });
 
-      queryClient.invalidateQueries(queryKeys.habits);
+      queryClient.invalidateQueries({ queryKey: queryKeys.habits });
     },
   });
 }
@@ -356,7 +366,7 @@ export function useApiMutation_config_habits_archive() {
         body: JSON.stringify(body),
       });
 
-      queryClient.invalidateQueries(queryKeys.habits);
+      queryClient.invalidateQueries({ queryKey: queryKeys.habits });
     },
   });
 }
@@ -371,7 +381,7 @@ export function useApiMutation_config_habits_unarchive() {
         body: JSON.stringify(body),
       });
 
-      queryClient.invalidateQueries(queryKeys.habits);
+      queryClient.invalidateQueries({ queryKey: queryKeys.habits });
     },
   });
 }
@@ -394,7 +404,7 @@ export function useApiMutation_config_habits_move() {
         body: JSON.stringify(body),
       });
 
-      queryClient.invalidateQueries(queryKeys.habits);
+      queryClient.invalidateQueries({ queryKey: queryKeys.habits });
     },
   });
 }
@@ -412,7 +422,7 @@ export function useApiMutation_config_habits_delete() {
         body: JSON.stringify(body),
       });
 
-      queryClient.invalidateQueries(queryKeys.habits);
+      queryClient.invalidateQueries({ queryKey: queryKeys.habits });
     },
   });
 }
@@ -426,7 +436,7 @@ export function useApiMutation_config_todos() {
         body: JSON.stringify(payload),
       });
 
-      queryClient.invalidateQueries(queryKeys.todos);
+      queryClient.invalidateQueries({ queryKey: queryKeys.todos });
     },
   });
 }
@@ -440,7 +450,7 @@ export function useApiMutation_config_projects() {
         body: JSON.stringify(payload),
       });
 
-      queryClient.invalidateQueries(queryKeys.projects);
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects });
     },
   });
 }
@@ -454,7 +464,7 @@ export function useApiMutation_config_radios() {
         body: JSON.stringify(payload),
       });
 
-      queryClient.invalidateQueries(queryKeys.radio);
+      queryClient.invalidateQueries({ queryKey: queryKeys.radio });
     },
   });
 }
