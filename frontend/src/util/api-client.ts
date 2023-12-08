@@ -57,6 +57,7 @@ export const queryKeys = {
   config_habits: ["habits", "config"],
   config_todos: ["todos", "config"],
   config_projects: ["projects", "config"],
+  config_radio: ["radio", "config"],
 };
 
 export function useApiQuery_habits() {
@@ -172,6 +173,15 @@ export function useApiQuery_config_projects() {
     queryKey: queryKeys.config_projects,
     queryFn: async () => {
       return apiFetchJson(Api.Config.Projects.path);
+    },
+  });
+}
+
+export function useApiQuery_config_radios() {
+  return useQuery<Api.Config.Radio.type>({
+    queryKey: queryKeys.config_radio,
+    queryFn: async () => {
+      return apiFetchJson(Api.Config.Radio.path);
     },
   });
 }
@@ -431,6 +441,20 @@ export function useApiMutation_config_projects() {
       });
 
       queryClient.invalidateQueries(queryKeys.projects);
+    },
+  });
+}
+
+export function useApiMutation_config_radios() {
+  return useMutation<unknown, unknown, Api.Config.Radio.type>({
+    mutationFn: async (payload) => {
+      await fetch(API_URL + Api.Config.Radio.path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      queryClient.invalidateQueries(queryKeys.radio);
     },
   });
 }

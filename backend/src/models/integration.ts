@@ -17,6 +17,7 @@ export class Integration extends Model<
 > {
   declare Todos: CreationOptional<Api.Config.Todos.type>;
   declare Projects: CreationOptional<Api.Config.Projects.type>;
+  declare Radios: CreationOptional<Api.Config.Radio.type>;
   declare Owner: NonAttribute<User>;
   declare ownerId: ForeignKey<User["id"]>;
 }
@@ -30,6 +31,10 @@ Integration.init(
     Projects: {
       type: DataTypes.JSON,
       defaultValue: { schema: 1 } as Api.Config.Projects.type,
+    },
+    Radios: {
+      type: DataTypes.JSON,
+      defaultValue: { schema: 1 } as Api.Config.Radio.type,
     },
     ownerId: {
       type: DataTypes.INTEGER,

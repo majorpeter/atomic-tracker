@@ -314,4 +314,48 @@ export default function (app: Express) {
       res.sendStatus(200);
     }
   );
+
+  app.get<{}, Api.Config.Radio.type>(
+    Api.Config.Radio.path,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      const int = await Integration.findOne({
+        where: {
+          ownerId: req.session.userId!,
+        },
+      });
+
+      if (int) {
+        res.send(int.Radios);
+      } else
+        res.send({
+          schema: 1,
+          stations: [],
+        });
+    }
+  );
+
+  app.post<{}, {}, Api.Config.Radio.type>(
+    Api.Config.Radio.path,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      const int = await Integration.findOne({
+        where: {
+          ownerId: req.session.userId!,
+        },
+      });
+
+      if (int) {
+        int.Radios = req.body;
+        await int.save();
+      } else {
+        await Integration.create({
+          Radios: req.body,
+          ownerId: req.session.userId!,
+        });
+      }
+
+      res.sendStatus(200);
+    }
+  );
 }

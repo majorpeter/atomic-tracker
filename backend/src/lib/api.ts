@@ -248,5 +248,12 @@ export namespace Api {
         };
       };
     }
+
+    export namespace Radio {
+      export const path = "/api/config/radio";
+      export type type = {
+        schema: 1;
+      } & Api.Radio.type;
+    }
   }
 }

@@ -9,6 +9,7 @@ import Projects from "../components/ConfigPage/Projects";
 
 import { dashboardRoute } from "./Dashboard";
 import Todos from "../components/ConfigPage/Todos";
+import Radios from "../components/ConfigPage/Radios";
 
 const ConfigPage: React.FC = () => {
   return (
@@ -44,7 +45,9 @@ const ConfigPage: React.FC = () => {
         <TabPanel value="projects">
           <Projects />
         </TabPanel>
-        <TabPanel value="radios">TBD</TabPanel>
+        <TabPanel value="radios">
+          <Radios />
+        </TabPanel>
       </Tabs>
     </>
   );
