@@ -1,34 +1,19 @@
-import fs from "fs/promises";
-import path from "path";
-
 import fetch from "node-fetch";
 import { xml2js } from "xml-js";
 
-async function getConfig(): Promise<{
-  url: string;
-  board_url?: string;
-  api_key: string;
-  inprogress_status_id: number;
-} | null> {
-  try {
-    return JSON.parse(
-      (
-        await fs.readFile(
-          path.resolve(__dirname, "..", "..", "dist", "redmine.json")
-        )
-      ).toString()
-    );
-  } catch {
+function getElementText(key: string, element: any): string | null {
+  const item = element.elements.find((item: any) => item.name == key);
+  if (!item) {
     return null;
   }
-}
-
-function getElementText(key: string, element: any): string {
-  const item = element.elements.find((item: any) => item.name == key);
   return item.elements[0].text;
 }
 
-export async function fetchInProgress(): Promise<{
+export async function fetchInProgress(config: {
+  url: string;
+  api_key: string;
+  inprogress_status_id: number;
+}): Promise<{
   inprogress: {
     id: number;
     subject: string;
@@ -37,17 +22,14 @@ export async function fetchInProgress(): Promise<{
     updatedAt: string;
     url: string;
   }[];
-  url: string;
-  board_url?: string;
 } | null> {
-  const config = await getConfig();
-  if (config) {
-    const url =
-      config.url +
-      "/issues.xml?" +
-      new URLSearchParams({
-        status_id: config.inprogress_status_id.toString(),
-      });
+  const url =
+    config.url +
+    "/issues.xml?" +
+    new URLSearchParams({
+      status_id: config.inprogress_status_id.toString(),
+    });
+  try {
     const resp = await fetch(
       url,
 
@@ -57,21 +39,26 @@ export async function fetchInProgress(): Promise<{
         },
       }
     );
-    const body = resp.body.read().toString();
-    const js: any[] = xml2js(body).elements[0].elements;
+    const body = xml2js(resp.body.read().toString());
+    const js: any[] | undefined = body.elements[0].elements;
 
-    return {
-      inprogress: js.map((item) => ({
-        id: parseInt(getElementText("id", item)),
-        subject: getElementText("subject", item),
-        donePercent: parseInt(getElementText("done_ratio", item)),
-        createdAt: getElementText("created_on", item),
-        updatedAt: getElementText("updated_on", item),
-        url: config.url + "/issues/" + getElementText("id", item),
-      })),
-      url: config.url,
-      board_url: config.board_url,
-    };
+    if (js) {
+      return {
+        inprogress: js.map((item) => ({
+          id: parseInt(getElementText("id", item) ?? "-1"),
+          subject: getElementText("subject", item) as string,
+          donePercent: parseInt(getElementText("done_ratio", item) ?? "0"),
+          createdAt: getElementText("created_on", item) as string,
+          updatedAt: getElementText("updated_on", item) as string,
+          url: config.url + "/issues/" + getElementText("id", item),
+        })),
+      };
+    } else if (body.elements[0].attributes.total_count == 0) {
+      return { inprogress: [] };
+    }
+  } catch (e) {
+    console.error(e);
   }
+
   return null;
 }

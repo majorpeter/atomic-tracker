@@ -221,5 +221,19 @@ export namespace Api {
         | { action: "move"; direction: "up" | "down"; id: number }
         | { action: "delete"; id: number };
     }
+
+    export namespace Projects {
+      export const path = "/api/config/projects";
+
+      export type type = {
+        schema: 1;
+        redmine?: {
+          url: string;
+          api_key: string;
+          inprogress_status_id: number;
+          board_url?: string;
+        };
+      };
+    }
   }
 }

@@ -1,8 +1,10 @@
 import { Express } from "express";
 
-import { fetchInProgress } from "../lib/redmine";
 import { Api } from "../lib/api";
 import { isLoggedInMiddleware } from "./auth";
+import { Integration } from "../models/integration";
+
+import * as redmine from "../lib/redmine";
 
 const DUMMY_PROJECTS: {
   title: string;
@@ -29,11 +31,32 @@ export default function (app: Express) {
     isLoggedInMiddleware,
     async (req, res) => {
       if (req.query.dummy === undefined) {
-        const data = await fetchInProgress();
-        if (data) {
-          res.send(data);
+        const integrations = await Integration.findOne({
+          where: { ownerId: req.session.userId! },
+        });
+
+        if (
+          integrations &&
+          integrations.Projects.schema == 1 &&
+          integrations.Projects.redmine
+        ) {
+          const data = await redmine.fetchInProgress({
+            url: integrations.Projects.redmine.url,
+            api_key: integrations.Projects.redmine.api_key,
+            inprogress_status_id:
+              integrations.Projects.redmine.inprogress_status_id,
+          });
+
+          if (data != null) {
+            res.send({
+              ...data,
+              board_url: integrations.Projects.redmine.board_url,
+            });
+          } else {
+            res.sendStatus(500);
+          }
         } else {
-          res.sendStatus(404);
+          res.send({ inprogress: [] });
         }
       } else {
         res.send({

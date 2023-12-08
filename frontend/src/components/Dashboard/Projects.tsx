@@ -75,6 +75,7 @@ const Projects: React.FC = () => {
                           sx={{
                             opacity: Math.min(item.lastChangedDaysAgo, 5) / 5,
                           }}
+                          title={item.updatedAt}
                         >
                           {Math.floor(item.lastChangedDaysAgo)} days ago
                         </Typography>

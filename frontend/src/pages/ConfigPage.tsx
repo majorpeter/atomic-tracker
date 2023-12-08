@@ -5,6 +5,7 @@ import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 
 import UserPrefs from "../components/ConfigPage/UserPrefs";
 import Habits from "../components/ConfigPage/Habits";
+import Projects from "../components/ConfigPage/Projects";
 
 import { dashboardRoute } from "./Dashboard";
 
@@ -24,6 +25,10 @@ const ConfigPage: React.FC = () => {
         <TabList>
           <Tab value="user">User Preferences</Tab>
           <Tab value="habits">Habits</Tab>
+          <Tab value="todos">Todos</Tab>
+          <Tab value="agenda">Agenda</Tab>
+          <Tab value="projects">Projects</Tab>
+          <Tab value="radios">Radios</Tab>
         </TabList>
         <TabPanel value="user">
           <UserPrefs />
@@ -31,6 +36,12 @@ const ConfigPage: React.FC = () => {
         <TabPanel value="habits">
           <Habits />
         </TabPanel>
+        <TabPanel value="todos">TBD</TabPanel>
+        <TabPanel value="agenda">TBD</TabPanel>
+        <TabPanel value="projects">
+          <Projects />
+        </TabPanel>
+        <TabPanel value="radios">TBD</TabPanel>
       </Tabs>
     </>
   );

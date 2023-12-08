@@ -50,10 +50,12 @@ export const queryKeys = {
   calendar: ["calendar"],
   journal_overview: ["journal"],
   journal_day: (date: Date) => ["journal", getIsoDate(date)],
+  projects: ["projects"],
   projects_inprogress: ["projects", "inprogress"],
   weather: ["weather"],
   radio: ["radio"],
   config_habits: ["habits", "config"],
+  config_projects: ["projects", "config"],
 };
 
 export function useApiQuery_habits() {
@@ -152,6 +154,15 @@ export function useApiQuery_config_habits(
       return apiFetchJson(Api.Config.Habits.path);
     },
     onSuccess,
+  });
+}
+
+export function useApiQuery_config_projects() {
+  return useQuery<Api.Config.Projects.type>({
+    queryKey: queryKeys.config_projects,
+    queryFn: async () => {
+      return apiFetchJson(Api.Config.Projects.path);
+    },
   });
 }
 
@@ -382,6 +393,20 @@ export function useApiMutation_config_habits_delete() {
       });
 
       queryClient.invalidateQueries(queryKeys.habits);
+    },
+  });
+}
+
+export function useApiMutation_config_projects() {
+  return useMutation<unknown, unknown, Api.Config.Projects.type>({
+    mutationFn: async (payload) => {
+      await fetch(API_URL + Api.Config.Projects.path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      queryClient.invalidateQueries(queryKeys.projects);
     },
   });
 }

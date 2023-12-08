@@ -4,6 +4,7 @@ import { Op } from "sequelize";
 import { isLoggedInMiddleware } from "./auth";
 
 import { Habit, Activity } from "../models/habit";
+import { Integration } from "../models/integration";
 import db from "../lib/db";
 
 export default function (app: Express) {
@@ -229,6 +230,47 @@ export default function (app: Express) {
       } else {
         res.sendStatus(400);
       }
+    }
+  );
+
+  app.get<{}, Api.Config.Projects.type>(
+    Api.Config.Projects.path,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      const int = await Integration.findOne({
+        where: {
+          ownerId: req.session.userId!,
+        },
+      });
+      if (int) {
+        res.send(int?.Projects);
+      } else {
+        res.sendStatus(404);
+      }
+    }
+  );
+
+  app.post<{}, {}, Api.Config.Projects.type>(
+    Api.Config.Projects.path,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      const int = await Integration.findOne({
+        where: {
+          ownerId: req.session.userId!,
+        },
+      });
+
+      if (int) {
+        int.Projects = req.body;
+        await int.save();
+      } else {
+        await Integration.create({
+          Projects: req.body,
+          ownerId: req.session.userId!,
+        });
+      }
+
+      res.sendStatus(200);
     }
   );
 }
