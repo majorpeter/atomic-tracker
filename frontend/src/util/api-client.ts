@@ -55,6 +55,7 @@ export const queryKeys = {
   weather: ["weather"],
   radio: ["radio"],
   config_habits: ["habits", "config"],
+  config_todos: ["todos", "config"],
   config_projects: ["projects", "config"],
 };
 
@@ -154,6 +155,15 @@ export function useApiQuery_config_habits(
       return apiFetchJson(Api.Config.Habits.path);
     },
     onSuccess,
+  });
+}
+
+export function useApiQuery_config_todos() {
+  return useQuery<Api.Config.Todos.type>({
+    queryKey: queryKeys.config_todos,
+    queryFn: async () => {
+      return apiFetchJson(Api.Config.Todos.path);
+    },
   });
 }
 
@@ -393,6 +403,20 @@ export function useApiMutation_config_habits_delete() {
       });
 
       queryClient.invalidateQueries(queryKeys.habits);
+    },
+  });
+}
+
+export function useApiMutation_config_todos() {
+  return useMutation<unknown, unknown, Api.Config.Todos.type>({
+    mutationFn: async (payload) => {
+      await fetch(API_URL + Api.Config.Todos.path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      queryClient.invalidateQueries(queryKeys.todos);
     },
   });
 }

@@ -1,29 +1,10 @@
 import { DAVObject, createDAVClient } from "tsdav";
 import { Express } from "express";
 
-import fs from "fs/promises";
-import path from "path";
-
 import { Api } from "../lib/api";
 import { DUMMY_TODOS } from "../misc/dummy_data";
 import { isLoggedInMiddleware } from "./auth";
-
-async function getConfig(): Promise<{
-  serverUrl: string;
-  user: string;
-  token: string;
-  webuiUrl: string;
-} | null> {
-  try {
-    return JSON.parse(
-      (
-        await fs.readFile(path.resolve(__dirname, "..", "todos.json"))
-      ).toString()
-    );
-  } catch {
-    return null;
-  }
-}
+import { Integration } from "../models/integration";
 
 function findAttribute(object: DAVObject, path: string[]): string | undefined {
   const currentPath = [];
@@ -76,37 +57,36 @@ function timestampToIso(t: string | undefined): string | undefined {
   return t.substring(0, 4) + "-" + t.substring(4, 6) + "-" + t.substring(6, 8);
 }
 
-async function fetchCalendarObjects(): Promise<DAVObject[]> {
-  const config = await getConfig();
+async function fetchCalendarObjects(config: {
+  davServerUrl: string;
+  user: string;
+  token: string;
+}): Promise<DAVObject[]> {
+  const client = await createDAVClient({
+    serverUrl: config.davServerUrl,
+    credentials: {
+      username: config.user,
+      password: config.token,
+    },
+    authMethod: "Basic",
+    defaultAccountType: "caldav",
+  });
 
-  if (config) {
-    const client = await createDAVClient({
-      serverUrl: config.serverUrl,
-      credentials: {
-        username: config.user,
-        password: config.token,
-      },
-      authMethod: "Basic",
-      defaultAccountType: "caldav",
-    });
-
-    const calendars = await client.fetchCalendars();
-    const calendarObjects = await client.fetchCalendarObjects({
-      calendar: calendars[0],
-      filters: [
-        {
-          "comp-filter": {
-            _attributes: {
-              name: "VCALENDAR",
-            },
+  const calendars = await client.fetchCalendars();
+  const calendarObjects = await client.fetchCalendarObjects({
+    calendar: calendars[0],
+    filters: [
+      {
+        "comp-filter": {
+          _attributes: {
+            name: "VCALENDAR",
           },
         },
-      ],
-    });
+      },
+    ],
+  });
 
-    return calendarObjects;
-  }
-  return [];
+  return calendarObjects;
 }
 
 function sortConvFn(todo: Api.Todos.type["todos"][0]): number {
@@ -125,31 +105,59 @@ export default function (app: Express) {
     Api.Todos.path,
     isLoggedInMiddleware,
     async (req, res) => {
-      const config = await getConfig();
-
       if (req.query.dummy === undefined) {
-        const todos: Api.Todos.type["todos"] = (await fetchCalendarObjects())
-          .map((i) => ({
-            uid: findAttribute(i, ["VCALENDAR", "VTODO", "UID"])!,
-            summary: findAttribute(i, ["VCALENDAR", "VTODO", "SUMMARY"]),
-            description: findAttribute(i, [
-              "VCALENDAR",
-              "VTODO",
-              "DESCRIPTION",
-            ]),
-            due: timestampToIso(
-              findAttribute(i, ["VCALENDAR", "VTODO", "DUE"])
-            ),
-            repeats:
-              findAttribute(i, ["VCALENDAR", "VTODO", "RRULE"]) !== undefined,
-            done:
-              findAttribute(i, ["VCALENDAR", "VTODO", "STATUS"]) == "COMPLETED",
-            __data: i.data,
-          }))
-          .filter((i) => !i.done)
-          .sort((a, b) => sortConvFn(a) - sortConvFn(b));
+        const integrations = await Integration.findOne({
+          where: { ownerId: req.session.userId! },
+        });
 
-        res.send({ todos, webui: config?.webuiUrl });
+        if (
+          integrations &&
+          integrations.Todos.schema == 1 &&
+          integrations.Todos.nextcloud
+        ) {
+          try {
+            const todos: Api.Todos.type["todos"] = (
+              await fetchCalendarObjects({
+                davServerUrl:
+                  integrations.Todos.nextcloud.serverUrl +
+                  "/remote.php/dav/calendars/",
+                user: integrations.Todos.nextcloud.user,
+                token: integrations.Todos.nextcloud.token,
+              })
+            )
+              .map((i) => ({
+                uid: findAttribute(i, ["VCALENDAR", "VTODO", "UID"])!,
+                summary: findAttribute(i, ["VCALENDAR", "VTODO", "SUMMARY"]),
+                description: findAttribute(i, [
+                  "VCALENDAR",
+                  "VTODO",
+                  "DESCRIPTION",
+                ]),
+                due: timestampToIso(
+                  findAttribute(i, ["VCALENDAR", "VTODO", "DUE"])
+                ),
+                repeats:
+                  findAttribute(i, ["VCALENDAR", "VTODO", "RRULE"]) !==
+                  undefined,
+                done:
+                  findAttribute(i, ["VCALENDAR", "VTODO", "STATUS"]) ==
+                  "COMPLETED",
+                __data: i.data,
+              }))
+              .filter((i) => !i.done)
+              .sort((a, b) => sortConvFn(a) - sortConvFn(b));
+
+            res.send({
+              todos,
+              webui: integrations.Todos.nextcloud.serverUrl + "/apps/tasks/",
+            });
+          } catch (e) {
+            console.error(e);
+            res.sendStatus(500);
+          }
+        } else {
+          res.send({ todos: [] });
+        }
       } else {
         res.send(DUMMY_TODOS);
       }

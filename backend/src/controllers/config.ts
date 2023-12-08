@@ -233,6 +233,47 @@ export default function (app: Express) {
     }
   );
 
+  app.get<{}, Api.Config.Todos.type>(
+    Api.Config.Todos.path,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      const int = await Integration.findOne({
+        where: {
+          ownerId: req.session.userId!,
+        },
+      });
+      if (int) {
+        res.send(int.Todos);
+      } else {
+        res.sendStatus(404);
+      }
+    }
+  );
+
+  app.post<{}, {}, Api.Config.Todos.type>(
+    Api.Config.Todos.path,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      const int = await Integration.findOne({
+        where: {
+          ownerId: req.session.userId!,
+        },
+      });
+
+      if (int) {
+        int.Todos = req.body;
+        await int.save();
+      } else {
+        await Integration.create({
+          Todos: req.body,
+          ownerId: req.session.userId!,
+        });
+      }
+
+      res.sendStatus(200);
+    }
+  );
+
   app.get<{}, Api.Config.Projects.type>(
     Api.Config.Projects.path,
     isLoggedInMiddleware,
@@ -243,7 +284,7 @@ export default function (app: Express) {
         },
       });
       if (int) {
-        res.send(int?.Projects);
+        res.send(int.Projects);
       } else {
         res.sendStatus(404);
       }

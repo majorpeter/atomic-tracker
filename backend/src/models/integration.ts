@@ -15,6 +15,7 @@ export class Integration extends Model<
   InferAttributes<Integration>,
   InferCreationAttributes<Integration>
 > {
+  declare Todos: CreationOptional<Api.Config.Todos.type>;
   declare Projects: CreationOptional<Api.Config.Projects.type>;
   declare Owner: NonAttribute<User>;
   declare ownerId: ForeignKey<User["id"]>;
@@ -22,6 +23,10 @@ export class Integration extends Model<
 
 Integration.init(
   {
+    Todos: {
+      type: DataTypes.JSON,
+      defaultValue: { schema: 1 } as Api.Config.Todos.type,
+    },
     Projects: {
       type: DataTypes.JSON,
       defaultValue: { schema: 1 } as Api.Config.Projects.type,

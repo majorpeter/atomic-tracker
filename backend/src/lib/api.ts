@@ -222,6 +222,19 @@ export namespace Api {
         | { action: "delete"; id: number };
     }
 
+    export namespace Todos {
+      export const path = "/api/config/todos";
+
+      export type type = {
+        schema: 1;
+        nextcloud?: {
+          serverUrl: string;
+          user: string;
+          token: string;
+        };
+      };
+    }
+
     export namespace Projects {
       export const path = "/api/config/projects";
 

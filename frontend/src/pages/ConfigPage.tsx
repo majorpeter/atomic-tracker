@@ -8,6 +8,7 @@ import Habits from "../components/ConfigPage/Habits";
 import Projects from "../components/ConfigPage/Projects";
 
 import { dashboardRoute } from "./Dashboard";
+import Todos from "../components/ConfigPage/Todos";
 
 const ConfigPage: React.FC = () => {
   return (
@@ -36,7 +37,9 @@ const ConfigPage: React.FC = () => {
         <TabPanel value="habits">
           <Habits />
         </TabPanel>
-        <TabPanel value="todos">TBD</TabPanel>
+        <TabPanel value="todos">
+          <Todos />
+        </TabPanel>
         <TabPanel value="agenda">TBD</TabPanel>
         <TabPanel value="projects">
           <Projects />
