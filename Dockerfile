@@ -18,6 +18,7 @@ RUN cd frontend; npm run-script build
 
 VOLUME [ "/config" ]
 ENV CONFIG_DIR=/config
+ENV BYPASS_LOGIN=0
 
 EXPOSE 8080
 ENTRYPOINT [ "node", "backend/dist/app.js" ]
