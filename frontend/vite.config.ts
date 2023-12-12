@@ -18,6 +18,9 @@ export default defineConfig({
       "@api": path.resolve(__dirname, "../backend/src/lib/api.ts"),
     },
   },
+  define: {
+    BUILD_NUMBER: JSON.stringify(new Date().valueOf()),
+  },
   build: {
     rollupOptions: {
       output: {

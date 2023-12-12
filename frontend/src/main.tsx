@@ -32,13 +32,14 @@ const router = createBrowserRouter([
 
 const persister = createSyncStoragePersister({
   storage: window.localStorage,
+  key: "atomicCache",
 });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <PersistQueryClientProvider
       client={queryClient}
-      persistOptions={{ persister }}
+      persistOptions={{ persister, buster: BUILD_NUMBER.toString() }}
     >
       <RouterProvider router={router} />
     </PersistQueryClientProvider>
