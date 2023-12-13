@@ -5,12 +5,14 @@ import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import ClassIcon from "@mui/icons-material/Class";
 import SelfImprovementIcon from "@mui/icons-material/SelfImprovement";
+import FastfoodIcon from "@mui/icons-material/Fastfood";
 
 const icons: Record<string, SvgIconComponent> = {
   workout: FitnessCenterIcon,
   book: MenuBookIcon,
   journal: ClassIcon,
   selfImprovement: SelfImprovementIcon,
+  fastfood: FastfoodIcon,
 };
 
 const fallbackIcon = QuestionMarkIcon;

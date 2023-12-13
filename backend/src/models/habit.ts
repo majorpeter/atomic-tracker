@@ -15,12 +15,15 @@ import {
 import db from "../lib/db";
 import { User } from "./user";
 
+const typeValueSet = ["good", "bad"] as const;
+
 export class Habit extends Model<
   InferAttributes<Habit>,
   InferCreationAttributes<Habit>
 > {
   declare id: CreationOptional<number>;
   declare name: string;
+  declare type: (typeof typeValueSet)[number];
   declare iconName: string | null;
   declare targetValue: number;
   declare periodLength: number;
@@ -46,6 +49,11 @@ Habit.init(
     },
     name: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    type: {
+      type: DataTypes.ENUM,
+      values: typeValueSet,
       allowNull: false,
     },
     iconName: {

@@ -32,6 +32,7 @@ export default function (app: Express) {
         habits: habits.map((item) => ({
           id: item.id,
           name: item.name,
+          type: item.type,
           iconName: item.iconName,
           targetValue: item.targetValue,
           periodLength: item.periodLength,

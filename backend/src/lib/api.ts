@@ -190,6 +190,7 @@ export namespace Api {
       export type HabitDescriptor = {
         id?: number;
         name: string;
+        type: "good" | "bad";
         iconName: string | null;
         targetValue: number;
         periodLength: number;
