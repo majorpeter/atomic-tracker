@@ -43,6 +43,7 @@ export namespace Api {
     export type type = {
       id: number;
       name: string;
+      type: "good" | "bad";
       iconName: string | null;
       value: number;
       targetValue: number;

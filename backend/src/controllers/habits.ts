@@ -49,6 +49,7 @@ export default function (app: Express) {
         result.push({
           id: habit.id,
           name: habit.name,
+          type: habit.type,
           iconName: habit.iconName,
           value: trackedInPeriod.sumValue,
           targetValue: habit.targetValue,

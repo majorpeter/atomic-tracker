@@ -1,4 +1,10 @@
-import { Card, CardContent, CircularProgress, Typography } from "@mui/joy";
+import {
+  Card,
+  CardContent,
+  CircularProgress,
+  ColorPaletteProp,
+  Typography,
+} from "@mui/joy";
 
 import { Link } from "react-router-dom";
 import { habitTrackerRoute } from "../../pages/Dashboard/HabitTrackerModal";
@@ -7,6 +13,7 @@ import { getHabitIconByName } from "../../util/habit-icons";
 export type HabitProps = {
   id: number;
   name: string;
+  type: "good" | "bad";
   iconName: string | null;
   value: number;
   targetValue: number;
@@ -16,12 +23,32 @@ export type HabitProps = {
 const Habit: React.FC<HabitProps> = ({
   id,
   name,
+  type,
   iconName,
   value,
   targetValue,
   historicalPercent,
 }) => {
   const Icon = getHabitIconByName(iconName);
+
+  let color: ColorPaletteProp = "neutral";
+  if (type == "good") {
+    if (value == 0) {
+      color = "danger";
+    } else if (historicalPercent < 75) {
+      color = "primary";
+    } else {
+      color = "success";
+    }
+  } else if (type == "bad") {
+    if (historicalPercent < 1) {
+      color = "neutral";
+    } else if (historicalPercent < 75) {
+      color = "warning";
+    } else {
+      color = "danger";
+    }
+  }
 
   return (
     <Card
@@ -52,6 +79,7 @@ const Habit: React.FC<HabitProps> = ({
           }}
           determinate
           value={historicalPercent}
+          color={color}
         >
           <Icon />
         </CircularProgress>
@@ -64,7 +92,7 @@ const Habit: React.FC<HabitProps> = ({
             {name}
           </Typography>
           <Typography level="h3" color="neutral" sx={{ textAlign: "center" }}>
-            <Typography color="primary" level="h1" sx={{ paddingRight: 0.3 }}>
+            <Typography color={color} level="h1" sx={{ paddingRight: 0.3 }}>
               {value}
             </Typography>
             /{targetValue}
