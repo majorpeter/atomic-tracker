@@ -45,6 +45,7 @@ const HabitEditor: React.FC<{
 
     return {
       name: data.name as string,
+      type: data.type as "good" | "bad",
       iconName: (data.iconName as string) || null,
       targetValue: parseInt(data.targetValue as string),
       periodLength: parseInt(data.periodLength as string),
@@ -87,6 +88,30 @@ const HabitEditor: React.FC<{
           <FormControl>
             <FormLabel>Name</FormLabel>
             <Input defaultValue={habit.name} name="name" />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Type</FormLabel>
+            <RadioGroup
+              defaultValue={habit.type}
+              sx={{
+                flexDirection: "row",
+                alignItems: "baseline",
+                "& > *": { mr: 3 },
+              }}
+            >
+              <Radio
+                name="type"
+                value="good"
+                label="Good"
+                color="primary"
+              ></Radio>
+              <Radio
+                name="type"
+                value="bad"
+                label="Bad"
+                color="warning"
+              ></Radio>
+            </RadioGroup>
           </FormControl>
           <FormControl>
             <FormLabel>Target Value</FormLabel>

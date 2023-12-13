@@ -87,7 +87,7 @@ const Habits: React.FC = () => {
       isHabitRefreshRequired: false,
       habit: {
         name: "New habit",
-        type: "good", //TODO
+        type: "good",
         iconName: "",
         targetValue: 1,
         periodLength: 7,
