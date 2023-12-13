@@ -1,17 +1,21 @@
-import { Link, RouteObject } from "react-router-dom";
-
+import { Link, RouteObject, useLocation } from "react-router-dom";
 import { Tabs, TabList, Tab, TabPanel, Button, Sheet } from "@mui/joy";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 
 import UserPrefs from "../components/ConfigPage/UserPrefs";
 import Habits from "../components/ConfigPage/Habits";
-import Projects from "../components/ConfigPage/Projects";
-
-import { dashboardRoute } from "./Dashboard";
 import Todos from "../components/ConfigPage/Todos";
+import Agenda from "../components/ConfigPage/Agenda";
+import Projects from "../components/ConfigPage/Projects";
 import Radios from "../components/ConfigPage/Radios";
 
+import { dashboardRoute } from "./Dashboard";
+
 const ConfigPage: React.FC = () => {
+  const location = useLocation();
+  const sp = new URLSearchParams(location.search);
+  const agendaSelected = sp.get("agenda") != null;
+
   return (
     <>
       <Sheet sx={{ mb: 2 }}>
@@ -23,7 +27,7 @@ const ConfigPage: React.FC = () => {
           Dashboard
         </Button>
       </Sheet>
-      <Tabs defaultValue="user">
+      <Tabs defaultValue={agendaSelected ? "agenda" : "user"}>
         <TabList>
           <Tab value="user">User Preferences</Tab>
           <Tab value="habits">Habits</Tab>
@@ -41,7 +45,9 @@ const ConfigPage: React.FC = () => {
         <TabPanel value="todos">
           <Todos />
         </TabPanel>
-        <TabPanel value="agenda">TBD</TabPanel>
+        <TabPanel value="agenda">
+          <Agenda />
+        </TabPanel>
         <TabPanel value="projects">
           <Projects />
         </TabPanel>

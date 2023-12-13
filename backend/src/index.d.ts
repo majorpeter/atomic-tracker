@@ -5,5 +5,12 @@ declare module "express-session" {
     userId: number;
     userName: string;
     interfaceLanguage: string;
+    pendingConfig: {
+      gCal?: {
+        client_id: string;
+        client_secret: string;
+        redirect_uri: string;
+      };
+    };
   }
 }

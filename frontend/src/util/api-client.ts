@@ -65,6 +65,7 @@ export const queryKeys = {
   config_todos: ["todos", "config"],
   config_projects: ["projects", "config"],
   config_radio: ["radio", "config"],
+  config_agenda_state: ["calendar", "state"],
 };
 
 export function useApiQuery_habits() {
@@ -175,6 +176,25 @@ export function useApiQuery_config_todos() {
     queryFn: async () => {
       return apiFetchJson(Api.Config.Todos.path);
     },
+  });
+}
+
+export function useApiQuery_config_agenda_state() {
+  return useQuery<Api.Config.Agenda.get_resp>({
+    queryKey: queryKeys.config_agenda_state,
+    queryFn: async () => {
+      return apiFetchJson(Api.Config.Agenda.path);
+    },
+  });
+}
+
+export async function apiFetchGoogleCalendarAuthUrl(
+  options: Api.Config.Agenda.AuthorizeGoogleAccount.post_req
+): Promise<Api.Config.Agenda.AuthorizeGoogleAccount.post_resp> {
+  return apiFetchJson(Api.Config.Agenda.AuthorizeGoogleAccount.path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(options),
   });
 }
 
@@ -437,6 +457,20 @@ export function useApiMutation_config_todos() {
       });
 
       queryClient.invalidateQueries({ queryKey: queryKeys.todos });
+    },
+  });
+}
+
+export function useApiMutation_config_agenda() {
+  return useMutation<unknown, unknown, Api.Config.Agenda.post_req>({
+    mutationFn: async (payload) => {
+      await fetch(API_URL + Api.Config.Agenda.path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      queryClient.invalidateQueries({ queryKey: queryKeys.calendar });
     },
   });
 }

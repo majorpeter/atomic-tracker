@@ -235,6 +235,30 @@ export namespace Api {
       };
     }
 
+    export namespace Agenda {
+      export const path = "/api/config/agenda";
+      export type get_resp = {
+        provider: null | "google";
+      };
+      export type post_req = {
+        google?: {
+          code: string;
+        };
+      };
+
+      export namespace AuthorizeGoogleAccount {
+        export const path = "/api/config/agenda/google-auth";
+        export type post_req = {
+          client_id: string;
+          client_secret: string;
+          redirect_uri: string;
+        };
+        export type post_resp = {
+          url: string;
+        };
+      }
+    }
+
     export namespace Projects {
       export const path = "/api/config/projects";
 

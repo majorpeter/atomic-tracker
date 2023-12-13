@@ -80,6 +80,7 @@ export default function (app: Express) {
             req.session.userId = user.id;
             req.session.userName = user.name;
             req.session.interfaceLanguage = user.language;
+            req.session.pendingConfig = {};
 
             res.send({
               name: user.name,

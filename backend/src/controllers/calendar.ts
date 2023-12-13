@@ -1,10 +1,11 @@
 import { Express } from "express";
 import { Api } from "../lib/api";
-import { listEvents } from "../lib/google-account";
+import { authorize, listEvents } from "../lib/google-account";
 import { calendar_v3 } from "googleapis";
 
 import { DUMMY_CALENDAR } from "../misc/dummy_data";
 import { isLoggedInMiddleware } from "./auth";
+import { Integration } from "../models/integration";
 
 function filterEvents(
   events: calendar_v3.Schema$Event[],
@@ -32,43 +33,54 @@ export default function (app: Express) {
     isLoggedInMiddleware,
     async (req, res) => {
       if (req.query.dummy === undefined) {
-        const events = await listEvents();
-
-        const startToday = new Date();
-        startToday.setHours(0, 0, 0, 0);
-
-        const tonight = new Date();
-        tonight.setHours(0, 0, 0, 0);
-        tonight.setDate(tonight.getDate() + 1);
-
-        const endWeek = new Date(startToday);
-        endWeek.setDate(endWeek.getDate() - endWeek.getDay() + 7 + 1); // +1 for starting on Monday
-
-        const endNextWeek = new Date(endWeek);
-        endNextWeek.setDate(endNextWeek.getDate() + 7);
-
-        const endThisMonth = new Date(startToday);
-        endThisMonth.setDate(1);
-        endThisMonth.setMonth(endThisMonth.getMonth() + 1);
-
-        const endNextMonth = new Date(endThisMonth);
-        endNextMonth.setMonth(endNextMonth.getMonth() + 1);
-
-        /*
-         * may not be the most efficient way of iterating but good enough for the amount of data I'm handling
-         */
-        res.send({
-          today: filterEvents(events!, startToday, tonight),
-          thisWeek: filterEvents(events!, tonight, endWeek),
-          nextWeek: filterEvents(events!, endWeek, endNextWeek),
-          thisMonth: filterEvents(events!, endNextWeek, endThisMonth), // "end < start" maybe
-          nextMonth: filterEvents(
-            events!,
-            new Date(Math.max(endNextWeek.getTime(), endThisMonth.getTime())),
-            endNextMonth
-          ),
-          later: filterEvents(events!, endNextMonth),
+        const integration = await Integration.findOne({
+          where: { ownerId: req.session.userId! },
         });
+
+        if (integration?.Agenda.google) {
+          const client = await authorize({
+            clientId: integration.Agenda.google.clientId,
+            clientSecret: integration.Agenda.google.clientSecret,
+            refreshToken: integration.Agenda.google.refreshToken,
+          });
+          const events = await listEvents(client);
+
+          const startToday = new Date();
+          startToday.setHours(0, 0, 0, 0);
+
+          const tonight = new Date();
+          tonight.setHours(0, 0, 0, 0);
+          tonight.setDate(tonight.getDate() + 1);
+
+          const endWeek = new Date(startToday);
+          endWeek.setDate(endWeek.getDate() - endWeek.getDay() + 7 + 1); // +1 for starting on Monday
+
+          const endNextWeek = new Date(endWeek);
+          endNextWeek.setDate(endNextWeek.getDate() + 7);
+
+          const endThisMonth = new Date(startToday);
+          endThisMonth.setDate(1);
+          endThisMonth.setMonth(endThisMonth.getMonth() + 1);
+
+          const endNextMonth = new Date(endThisMonth);
+          endNextMonth.setMonth(endNextMonth.getMonth() + 1);
+
+          /*
+           * may not be the most efficient way of iterating but good enough for the amount of data I'm handling
+           */
+          res.send({
+            today: filterEvents(events!, startToday, tonight),
+            thisWeek: filterEvents(events!, tonight, endWeek),
+            nextWeek: filterEvents(events!, endWeek, endNextWeek),
+            thisMonth: filterEvents(events!, endNextWeek, endThisMonth), // "end < start" maybe
+            nextMonth: filterEvents(
+              events!,
+              new Date(Math.max(endNextWeek.getTime(), endThisMonth.getTime())),
+              endNextMonth
+            ),
+            later: filterEvents(events!, endNextMonth),
+          });
+        }
       } else {
         res.send(DUMMY_CALENDAR);
       }

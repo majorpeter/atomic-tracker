@@ -4,8 +4,9 @@ import { Op } from "sequelize";
 import { isLoggedInMiddleware } from "./auth";
 
 import { Habit, Activity } from "../models/habit";
-import { Integration } from "../models/integration";
+import { AgendaType, Integration } from "../models/integration";
 import db from "../lib/db";
+import { generateAuthUrl, getTokenFromCode } from "../lib/google-account";
 
 export default function (app: Express) {
   app.get<{}, Api.Config.Habits.get_type>(
@@ -271,6 +272,104 @@ export default function (app: Express) {
       }
 
       res.sendStatus(200);
+    }
+  );
+
+  app.get<{}, Api.Config.Agenda.get_resp>(
+    Api.Config.Agenda.path,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      const int = await Integration.findOne({
+        where: {
+          ownerId: req.session.userId!,
+        },
+      });
+
+      if (int && int.Agenda.schema == 1) {
+        res.send({ provider: int.Agenda.google ? "google" : null });
+      } else {
+        res.send({ provider: null });
+      }
+    }
+  );
+
+  app.post<
+    {},
+    Api.Config.Agenda.AuthorizeGoogleAccount.post_resp,
+    Api.Config.Agenda.AuthorizeGoogleAccount.post_req
+  >(
+    Api.Config.Agenda.AuthorizeGoogleAccount.path,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      // save in session for later
+      req.session.pendingConfig!.gCal = {
+        client_id: req.body.client_id,
+        client_secret: req.body.client_secret,
+        redirect_uri: req.body.redirect_uri,
+      };
+
+      res.send({
+        url: generateAuthUrl({
+          clientId: req.body.client_id,
+          clientSecret: req.body.client_secret,
+          redirectUri: req.body.redirect_uri,
+        }),
+      });
+    }
+  );
+
+  app.post<{}, {}, Api.Config.Agenda.post_req>(
+    Api.Config.Agenda.path,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      let config: AgendaType | undefined;
+
+      if (req.body.google) {
+        if (req.session.pendingConfig!.gCal && req.body.google?.code) {
+          config = {
+            schema: 1,
+            google: {
+              clientId: req.session.pendingConfig!.gCal.client_id,
+              clientSecret: req.session.pendingConfig!.gCal.client_secret,
+              refreshToken: await getTokenFromCode({
+                clientId: req.session.pendingConfig!.gCal.client_id,
+                clientSecret: req.session.pendingConfig!.gCal.client_secret,
+                redirectUri: req.session.pendingConfig!.gCal.redirect_uri,
+                code: req.body.google.code,
+              }),
+            },
+          };
+
+          // clear session just in case
+          req.session.pendingConfig!.gCal = undefined;
+        } else {
+          // need a pending config in session (leave config undefined)
+        }
+      } else {
+        // no privder, empty config
+        config = { schema: 1 };
+      }
+
+      if (config !== undefined) {
+        const int = await Integration.findOne({
+          where: {
+            ownerId: req.session.userId!,
+          },
+        });
+
+        if (int) {
+          int.Agenda = config;
+          await int.save();
+        } else {
+          await Integration.create({
+            Agenda: config,
+            ownerId: req.session.userId!,
+          });
+        }
+        res.sendStatus(200);
+      } else {
+        res.sendStatus(500);
+      }
     }
   );
 
