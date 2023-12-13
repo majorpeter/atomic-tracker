@@ -61,3 +61,22 @@ export const DUMMY_CALENDAR: Api.Calendar.type = {
     },
   ],
 };
+
+export const DUMMY_PROJECTS: {
+  title: string;
+  progressPercent: number;
+  lastChangedDaysAgo: number;
+}[] = [
+  { title: "Read Atomic Habits", lastChangedDaysAgo: 10, progressPercent: 95 },
+  { title: "Reorganize furniture", lastChangedDaysAgo: 6, progressPercent: 30 },
+  {
+    title: "Automate lights in living room",
+    lastChangedDaysAgo: 2,
+    progressPercent: 50,
+  },
+  {
+    title: "Develop habit tracker site",
+    progressPercent: 5,
+    lastChangedDaysAgo: 0,
+  },
+];

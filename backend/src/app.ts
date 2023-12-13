@@ -15,7 +15,11 @@ import weather from "./controllers/weather";
 import radio from "./controllers/radio";
 import config from "./controllers/config";
 
-const PORT = 8080;
+const LISTENING_PORT = process.env.LISTENING_PORT || 8080;
+const USE_DUMMY_DATA =
+  process.env.USE_DUMMY_DATA != undefined &&
+  parseInt(process.env.USE_DUMMY_DATA) > 0;
+
 const FRONTEND_RELATIVE_PATH = "../../frontend/dist";
 
 const app = express();
@@ -46,10 +50,10 @@ app.use(express.static(path.resolve(__dirname, FRONTEND_RELATIVE_PATH)));
 auth(app);
 install(app);
 habits(app);
-todos(app);
-calendar(app);
+todos(app, USE_DUMMY_DATA);
+calendar(app, USE_DUMMY_DATA);
 journal(app);
-projects(app);
+projects(app, USE_DUMMY_DATA);
 weather(app);
 radio(app);
 config(app);
@@ -68,6 +72,6 @@ app.get("*", (_, res) => {
 
 initDb();
 
-app.listen(PORT, () => {
-  console.log(`Backend listening on localhost:${PORT}!`);
+app.listen(LISTENING_PORT, () => {
+  console.log(`Backend listening on localhost:${LISTENING_PORT}!`);
 });

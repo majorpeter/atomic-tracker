@@ -100,12 +100,12 @@ function sortConvFn(todo: Api.Todos.type["todos"][0]): number {
   return MAX_TIME;
 }
 
-export default function (app: Express) {
+export default function (app: Express, useDummyData: boolean) {
   app.get<{}, Api.Todos.type, {}, Api.Todos.get_query>(
     Api.Todos.path,
     isLoggedInMiddleware,
     async (req, res) => {
-      if (req.query.dummy === undefined) {
+      if (!useDummyData) {
         const integrations = await Integration.findOne({
           where: { ownerId: req.session.userId! },
         });

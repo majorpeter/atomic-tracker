@@ -6,31 +6,14 @@ import { Integration } from "../models/integration";
 
 import * as redmine from "../lib/redmine";
 
-const DUMMY_PROJECTS: {
-  title: string;
-  progressPercent: number;
-  lastChangedDaysAgo: number;
-}[] = [
-  { title: "Read Atomic Habits", lastChangedDaysAgo: 10, progressPercent: 95 },
-  { title: "Reorganize furniture", lastChangedDaysAgo: 6, progressPercent: 30 },
-  {
-    title: "Automate lights in living room",
-    lastChangedDaysAgo: 2,
-    progressPercent: 50,
-  },
-  {
-    title: "Develop habit tracker site",
-    progressPercent: 5,
-    lastChangedDaysAgo: 0,
-  },
-];
+import { DUMMY_PROJECTS } from "../misc/dummy_data";
 
-export default function (app: Express) {
+export default function (app: Express, useDummyData: boolean) {
   app.get<{}, Api.Projects.type>(
     Api.Projects.path,
     isLoggedInMiddleware,
     async (req, res) => {
-      if (req.query.dummy === undefined) {
+      if (!useDummyData) {
         const integrations = await Integration.findOne({
           where: { ownerId: req.session.userId! },
         });

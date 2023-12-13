@@ -27,12 +27,12 @@ function filterEvents(
   return filtered.length ? filtered : undefined;
 }
 
-export default function (app: Express) {
+export default function (app: Express, useDummyData: boolean) {
   app.get<{}, Api.Calendar.type, {}, Api.Calendar.get_query>(
     Api.Calendar.path,
     isLoggedInMiddleware,
     async (req, res) => {
-      if (req.query.dummy === undefined) {
+      if (!useDummyData) {
         const integration = await Integration.findOne({
           where: { ownerId: req.session.userId! },
         });

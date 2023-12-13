@@ -18,6 +18,7 @@ RUN cd frontend; npm run-script build
 
 VOLUME [ "/config" ]
 ENV CONFIG_DIR=/config
+ENV LISTENING_PORT=8080
 ENV BYPASS_LOGIN=0
 
 EXPOSE 8080
