@@ -57,6 +57,7 @@ export namespace Api {
 
     export type type = {
       name: string;
+      type: "good" | "bad";
       iconName: string | null;
       targetValue: number;
       periodLength: number;

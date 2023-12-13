@@ -3,6 +3,7 @@ import { useRef } from "react";
 import {
   Button,
   Chip,
+  ColorPaletteProp,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -41,6 +42,23 @@ import { formatDate, getIsoDate } from "../../util/formatter";
 import { getHabitIconByName } from "../../util/habit-icons";
 
 import DeleteIcon from "@mui/icons-material/Delete";
+
+function colorValue(
+  type: "good" | "bad",
+  value: number,
+  target: number
+): ColorPaletteProp {
+  if (type == "good") {
+    if (value >= target) {
+      return "success";
+    }
+    return "warning";
+  }
+  if (value >= target) {
+    return "danger";
+  }
+  return "warning";
+}
 
 const HabitTrackerModal: React.FC = () => {
   const navigate = useNavigate();
@@ -89,11 +107,11 @@ const HabitTrackerModal: React.FC = () => {
                   <th>Tracked</th>
                   <td>
                     <Chip
-                      color={
-                        data.trackedInPeriod.value >= data.targetValue
-                          ? "success"
-                          : "warning"
-                      }
+                      color={colorValue(
+                        data.type,
+                        data.trackedInPeriod.value,
+                        data.targetValue
+                      )}
                     >
                       {data.trackedInPeriod.value}
                     </Chip>{" "}
@@ -106,10 +124,12 @@ const HabitTrackerModal: React.FC = () => {
                   </td>
                 </tr>
                 <tr>
-                  <th>Target</th>
+                  <th>{data.type == "good" ? "Target" : "Limit"}</th>
                   <td>
-                    <Chip color="primary">{data.targetValue}</Chip> over a
-                    period of {data.periodLength} days
+                    <Chip color={data.type == "good" ? "primary" : "warning"}>
+                      {data.targetValue}
+                    </Chip>{" "}
+                    over a period of {data.periodLength} days
                   </td>
                 </tr>
               </tbody>
@@ -176,6 +196,7 @@ const HabitTrackerModal: React.FC = () => {
                 key={activity.id}
                 onClick={() => handleTrack(activity.id)}
                 loading={trackPosting}
+                color={data.type == "good" ? "primary" : "warning"}
               >
                 Track "{activity.name}"
               </Button>

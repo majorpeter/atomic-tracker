@@ -99,6 +99,7 @@ export default function (app: Express) {
 
         res.send({
           name: habit.name,
+          type: habit.type,
           iconName: habit.iconName,
           targetValue: habit.targetValue,
           periodLength: habit.periodLength,
