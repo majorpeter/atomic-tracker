@@ -173,8 +173,8 @@ export namespace Api {
   export namespace Weather {
     export const path = "/api/weather";
     export type type = {
-      temp_celsius: number;
-      weather_symbol: WeatherSymbolCode;
+      temp_celsius?: number;
+      weather_symbol?: WeatherSymbolCode;
     };
   }
 

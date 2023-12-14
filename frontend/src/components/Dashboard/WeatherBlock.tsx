@@ -79,7 +79,7 @@ const WeatherSymbol: React.FC<{
 
 const WeatherBlock: React.FC = () => {
   const { data } = useApiQuery_weather();
-  if (data) {
+  if (data && data.weather_symbol) {
     return (
       <Stack
         sx={{ ml: 2, textDecoration: "none", color: "inherit" }}
