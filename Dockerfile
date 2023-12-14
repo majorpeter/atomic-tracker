@@ -13,6 +13,7 @@ COPY backend/src backend/src
 RUN cd backend; npm run-script build
 
 COPY frontend/tsconfig.json frontend/tsconfig.node.json frontend/vite.config.ts frontend/index.html frontend/
+COPY frontend/public frontend/public
 COPY frontend/src frontend/src
 RUN cd frontend; npm run-script build
 
