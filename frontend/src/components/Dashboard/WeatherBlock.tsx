@@ -68,6 +68,9 @@ const WeatherSymbol: React.FC<{
 
     //TODO finish mapping!
 
+    case "lightrain":
+    case "rain":
+      return <WeatherIcons.WiRain {...props} />;
     case "cloudy":
       return <WeatherIcons.WiCloudy {...props} />;
   }
