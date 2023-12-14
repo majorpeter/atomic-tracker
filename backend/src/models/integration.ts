@@ -1,4 +1,5 @@
 import {
+  Attributes,
   CreationOptional,
   DataTypes,
   ForeignKey,
@@ -11,21 +12,19 @@ import { User } from "./user";
 import db from "../lib/db";
 import { Api } from "../lib/api";
 
-export type AgendaType = {
-  schema: 1;
-  google?: {
-    clientId: string;
-    clientSecret: string;
-    refreshToken: string;
-  };
-};
-
 export class Integration extends Model<
   InferAttributes<Integration>,
   InferCreationAttributes<Integration>
 > {
   declare Todos: CreationOptional<Api.Config.Todos.type>;
-  declare Agenda: CreationOptional<AgendaType>;
+  declare Agenda: CreationOptional<{
+    schema: 1;
+    google?: {
+      clientId: string;
+      clientSecret: string;
+      refreshToken: string;
+    };
+  }>;
   declare Projects: CreationOptional<Api.Config.Projects.type>;
   declare Radios: CreationOptional<Api.Config.Radio.type>;
   declare Owner: NonAttribute<User>;
@@ -36,19 +35,22 @@ Integration.init(
   {
     Todos: {
       type: DataTypes.JSON,
-      defaultValue: { schema: 1 } satisfies Api.Config.Todos.type,
+      defaultValue: { schema: 1 } satisfies Attributes<Integration>["Todos"],
     },
     Agenda: {
       type: DataTypes.JSON,
-      defaultValue: { schema: 1 } satisfies AgendaType,
+      defaultValue: { schema: 1 } satisfies Attributes<Integration>["Agenda"],
     },
     Projects: {
       type: DataTypes.JSON,
-      defaultValue: { schema: 1 } satisfies Api.Config.Projects.type,
+      defaultValue: { schema: 1 } satisfies Attributes<Integration>["Projects"],
     },
     Radios: {
       type: DataTypes.JSON,
-      defaultValue: { schema: 1, stations: [] } satisfies Api.Config.Radio.type,
+      defaultValue: {
+        schema: 1,
+        stations: [],
+      } satisfies Attributes<Integration>["Radios"],
     },
     ownerId: {
       type: DataTypes.INTEGER,

@@ -1,10 +1,10 @@
 import { Express } from "express";
 import { Api } from "../lib/api";
-import { Op } from "sequelize";
+import { Attributes, Op } from "sequelize";
 import { isLoggedInMiddleware } from "./auth";
 
 import { Habit, Activity } from "../models/habit";
-import { AgendaType, Integration } from "../models/integration";
+import { Integration } from "../models/integration";
 import db from "../lib/db";
 import { generateAuthUrl, getTokenFromCode } from "../lib/google-account";
 
@@ -323,7 +323,7 @@ export default function (app: Express) {
     Api.Config.Agenda.path,
     isLoggedInMiddleware,
     async (req, res) => {
-      let config: AgendaType | undefined;
+      let config: Attributes<Integration>["Agenda"] | undefined;
 
       if (req.body.google) {
         if (req.session.pendingConfig!.gCal && req.body.google?.code) {
