@@ -11,6 +11,7 @@ import Journal from "../components/Dashboard/Journal.tsx";
 import { habitTrackerRoute } from "./Dashboard/HabitTrackerModal.tsx";
 import { todosModalRoute } from "./Dashboard/TodosModal.tsx";
 import { journalEditorRoute } from "./Dashboard/JournalEditorModal.tsx";
+import { radioPickerRoute } from "./Dashboard/RadioPickerModal.tsx";
 
 function Dashboard() {
   return (
@@ -39,7 +40,12 @@ function Dashboard() {
 export const dashboardRoute: RouteObject = {
   path: "/dashboard",
   element: <Dashboard />,
-  children: [todosModalRoute, journalEditorRoute, habitTrackerRoute],
+  children: [
+    todosModalRoute,
+    journalEditorRoute,
+    habitTrackerRoute,
+    radioPickerRoute,
+  ],
 };
 
 export default Dashboard;

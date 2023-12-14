@@ -146,13 +146,15 @@ export function useApiQuery_weather() {
   });
 }
 
+export const apiQuery_radio = {
+  queryKey: queryKeys.radio,
+  queryFn: async () => {
+    return apiFetchJson(Api.Radio.path);
+  },
+};
+
 export function useApiQuery_radio() {
-  return useQuery<Api.Radio.type>({
-    queryKey: queryKeys.radio,
-    queryFn: async () => {
-      return apiFetchJson(Api.Radio.path);
-    },
-  });
+  return useQuery<Api.Radio.type>(apiQuery_radio);
 }
 
 export function useApiQuery_config_habits(
