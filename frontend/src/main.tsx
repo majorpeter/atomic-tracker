@@ -16,6 +16,7 @@ import { dashboardRoute } from "./pages/Dashboard.tsx";
 import { configPageRoute } from "./pages/ConfigPage.tsx";
 import { loginRoute, logoutRoute } from "./pages/LoginPage.tsx";
 import { installRoute } from "./pages/InstallPage.tsx";
+import { notfoundFallbackRoute } from "./pages/NotFound.tsx";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,8 @@ const router = createBrowserRouter([
   dashboardRoute,
   configPageRoute,
   installRoute,
+
+  notfoundFallbackRoute,
 ]);
 
 const persister = createSyncStoragePersister({
