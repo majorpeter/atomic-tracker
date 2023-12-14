@@ -36,16 +36,19 @@ Integration.init(
   {
     Todos: {
       type: DataTypes.JSON,
-      defaultValue: { schema: 1 } as Api.Config.Todos.type,
+      defaultValue: { schema: 1 } satisfies Api.Config.Todos.type,
     },
-    Agenda: { type: DataTypes.JSON, defaultValue: { schema: 1 } as AgendaType },
+    Agenda: {
+      type: DataTypes.JSON,
+      defaultValue: { schema: 1 } satisfies AgendaType,
+    },
     Projects: {
       type: DataTypes.JSON,
-      defaultValue: { schema: 1 } as Api.Config.Projects.type,
+      defaultValue: { schema: 1 } satisfies Api.Config.Projects.type,
     },
     Radios: {
       type: DataTypes.JSON,
-      defaultValue: { schema: 1 } as Api.Config.Radio.type,
+      defaultValue: { schema: 1, stations: [] } satisfies Api.Config.Radio.type,
     },
     ownerId: {
       type: DataTypes.INTEGER,
