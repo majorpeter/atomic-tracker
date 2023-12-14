@@ -247,7 +247,7 @@ export default function (app: Express) {
       if (int) {
         res.send(int.Todos);
       } else {
-        res.sendStatus(404);
+        res.send({ schema: 1 });
       }
     }
   );
@@ -386,7 +386,7 @@ export default function (app: Express) {
       if (int) {
         res.send(int.Projects);
       } else {
-        res.sendStatus(404);
+        res.send({ schema: 1 });
       }
     }
   );

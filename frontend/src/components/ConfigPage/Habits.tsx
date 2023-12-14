@@ -4,6 +4,7 @@ import {
   AccordionDetails,
   AccordionGroup,
   AccordionSummary,
+  Alert,
   Button,
   IconButton,
   List,
@@ -17,6 +18,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import DeleteIcon from "@mui/icons-material/Delete";
+import InfoIcon from "@mui/icons-material/Info";
 
 import {
   useApiMutation_config_habits_add,
@@ -230,7 +232,7 @@ const Habits: React.FC = () => {
       </Stack>
 
       <List variant="outlined">
-        {data &&
+        {data && data.habits.length ? (
           data.habits.map((item) => {
             const Icon = getHabitIconByName(item.iconName);
             return (
@@ -245,7 +247,12 @@ const Habits: React.FC = () => {
                 {item.name}
               </ListItemButton>
             );
-          })}
+          })
+        ) : (
+          <Alert variant="plain" startDecorator={<InfoIcon />}>
+            There are currently no habits. Get started by adding one!
+          </Alert>
+        )}
       </List>
 
       {data && data.archived.length > 0 && (
