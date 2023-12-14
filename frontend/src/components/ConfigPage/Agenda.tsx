@@ -52,16 +52,28 @@ const Agenda: React.FC = () => {
       const reader = new FileReader();
       reader.onload = async (ev: ProgressEvent<FileReader>) => {
         const credentials = JSON.parse(ev.target!.result as string) as {
-          installed: { client_id: string; client_secret: string };
+          installed?: { client_id: string; client_secret: string };
+          web?: { client_id: string; client_secret: string };
         };
-        const authUrl = await apiFetchGoogleCalendarAuthUrl({
-          client_id: credentials.installed.client_id,
-          client_secret: credentials.installed.client_secret,
-          redirect_uri: window.location.href.split("?")[0] + "?agenda",
-        });
 
-        // redirect to google oauth screen
-        window.location.href = authUrl.url;
+        const client_id =
+          credentials.web?.client_id || credentials.installed?.client_id;
+        const client_secret =
+          credentials.web?.client_secret ||
+          credentials.installed?.client_secret;
+
+        if (client_id && client_secret) {
+          const authUrl = await apiFetchGoogleCalendarAuthUrl({
+            client_id,
+            client_secret,
+            redirect_uri: window.location.href.split("?")[0] + "?agenda",
+          });
+
+          // redirect to google oauth screen
+          window.location.href = authUrl.url;
+        } else {
+          alert("Invalid credentials!");
+        }
       };
       reader.readAsText(f);
     }
