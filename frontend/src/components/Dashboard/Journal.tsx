@@ -1,3 +1,6 @@
+import { Link } from "react-router-dom";
+import { Trans } from "react-i18next";
+
 import {
   Box,
   Button,
@@ -14,8 +17,6 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import ClearIcon from "@mui/icons-material/Clear";
 
-import { Link } from "react-router-dom";
-
 import { journalEditorRoute } from "../../pages/Dashboard/JournalEditorModal";
 
 import { useApiQuery_journalOverview } from "../../util/api-client";
@@ -30,7 +31,7 @@ const Journal: React.FC = () => {
     <Card>
       <Stack direction="row">
         <Typography fontSize="lg" fontWeight="lg">
-          Journal
+          <Trans>journal</Trans>
         </Typography>
         <Typography fontSize="md" sx={{ ml: "auto" }} title="Number of entries">
           {data?.today.count}
@@ -87,7 +88,7 @@ const Journal: React.FC = () => {
             sx={{ ml: "auto" }}
           >
             <EditIcon />
-            Edit
+            <Trans>edit</Trans>
           </Button>
         </CardActions>
       </CardOverflow>

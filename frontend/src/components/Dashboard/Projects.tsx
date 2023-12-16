@@ -1,3 +1,4 @@
+import { Trans, useTranslation } from "react-i18next";
 import {
   Button,
   Card,
@@ -21,11 +22,12 @@ const STALE_TIMEOUT_DAYS = 7;
 
 const Projects: React.FC = () => {
   const { data } = useApiQuery_projectsInProgress();
+  const { t } = useTranslation();
 
   return (
     <Card>
       <Typography fontSize="lg" fontWeight="lg">
-        Projects
+        <Trans>projects</Trans>
       </Typography>
       <Divider />
       <CardContent>
@@ -77,7 +79,12 @@ const Projects: React.FC = () => {
                           }}
                           title={item.updatedAt}
                         >
-                          {Math.floor(item.lastChangedDaysAgo)} days ago
+                          <Trans
+                            i18nKey="n_daysAgo"
+                            count={Math.floor(item.lastChangedDaysAgo)}
+                          >
+                            n days ago
+                          </Trans>
                         </Typography>
                       </ListItemDecorator>
                     )}
@@ -90,7 +97,8 @@ const Projects: React.FC = () => {
         <Divider inset="context" />
         <CardActions>
           <Typography mr="auto">
-            {data && `${data.inprogress.length} projects in progress`}
+            {data &&
+              t("n_projectsInProgress", { count: data.inprogress.length })}
           </Typography>
           {data?.url && (
             <Button
@@ -99,7 +107,7 @@ const Projects: React.FC = () => {
               target="_blank"
               startDecorator={<OpenInNewIcon />}
             >
-              Open Projects
+              <Trans>openProjects</Trans>
             </Button>
           )}
           {data?.board_url && (
@@ -109,7 +117,7 @@ const Projects: React.FC = () => {
               target="_blank"
               startDecorator={<OpenInNewIcon />}
             >
-              Agile board
+              <Trans>agileBoard</Trans>
             </Button>
           )}
         </CardActions>

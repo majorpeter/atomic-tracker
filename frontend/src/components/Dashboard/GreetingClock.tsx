@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import {
   Button,
@@ -25,15 +26,15 @@ import { AppLocalStorage } from "../../util/local-storage";
 import WeatherBlock from "./WeatherBlock";
 import RadioBlock from "./RadioBlock";
 
-function greetingForTime(date: Date) {
+function greetingForTime(t: (s: string) => string, date: Date) {
   const h = date.getHours();
   if (5 <= h && h < 12) {
-    return "Good Morning!";
+    return t("goodMorning");
   }
   if (12 <= h && h < 18) {
-    return "Good Afternoon!";
+    return t("goodAfternoon");
   }
-  return "Good Evening!";
+  return t("goodEvening");
 }
 
 const GreetingClock: React.FC = () => {
@@ -46,6 +47,7 @@ const GreetingClock: React.FC = () => {
       clearInterval(interval);
     };
   }, []);
+  const { t } = useTranslation();
 
   const LANG = AppLocalStorage.getLanguage();
   const day = now.toLocaleDateString(LANG, { weekday: "long" });
@@ -62,7 +64,7 @@ const GreetingClock: React.FC = () => {
   return (
     <Stack direction="row">
       <Stack>
-        <Typography level="h3">{greetingForTime(now)}</Typography>
+        <Typography level="h3">{greetingForTime(t, now)}</Typography>
         <p>
           <strong>{day}</strong>, {date}
         </p>

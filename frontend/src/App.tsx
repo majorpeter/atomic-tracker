@@ -1,4 +1,5 @@
 import "./App.css";
+import "./i18n/config";
 
 import { Outlet } from "react-router-dom";
 
