@@ -25,5 +25,8 @@
   "n_projectsInProgress_other": "{{count}} projects in progress",
   "openProjects": "Open Projects",
   "agileBoard": "Agile board",
-  "journal": "Journal"
+  "journal": "Journal",
+  "configuration": "Configuration",
+  "logout": "Log out",
+  "dashboard": "Dashboard"
 }

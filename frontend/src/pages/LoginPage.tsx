@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { RouteObject, redirect, useNavigate } from "react-router-dom";
+import { getI18n } from "react-i18next";
 
 import {
   Alert,
@@ -29,6 +30,8 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { mutate: loginMutate, isError } = useApiMutation_login((me) => {
     AppLocalStorage.setLanguage(me.language);
+    getI18n().changeLanguage(me.language);
+
     navigate(dashboardRoute.path!);
   });
 

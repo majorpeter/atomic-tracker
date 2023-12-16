@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 
 import {
   Button,
@@ -85,13 +85,13 @@ const GreetingClock: React.FC = () => {
                 <ListItemDecorator>
                   <SettingsIcon />
                 </ListItemDecorator>
-                Configuration
+                <Trans>configuration</Trans>
               </MenuItem>
               <MenuItem component={Link} to={logoutRoute.path!}>
                 <ListItemDecorator>
                   <LogoutIcon />
                 </ListItemDecorator>
-                Log out
+                <Trans>logout</Trans>
               </MenuItem>
             </Menu>
           </Dropdown>

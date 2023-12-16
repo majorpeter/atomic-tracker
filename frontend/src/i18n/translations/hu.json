@@ -22,5 +22,8 @@
   "n_projectsInProgress": "{{count}} projekt folyamatban",
   "openProjects": "Projektek megnyitása",
   "agileBoard": "Kanban tábla",
-  "journal": "Napló"
+  "journal": "Napló",
+  "configuration": "Beállítások",
+  "logout": "Kijelentkezés",
+  "dashboard": "Irányítópult"
 }

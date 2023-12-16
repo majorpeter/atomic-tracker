@@ -1,3 +1,6 @@
+import { useRef } from "react";
+import { getI18n } from "react-i18next";
+
 import {
   Button,
   FormControl,
@@ -7,8 +10,8 @@ import {
   Select,
   Sheet,
 } from "@mui/joy";
+
 import { AppLocalStorage } from "../../util/local-storage";
-import { useRef } from "react";
 import { useApiMutation_config_user } from "../../util/api-client";
 
 const LANGUAGES = {
@@ -20,6 +23,7 @@ const UserPrefs: React.FC = () => {
   const formRef = useRef(null);
   const { mutate: mutateSave } = useApiMutation_config_user((me) => {
     AppLocalStorage.setLanguage(me.language);
+    getI18n().changeLanguage(me.language);
   });
 
   function handleSave() {
