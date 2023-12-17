@@ -35,12 +35,12 @@ const ConfigPage: React.FC = () => {
       </Sheet>
       <Tabs defaultValue={agendaSelected ? "agenda" : "user"}>
         <TabList>
-          <Tab value="user">User Preferences</Tab>
-          <Tab value="habits">Habits</Tab>
-          <Tab value="todos">Todos</Tab>
-          <Tab value="agenda">Agenda</Tab>
-          <Tab value="projects">Projects</Tab>
-          <Tab value="radios">Radios</Tab>
+          <Tab value="user">{t("userPrefs", "User Preferences")}</Tab>
+          <Tab value="habits">{t("habits", "Habits")}</Tab>
+          <Tab value="todos">{t("todos", "Todos")}</Tab>
+          <Tab value="agenda">{t("agenda", "Agenda")}</Tab>
+          <Tab value="projects">{t("projects", "Projects")}</Tab>
+          <Tab value="radios">{t("radios", "Radios")}</Tab>
         </TabList>
         <TabPanel value="user">
           <UserPrefs />

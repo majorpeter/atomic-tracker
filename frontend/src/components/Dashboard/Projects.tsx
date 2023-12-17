@@ -27,7 +27,7 @@ const Projects: React.FC = () => {
   return (
     <Card>
       <Typography fontSize="lg" fontWeight="lg">
-        <Trans>projects</Trans>
+        <Trans i18nKey="projects">Projects</Trans>
       </Typography>
       <Divider />
       <CardContent>

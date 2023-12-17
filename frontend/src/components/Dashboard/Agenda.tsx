@@ -59,7 +59,7 @@ const Agenda: React.FC = () => {
   return (
     <Card>
       <Typography fontSize="lg" fontWeight="lg">
-        <Trans>agenda</Trans>
+        <Trans i18nKey="agenda">Agenda</Trans>
       </Typography>
       <Divider />
       <Sheet sx={{ maxHeight: 250, overflow: "auto" }}>

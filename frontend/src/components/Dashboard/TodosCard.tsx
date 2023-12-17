@@ -23,7 +23,7 @@ const TodosCard: React.FC = () => {
   return (
     <Card>
       <Typography fontSize="lg" fontWeight="lg">
-        {t("todos")}
+        {t("todos", "Todos")}
       </Typography>
       <IconButton
         component={Link}

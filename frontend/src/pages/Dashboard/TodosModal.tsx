@@ -24,7 +24,7 @@ const TodosModal: React.FC = () => {
     <Modal open onClose={handleClose}>
       <ModalDialog layout="fullscreen">
         <DialogTitle>
-          <Trans>todos</Trans>
+          <Trans i18nKey="todos">Todos</Trans>
         </DialogTitle>
         <ModalClose />
         <DialogContent>

@@ -1,4 +1,6 @@
 {
+  "interfaceLang": "Interface Language",
+  "save": "Save",
   "today": "Today",
   "thisWeek": "This Week",
   "nextWeek": "Next Week",
@@ -29,5 +31,11 @@
   "n_pastDue_one": "{{count}} past due",
   "n_pastDue_other": "{{count}} past due",
   "todos": "Todos",
-  "dashboard": "Dashboard"
+  "dashboard": "Dashboard",
+  "userPrefs": "User Preferences",
+  "habits": "Habits",
+  "radios": "Radios",
+  "notFound": "Not found",
+  "thisPageCannotBeFound": "This page cannot be found: <1>{{path}}</1>",
+  "gotoDashboard": "Go to Dashboard"
 }

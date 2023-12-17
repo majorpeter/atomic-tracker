@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { getI18n } from "react-i18next";
+import { Trans, getI18n } from "react-i18next";
 
 import {
   Button,
@@ -37,7 +37,9 @@ const UserPrefs: React.FC = () => {
   return (
     <form ref={formRef}>
       <FormControl>
-        <FormLabel>Interface Language</FormLabel>
+        <FormLabel>
+          <Trans i18nKey="interfaceLang">Interface Language</Trans>
+        </FormLabel>
         <Select name="language" defaultValue={AppLocalStorage.getLanguage()}>
           {Object.entries(LANGUAGES).map(([id, text]) => (
             <Option key={id} value={id}>
@@ -45,10 +47,11 @@ const UserPrefs: React.FC = () => {
             </Option>
           ))}
         </Select>
-        <FormHelperText>Only affects date formatting now.</FormHelperText>
       </FormControl>
       <Sheet sx={{ mt: 2 }}>
-        <Button onClick={handleSave}>Save</Button>
+        <Button onClick={handleSave}>
+          <Trans i18nKey="save">Save</Trans>
+        </Button>
       </Sheet>
     </form>
   );

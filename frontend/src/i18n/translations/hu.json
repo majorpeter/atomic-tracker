@@ -1,4 +1,6 @@
 {
+  "interfaceLang": "Felület nyelve",
+  "save": "Mentés",
   "today": "Ma",
   "thisWeek": "A héten",
   "nextWeek": "Jövő héten",
@@ -29,5 +31,11 @@
   "n_pastDue_one": "{{count}} határidőn túl",
   "n_pastDue_other": "{{count}} határidőn túl",
   "todos": "Teendők",
-  "dashboard": "Irányítópult"
+  "dashboard": "Irányítópult",
+  "userPrefs": "Felhasználói beállítások",
+  "habits": "Szokások",
+  "radios": "Rádiók",
+  "notFound": "Nem található",
+  "thisPageCannotBeFound": "Az oldal nem található: <1>{{path}}</1>",
+  "gotoDashboard": "Tovább az Irányítópultra"
 }
