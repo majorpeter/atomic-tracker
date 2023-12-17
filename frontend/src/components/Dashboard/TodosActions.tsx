@@ -18,7 +18,7 @@ const TodosActions: React.FC = () => {
     <>
       <Typography>
         <Trans i18nKey="n_items" count={data?.todos.length ?? 0}>
-          n items
+          {{ count: 0 }} items
         </Trans>
       </Typography>
       {countPastDue && (
@@ -26,7 +26,7 @@ const TodosActions: React.FC = () => {
           <Divider orientation="vertical" />
           <Typography color="danger">
             <Trans i18nKey="n_pastDue" count={countPastDue}>
-              n past due
+              {{ count: 0 }} past due
             </Trans>
           </Typography>
         </>
