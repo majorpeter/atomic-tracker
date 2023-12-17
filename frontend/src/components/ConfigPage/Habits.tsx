@@ -33,6 +33,7 @@ import { Api } from "@api";
 
 import HabitEditor from "./Habits/HabitEditor";
 import { getHabitIconByName } from "../../util/habit-icons";
+import { Trans, useTranslation } from "react-i18next";
 
 export type Handlers = {
   handleAddClick: (formData: Api.Config.Habits.HabitDescriptor) => void;
@@ -40,7 +41,7 @@ export type Handlers = {
   handleMoveUpClick: () => void;
   handleMoveDownClick: () => void;
   handleArchiveClick: () => void;
-  addActivityHandler: () => void;
+  addActivityHandler: (t: (s: string) => string) => void;
   archiveActivityHandler: (id: number) => void;
   unarchiveActivityHandler: (id: number) => void;
   deleteActivityHandler: (id: number) => void;
@@ -57,6 +58,7 @@ const Habits: React.FC = () => {
     isHabitRefreshRequired: false,
   });
 
+  const { t } = useTranslation();
   const { data } = useApiQuery_config_habits((newData) => {
     if (state.isHabitRefreshRequired && state.selectedExistingHabitId) {
       handleHabitSelection(state.selectedExistingHabitId, newData);
@@ -83,12 +85,12 @@ const Habits: React.FC = () => {
     }
   }
 
-  function handleNewClick() {
+  function handleNewClick(t: (s: string, s2: string) => string) {
     setState({
       isCreatingNew: true,
       isHabitRefreshRequired: false,
       habit: {
-        name: "New habit",
+        name: t("newHabit", "New habit"),
         type: "good",
         iconName: "",
         targetValue: 1,
@@ -138,11 +140,11 @@ const Habits: React.FC = () => {
         isHabitRefreshRequired: false,
       });
     },
-    addActivityHandler() {
+    addActivityHandler(t: (s: string, s2?: string) => string) {
       setState((prev) => {
         const s: typeof state = JSON.parse(JSON.stringify(prev));
         s.habit!.activities.push({
-          name: "New Activity",
+          name: t("newActivity", "New Activity"),
           value: 1,
           // this generates a "random" invalid negative ID that is required for UI key
           id: s.habit!.activities.reduce(
@@ -218,15 +220,17 @@ const Habits: React.FC = () => {
   return (
     <>
       <Stack direction="row">
-        <Typography level="h2">All Habits</Typography>
+        <Typography level="h2">
+          <Trans i18nKey="allHabits">All Habits</Trans>
+        </Typography>
         {!state.isCreatingNew && (
           <Button
             size="sm"
             startDecorator={<AddIcon />}
             sx={{ ml: "auto" }}
-            onClick={handleNewClick}
+            onClick={() => handleNewClick(t)}
           >
-            Add new
+            <Trans i18nKey="addNew">Add new</Trans>
           </Button>
         )}
       </Stack>
@@ -250,7 +254,9 @@ const Habits: React.FC = () => {
           })
         ) : (
           <Alert variant="plain" startDecorator={<InfoIcon />}>
-            There are currently no habits. Get started by adding one!
+            <Trans i18nKey="thereAreNoHabitsGetStarted">
+              There are currently no habits. Get started by adding one!
+            </Trans>
           </Alert>
         )}
       </List>
@@ -259,7 +265,9 @@ const Habits: React.FC = () => {
         <AccordionGroup size="md" sx={{ mt: 2 }}>
           <Accordion>
             <AccordionSummary>
-              <Typography fontWeight="lg">Archived</Typography>
+              <Typography fontWeight="lg">
+                <Trans i18nKey="archived">Archived</Trans>
+              </Typography>
             </AccordionSummary>
             <AccordionDetails>
               <List>
@@ -269,14 +277,14 @@ const Habits: React.FC = () => {
                     endAction={
                       <>
                         <IconButton
-                          title="Unarchive"
+                          title={t("unarchive", "Unarchive")}
                           onClick={() => handleUnarchiveClick(item.id)}
                         >
                           <UnarchiveIcon />
                         </IconButton>
                         <IconButton
                           color="danger"
-                          title="Delete"
+                          title={t("delete", "Delete")}
                           onClick={() => handleDeleteClick(item.id)}
                         >
                           <DeleteIcon />

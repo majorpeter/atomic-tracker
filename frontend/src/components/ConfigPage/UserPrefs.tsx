@@ -4,7 +4,6 @@ import { Trans, getI18n } from "react-i18next";
 import {
   Button,
   FormControl,
-  FormHelperText,
   FormLabel,
   Option,
   Select,
@@ -16,7 +15,7 @@ import { useApiMutation_config_user } from "../../util/api-client";
 
 const LANGUAGES = {
   en: "English",
-  hu: "Hungarian",
+  hu: "Hungarian / Magyar",
 };
 
 const UserPrefs: React.FC = () => {

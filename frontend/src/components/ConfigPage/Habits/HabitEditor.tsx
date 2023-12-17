@@ -27,12 +27,14 @@ import {
 
 import Activities from "./Activities";
 import { Handlers } from "../Habits";
+import { Trans, useTranslation } from "react-i18next";
 
 const HabitEditor: React.FC<{
   habit: Api.Config.Habits.HabitDescriptor;
   isCreatingNew: boolean;
   handlers: Handlers;
 }> = ({ habit, isCreatingNew, handlers }) => {
+  const { t } = useTranslation();
   const formRef = useRef<HTMLFormElement>(null);
 
   function collectFormData(): Api.Config.Habits.HabitDescriptor {
@@ -76,7 +78,7 @@ const HabitEditor: React.FC<{
               </IconButton>
               <IconButton
                 color="danger"
-                title="Archive"
+                title={t("archive", "Archive")}
                 onClick={handlers.handleArchiveClick}
               >
                 <DeleteIcon />
@@ -86,11 +88,15 @@ const HabitEditor: React.FC<{
         </Stack>
         <Stack sx={{ "&>*": { mb: 2 } }}>
           <FormControl>
-            <FormLabel>Name</FormLabel>
+            <FormLabel>
+              <Trans i18nKey="name">Name</Trans>
+            </FormLabel>
             <Input defaultValue={habit.name} name="name" />
           </FormControl>
           <FormControl>
-            <FormLabel>Type</FormLabel>
+            <FormLabel>
+              <Trans i18nKey="type">Type</Trans>
+            </FormLabel>
             <RadioGroup
               defaultValue={habit.type}
               sx={{
@@ -102,55 +108,69 @@ const HabitEditor: React.FC<{
               <Radio
                 name="type"
                 value="good"
-                label="Good"
+                label={t("good", "Good")}
                 color="primary"
               ></Radio>
               <Radio
                 name="type"
                 value="bad"
-                label="Bad"
+                label={t("bad", "Bad")}
                 color="warning"
               ></Radio>
             </RadioGroup>
           </FormControl>
           <FormControl>
-            <FormLabel>Target Value</FormLabel>
+            <FormLabel>
+              <Trans i18key="targetValue">Target Value</Trans>
+            </FormLabel>
             <Input
               defaultValue={habit.targetValue}
               type="number"
               name="targetValue"
             />
             <FormHelperText>
-              The number of tracked activities you wish to achieve over a
-              <strong>period</strong>.
+              <Trans i18nKey="targetValueHelper">
+                The number of tracked activities you wish to achieve over a
+                <strong>period</strong>.
+              </Trans>
             </FormHelperText>
           </FormControl>
           <FormControl>
-            <FormLabel>Period Length</FormLabel>
+            <FormLabel>
+              <Trans i18nKey="periodLength">Period Length</Trans>
+            </FormLabel>
             <Input
               defaultValue={habit.periodLength}
               type="number"
               name="periodLength"
             />
-            <FormHelperText>Number of days in a period.</FormHelperText>
+            <FormHelperText>
+              <Trans i18nKey="periodLengthHelper">
+                Number of days in a period.
+              </Trans>
+            </FormHelperText>
           </FormControl>
           <FormControl>
-            <FormLabel>History Length</FormLabel>
+            <FormLabel>
+              <Trans i18nKey="historyLength">History Length</Trans>
+            </FormLabel>
             <Input
               defaultValue={habit.historyLength}
               type="number"
               name="historyLength"
             />
             <FormHelperText>
-              How many days the history affects the display of progress bars on
-              the dashboard.
+              <Trans i18nKey="historyLengthHelper">
+                How many days the history affects the display of progress bars
+                on the dashboard.
+              </Trans>
             </FormHelperText>
           </FormControl>
           <FormControl>
             <FormLabel
               component="span" // fixes "incorrect use of <label..." warning
             >
-              Icon
+              <Trans i18nKey="icon">Icon</Trans>
             </FormLabel>
             <RadioGroup
               defaultValue={habit.iconName}
@@ -181,14 +201,14 @@ const HabitEditor: React.FC<{
               onClick={() => handlers.handleSaveClick(collectFormData())}
               startDecorator={<SaveIcon />}
             >
-              Save changes
+              <Trans i18nKey="saveChanges">Save changes</Trans>
             </Button>
           ) : (
             <Button
               onClick={() => handlers.handleAddClick(collectFormData())}
               startDecorator={<AddIcon />}
             >
-              Add
+              <Trans i18nKey="add">Add</Trans>
             </Button>
           )}
         </Stack>

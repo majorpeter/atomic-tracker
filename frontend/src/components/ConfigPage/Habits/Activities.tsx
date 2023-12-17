@@ -1,3 +1,4 @@
+import { Trans, useTranslation } from "react-i18next";
 import { Button, IconButton, Input, Stack, Table, Typography } from "@mui/joy";
 
 import AddIcon from "@mui/icons-material/Add";
@@ -12,24 +13,29 @@ const Activities: React.FC<{
   habit: Api.Config.Habits.HabitDescriptor;
   handlers: Handlers;
 }> = ({ habit, handlers }) => {
+  const { t } = useTranslation();
   return (
     <>
       <Stack direction="row">
         <Typography level="h4" sx={{ mr: "auto" }}>
-          Activities
+          <Trans i18nKey="activites">Activities</Trans>
         </Typography>
         <Button
-          onClick={handlers.addActivityHandler}
+          onClick={() => handlers.addActivityHandler(t)}
           startDecorator={<AddIcon />}
         >
-          Add
+          <Trans i18nKey="add">Add</Trans>
         </Button>
       </Stack>
       <Table>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Score Value</th>
+            <th>
+              <Trans i18nKey="name">Name</Trans>
+            </th>
+            <th>
+              <Trans i18nKey="scoreValue">Score Value</Trans>
+            </th>
             <th></th>
           </tr>
         </thead>
