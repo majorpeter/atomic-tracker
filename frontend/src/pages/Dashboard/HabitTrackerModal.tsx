@@ -1,4 +1,14 @@
 import { useRef } from "react";
+import { Trans, useTranslation } from "react-i18next";
+import {
+  RouteObject,
+  useNavigate,
+  LoaderFunctionArgs,
+  Params,
+  ParamParseKey,
+  redirect,
+  useParams,
+} from "react-router-dom";
 
 import {
   Button,
@@ -20,15 +30,7 @@ import {
   Typography,
 } from "@mui/joy";
 
-import {
-  RouteObject,
-  useNavigate,
-  LoaderFunctionArgs,
-  Params,
-  ParamParseKey,
-  redirect,
-  useParams,
-} from "react-router-dom";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import {
   apiQuery_habit_n,
@@ -40,8 +42,6 @@ import {
 
 import { formatDate, getIsoDate } from "../../util/formatter";
 import { getHabitIconByName } from "../../util/habit-icons";
-
-import DeleteIcon from "@mui/icons-material/Delete";
 
 function colorValue(
   type: "good" | "bad",
@@ -62,6 +62,7 @@ function colorValue(
 
 const HabitTrackerModal: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const dateInputRef = useRef<HTMLInputElement>(null);
 
   function handleClose() {
@@ -104,32 +105,62 @@ const HabitTrackerModal: React.FC = () => {
             <Table>
               <tbody>
                 <tr>
-                  <th>Tracked</th>
+                  <th>
+                    <Trans i18nKey="tracked">Tracked</Trans>
+                  </th>
                   <td>
-                    <Chip
-                      color={colorValue(
-                        data.type,
-                        data.trackedInPeriod.value,
-                        data.targetValue
-                      )}
+                    <Trans
+                      i18nKey="trackedScoreOverActivityInPeriod"
+                      values={{
+                        score: data.trackedInPeriod.value,
+                        count: data.trackedInPeriod.count,
+                        period: data.periodLength,
+                      }}
                     >
-                      {data.trackedInPeriod.value}
-                    </Chip>{" "}
-                    over {data.trackedInPeriod.count} activites in the last{" "}
-                    {data.periodLength} days
+                      <Chip
+                        color={colorValue(
+                          data.type,
+                          data.trackedInPeriod.value,
+                          data.targetValue
+                        )}
+                      >
+                        {"{{score}}"}
+                      </Chip>{" "}
+                      over {"{{count}}"} activites in the last {"{{period}}"}{" "}
+                      days
+                    </Trans>
                     <p>
-                      {data.history.length} activities in the last{" "}
-                      {data.historyLength} days
+                      <Trans
+                        i18nKey="trackedAcitvitiesInHistory"
+                        values={{
+                          count: data.history.length,
+                          length: data.historyLength,
+                        }}
+                      >
+                        {"{{count}}"} activities in the last {"{{length}}"} days
+                      </Trans>
                     </p>
                   </td>
                 </tr>
                 <tr>
-                  <th>{data.type == "good" ? "Target" : "Limit"}</th>
+                  <th>
+                    {data.type == "good"
+                      ? t("target", "Target")
+                      : t("limit", "Limit")}
+                  </th>
                   <td>
-                    <Chip color={data.type == "good" ? "primary" : "warning"}>
-                      {data.targetValue}
-                    </Chip>{" "}
-                    over a period of {data.periodLength} days
+                    <Trans
+                      i18nKey="targetScoreOverPeriodLength"
+                      values={{
+                        target: data.targetValue,
+                        length: data.periodLength,
+                      }}
+                    >
+                      <Chip color={data.type == "good" ? "primary" : "warning"}>
+                        {"{{target}}"}
+                      </Chip>{" "}
+                      over a period of {"{{length}}"} days
+                    </Trans>
                   </td>
                 </tr>
               </tbody>
@@ -176,7 +207,9 @@ const HabitTrackerModal: React.FC = () => {
                       mr: "auto",
                     }}
                   >
-                    This habit has not been tracked recently.
+                    <Trans i18nKey="habitNotTrackedRecently">
+                      This habit has not been tracked recently.
+                    </Trans>
                   </Typography>
                 </ListItem>
               )}
@@ -198,7 +231,12 @@ const HabitTrackerModal: React.FC = () => {
                 loading={trackPosting}
                 color={data.type == "good" ? "primary" : "warning"}
               >
-                Track "{activity.name}"
+                <Trans
+                  i18nKey="trackActivityName"
+                  values={{ name: activity.name }}
+                >
+                  Track "{"{{name}}"}"
+                </Trans>
               </Button>
             ))}
             <Input
