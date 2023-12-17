@@ -10,6 +10,8 @@ import {
   Sheet,
 } from "@mui/joy";
 
+import SaveIcon from "@mui/icons-material/Save";
+
 import { AppLocalStorage } from "../../util/local-storage";
 import { useApiMutation_config_user } from "../../util/api-client";
 
@@ -48,7 +50,7 @@ const UserPrefs: React.FC = () => {
         </Select>
       </FormControl>
       <Sheet sx={{ mt: 2 }}>
-        <Button onClick={handleSave}>
+        <Button onClick={handleSave} startDecorator={<SaveIcon />}>
           <Trans i18nKey="save">Save</Trans>
         </Button>
       </Sheet>

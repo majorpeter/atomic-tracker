@@ -1,4 +1,6 @@
 import React, { ChangeEvent, useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
+
 import {
   Button,
   Card,
@@ -22,6 +24,7 @@ import {
 import { Api } from "@api";
 
 const Todos: React.FC = () => {
+  const { t } = useTranslation();
   const { data } = useApiQuery_config_todos();
   const { mutate, isPending: isSaving } = useApiMutation_config_todos();
   const [provider, setProvider] = useState<"none" | "nextcloud">();
@@ -64,22 +67,30 @@ const Todos: React.FC = () => {
   return (
     <form onSubmit={handleSave}>
       <FormControl>
-        <FormLabel>Provider</FormLabel>
+        <FormLabel>
+          <Trans i18nKey="provider">Provider</Trans>
+        </FormLabel>
         <RadioGroup
           name="provider"
           value={provider ?? (data.nextcloud ? "nextcloud" : "none")}
           onChange={handleProviderChange}
         >
-          <Radio value="none" label="None" />
+          <Radio value="none" label={t("none", "None")} />
           <Radio value="nextcloud" label="Nextcloud" />
         </RadioGroup>
       </FormControl>
 
       {((data.nextcloud && !provider) || provider == "nextcloud") && (
         <Card>
-          <Typography level="h4">Nextcloud settings</Typography>
+          <Typography level="h4">
+            <Trans i18nKey="sg_settings" values={{ sg: "Nextcloud" }}>
+              {"{{sg}}"} settings
+            </Trans>
+          </Typography>
           <FormControl>
-            <FormLabel>URL</FormLabel>
+            <FormLabel>
+              <Trans i18nKey="url">URL</Trans>
+            </FormLabel>
             <Input
               name="nextcloud_url"
               defaultValue={
@@ -89,30 +100,41 @@ const Todos: React.FC = () => {
               }
             />
             <FormHelperText>
-              Base URL for all API requests and opening the web interface, e.g.
-              <code>https://example.com</code>
+              <Trans i18nKey="baseUrlHelperText">
+                Base URL for all API requests and opening the web interface,
+                e.g.
+                <code>https://example.com</code>
+              </Trans>
             </FormHelperText>
           </FormControl>
           <FormControl>
-            <FormLabel>User name</FormLabel>
+            <FormLabel>
+              <Trans i18nKey="userName">User name</Trans>
+            </FormLabel>
             <Input
               name="nextcloud_user"
               defaultValue={data.nextcloud ? data.nextcloud.user : undefined}
             />
             <FormHelperText>
-              User name whose todos shall be displayed.
+              <Trans i18nKey="userNameTodosHelper">
+                User name whose todos shall be displayed.
+              </Trans>
             </FormHelperText>
           </FormControl>
           <FormControl>
-            <FormLabel>Token</FormLabel>
+            <FormLabel>
+              <Trans i18nKey="token">Token</Trans>
+            </FormLabel>
             <Input
               name="nextcloud_token"
               defaultValue={data.nextcloud ? data.nextcloud.token : ""}
             />
             <FormHelperText>
-              Application token that can be used instead of password for API
-              requests. Can be created under{" "}
-              <code>Settings &gt; User &gt; Security</code>.
+              <Trans i18nKey="applicationTokenHelper">
+                Application token that can be used instead of password for API
+                requests. Can be created under{" "}
+                <code>Settings &gt; User &gt; Security</code>.
+              </Trans>
             </FormHelperText>
           </FormControl>
         </Card>
@@ -120,7 +142,7 @@ const Todos: React.FC = () => {
 
       <Stack sx={{ mt: 2 }}>
         <Button type="submit" loading={isSaving} startDecorator={<SaveIcon />}>
-          Submit
+          <Trans i18nKey="save">Save</Trans>
         </Button>
       </Stack>
     </form>
