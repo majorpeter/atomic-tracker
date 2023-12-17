@@ -1,25 +1,30 @@
+import { useRef } from "react";
+import { Trans, getI18n } from "react-i18next";
+
 import {
   Button,
   FormControl,
-  FormHelperText,
   FormLabel,
   Option,
   Select,
   Sheet,
 } from "@mui/joy";
+
+import SaveIcon from "@mui/icons-material/Save";
+
 import { AppLocalStorage } from "../../util/local-storage";
-import { useRef } from "react";
 import { useApiMutation_config_user } from "../../util/api-client";
 
 const LANGUAGES = {
   en: "English",
-  hu: "Hungarian",
+  hu: "Hungarian / Magyar",
 };
 
 const UserPrefs: React.FC = () => {
   const formRef = useRef(null);
   const { mutate: mutateSave } = useApiMutation_config_user((me) => {
     AppLocalStorage.setLanguage(me.language);
+    getI18n().changeLanguage(me.language);
   });
 
   function handleSave() {
@@ -33,7 +38,9 @@ const UserPrefs: React.FC = () => {
   return (
     <form ref={formRef}>
       <FormControl>
-        <FormLabel>Interface Language</FormLabel>
+        <FormLabel>
+          <Trans i18nKey="interfaceLang">Interface Language</Trans>
+        </FormLabel>
         <Select name="language" defaultValue={AppLocalStorage.getLanguage()}>
           {Object.entries(LANGUAGES).map(([id, text]) => (
             <Option key={id} value={id}>
@@ -41,10 +48,11 @@ const UserPrefs: React.FC = () => {
             </Option>
           ))}
         </Select>
-        <FormHelperText>Only affects date formatting now.</FormHelperText>
       </FormControl>
       <Sheet sx={{ mt: 2 }}>
-        <Button onClick={handleSave}>Save</Button>
+        <Button onClick={handleSave} startDecorator={<SaveIcon />}>
+          <Trans i18nKey="save">Save</Trans>
+        </Button>
       </Sheet>
     </form>
   );

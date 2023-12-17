@@ -1,4 +1,6 @@
 import { Link, RouteObject, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 import { Tabs, TabList, Tab, TabPanel, Button, Sheet } from "@mui/joy";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 
@@ -13,6 +15,10 @@ import { dashboardRoute } from "./Dashboard";
 
 const ConfigPage: React.FC = () => {
   const location = useLocation();
+
+  // hook usage is required to detech language change on UserPrefs, <Trans/> does not work
+  const { t } = useTranslation();
+
   const sp = new URLSearchParams(location.search);
   const agendaSelected = sp.get("agenda") != null;
 
@@ -24,17 +30,17 @@ const ConfigPage: React.FC = () => {
           to={dashboardRoute.path!}
           startDecorator={<KeyboardArrowLeftIcon />}
         >
-          Dashboard
+          {t("dashboard")}
         </Button>
       </Sheet>
       <Tabs defaultValue={agendaSelected ? "agenda" : "user"}>
         <TabList>
-          <Tab value="user">User Preferences</Tab>
-          <Tab value="habits">Habits</Tab>
-          <Tab value="todos">Todos</Tab>
-          <Tab value="agenda">Agenda</Tab>
-          <Tab value="projects">Projects</Tab>
-          <Tab value="radios">Radios</Tab>
+          <Tab value="user">{t("userPrefs", "User Preferences")}</Tab>
+          <Tab value="habits">{t("habits", "Habits")}</Tab>
+          <Tab value="todos">{t("todos", "Todos")}</Tab>
+          <Tab value="agenda">{t("agenda", "Agenda")}</Tab>
+          <Tab value="projects">{t("projects", "Projects")}</Tab>
+          <Tab value="radios">{t("radios", "Radios")}</Tab>
         </TabList>
         <TabPanel value="user">
           <UserPrefs />

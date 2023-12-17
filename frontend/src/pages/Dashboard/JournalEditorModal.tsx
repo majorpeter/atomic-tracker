@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { RouteObject, useNavigate, useParams } from "react-router-dom";
+import { Trans } from "react-i18next";
 
 import {
   Alert,
@@ -92,7 +93,9 @@ const JournalEditorModal: React.FC = () => {
     <Modal open onClose={handleClose}>
       <ModalDialog>
         {!isSaving && <ModalClose />}
-        <DialogTitle>Journal</DialogTitle>
+        <DialogTitle>
+          <Trans i18nKey="journal">Journal</Trans>
+        </DialogTitle>
         <DialogContent>
           <Box sx={{ display: "flex" }}>
             <IconButton onClick={handleDayPrev} disabled={isSaving}>
@@ -136,7 +139,9 @@ const JournalEditorModal: React.FC = () => {
               variant="outlined"
               startDecorator={<WarningIcon />}
             >
-              Saving failed, please try again.
+              <Trans i18nKey="savingFailedTryAgain">
+                Saving failed, please try again.
+              </Trans>
             </Alert>
           )}
         </DialogContent>
@@ -148,7 +153,7 @@ const JournalEditorModal: React.FC = () => {
             disabled={userInput === undefined}
             startDecorator={<DoneIcon />}
           >
-            Save
+            <Trans i18nKey="save">Save</Trans>
           </Button>
           <Button
             color="neutral"
@@ -156,7 +161,7 @@ const JournalEditorModal: React.FC = () => {
             disabled={isSaving}
             startDecorator={<CancelIcon />}
           >
-            Close
+            <Trans i18nKey="close">Close</Trans>
           </Button>
         </DialogActions>
       </ModalDialog>

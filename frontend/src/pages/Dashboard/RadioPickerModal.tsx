@@ -1,4 +1,6 @@
 import { RouteObject, useNavigate } from "react-router-dom";
+import { Trans } from "react-i18next";
+
 import {
   DialogContent,
   DialogTitle,
@@ -38,7 +40,9 @@ const RadioPickerModal: React.FC = () => {
     <Modal open onClose={handleClose}>
       <ModalDialog>
         <ModalClose />
-        <DialogTitle>Select Radio...</DialogTitle>
+        <DialogTitle>
+          <Trans i18nKey="selectRadio">Select Radio...</Trans>
+        </DialogTitle>
         <DialogContent>
           <List>
             {data?.stations.map((item, index) => (

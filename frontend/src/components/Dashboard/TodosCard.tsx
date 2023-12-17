@@ -1,3 +1,6 @@
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 import {
   Card,
   CardActions,
@@ -10,17 +13,17 @@ import {
 
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 
-import { Link } from "react-router-dom";
-
 import Todos from "./Todos";
 import TodosActions from "./TodosActions";
 import { todosModalRoute } from "../../pages/Dashboard/TodosModal";
 
 const TodosCard: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <Card>
       <Typography fontSize="lg" fontWeight="lg">
-        Todos
+        {t("todos", "Todos")}
       </Typography>
       <IconButton
         component={Link}

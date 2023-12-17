@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { Trans, useTranslation } from "react-i18next";
 
 import {
   Button,
@@ -23,6 +24,7 @@ import {
 } from "../../util/api-client";
 
 const Agenda: React.FC = () => {
+  const { t } = useTranslation();
   const { data } = useApiQuery_config_agenda_state();
   const { mutate, isPending: isSaving } = useApiMutation_config_agenda();
   const filePickerRef = useRef<HTMLInputElement>(null);
@@ -72,7 +74,7 @@ const Agenda: React.FC = () => {
           // redirect to google oauth screen
           window.location.href = authUrl.url;
         } else {
-          alert("Invalid credentials!");
+          alert(t("invalidCredentials", "Invalid credentials!"));
         }
       };
       reader.readAsText(f);
@@ -89,7 +91,12 @@ const Agenda: React.FC = () => {
     let vars: Parameters<typeof mutate>[0] = {};
     if (data.provider == "google") {
       if (!gCalCode) {
-        alert("New Token required for saving (for now).");
+        alert(
+          t(
+            "newTokenRequiredForSave",
+            "New Token required for saving (for now)."
+          )
+        );
         return;
       }
       vars = {
@@ -103,13 +110,19 @@ const Agenda: React.FC = () => {
   }
 
   if (!data) {
-    return <p>Loading...</p>;
+    return (
+      <p>
+        <Trans i18nKey="loading">Loading...</Trans>
+      </p>
+    );
   }
 
   return (
     <form onSubmit={handleSave}>
       <FormControl>
-        <FormLabel>Provider</FormLabel>
+        <FormLabel>
+          <Trans i18nKey="provider">Provider</Trans>
+        </FormLabel>
         <RadioGroup
           name="provider"
           value={provider ?? (data.provider == "google" ? "google" : "none")}
@@ -122,9 +135,17 @@ const Agenda: React.FC = () => {
 
       {((data.provider == "google" && !provider) || provider == "google") && (
         <Card>
-          <Typography level="h4">Google Calendar settings</Typography>
+          <Typography level="h4">
+            <Trans i18nKey="sg_settings" values={{ sg: "Google Calendar" }}>
+              {"{{sg}}"} settings
+            </Trans>
+          </Typography>
           <FormControl>
-            <FormLabel>Application Client Credentials</FormLabel>
+            <FormLabel>
+              <Trans i18nKey="appClientCreds">
+                Application Client Credentials
+              </Trans>
+            </FormLabel>
             <Input
               readOnly
               endDecorator={
@@ -132,22 +153,24 @@ const Agenda: React.FC = () => {
               }
               value={
                 gCalCode
-                  ? "New Code: " + gCalCode
+                  ? t("newCode", "New Code") + ": " + gCalCode
                   : data.provider == "google"
-                  ? "(Saved Token)"
-                  : "(not configured)"
+                  ? "(" + t("savedToken", "Saved Token") + ")"
+                  : "(" + t("notConfigured", "not configured") + ")"
               }
             />
-            <FormHelperText>
-              This{" "}
-              <code>
-                client_secret_SOMETHING.apps.googleusercontent.com.json
-              </code>{" "}
-              file has to be created in{" "}
-              <a href="https://console.cloud.google.com/" target="_blank">
-                Google Cloud Console
-              </a>
-              . Would be preconfigured if this app was not self-hosted.
+            <FormHelperText sx={{ display: "block" }}>
+              <Trans i18nKey="appClientCredsHelper">
+                This{" "}
+                <code>
+                  client_secret_SOMETHING.apps.googleusercontent.com.json
+                </code>{" "}
+                file has to be created in{" "}
+                <a href="https://console.cloud.google.com/" target="_blank">
+                  Google Cloud Console
+                </a>
+                . Would be preconfigured if this app was not self-hosted.
+              </Trans>
             </FormHelperText>
             <input
               ref={filePickerRef}
@@ -162,7 +185,7 @@ const Agenda: React.FC = () => {
 
       <Stack sx={{ mt: 2 }}>
         <Button type="submit" loading={isSaving} startDecorator={<SaveIcon />}>
-          Submit
+          <Trans i18nKey="save">Save</Trans>
         </Button>
       </Stack>
     </form>

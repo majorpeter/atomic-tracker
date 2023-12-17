@@ -19,6 +19,7 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { useApiQuery_calendar } from "../../util/api-client";
 import { formatTime } from "../../util/formatter";
 import { Api } from "@api";
+import { Trans, useTranslation } from "react-i18next";
 
 function formatDateOrTimeForListing(
   item: NonNullable<Api.Calendar.type["today"]>[0],
@@ -43,21 +44,22 @@ function formatDateOrTimeForListing(
 
 const Agenda: React.FC = () => {
   const { data } = useApiQuery_calendar();
+  const { t } = useTranslation();
 
   type DataKeys = keyof NonNullable<typeof data>;
   const dataItems: { [k in DataKeys]: string } = {
-    today: "Today",
-    thisWeek: "This Week",
-    nextWeek: "Next Week",
-    thisMonth: "This Month",
-    nextMonth: "Next Month",
-    later: "Later",
+    today: t("today"),
+    thisWeek: t("thisWeek"),
+    nextWeek: t("nextWeek"),
+    thisMonth: t("thisMonth"),
+    nextMonth: t("nextMonth"),
+    later: t("later"),
   };
 
   return (
     <Card>
       <Typography fontSize="lg" fontWeight="lg">
-        Agenda
+        <Trans i18nKey="agenda">Agenda</Trans>
       </Typography>
       <Divider />
       <Sheet sx={{ maxHeight: 250, overflow: "auto" }}>
@@ -108,8 +110,8 @@ const Agenda: React.FC = () => {
         <CardActions>
           <Typography sx={{ mr: "auto" }}>
             {data?.today
-              ? `${data.today.length} events today`
-              : "No events today"}
+              ? t("n_eventsToday", { count: data.today.length })
+              : t("noEventsToday")}
           </Typography>
           <Button
             component="a"
@@ -117,7 +119,7 @@ const Agenda: React.FC = () => {
             target="_blank"
             startDecorator={<OpenInNewIcon />}
           >
-            Open Calendar
+            <Trans>openCalendar</Trans>
           </Button>
         </CardActions>
       </CardOverflow>
