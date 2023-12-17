@@ -1,4 +1,6 @@
 import React, { ChangeEvent, useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
+
 import {
   Button,
   Card,
@@ -22,6 +24,7 @@ import {
 import { Api } from "@api";
 
 const Projects: React.FC = () => {
+  const { t } = useTranslation();
   const { data } = useApiQuery_config_projects();
   const { mutate, isPending: isSaving } = useApiMutation_config_projects();
   const [issueTracker, setIssueTracker] = useState<"none" | "redmine">();
@@ -63,28 +66,36 @@ const Projects: React.FC = () => {
   }
 
   if (!data) {
-    return <p>Loading...</p>;
+    return <Trans i18nKey="loading">Loading...</Trans>;
   }
 
   return (
     <form onSubmit={handleSave}>
       <FormControl>
-        <FormLabel>Issue Tracking System</FormLabel>
+        <FormLabel>
+          <Trans i18nKey="issueTrackingSys">Issue Tracking System</Trans>
+        </FormLabel>
         <RadioGroup
           name="issueTracker"
           value={issueTracker ?? (data.redmine ? "redmine" : "none")}
           onChange={handleIssueTrackerChange}
         >
-          <Radio value="none" label="None" />
+          <Radio value="none" label={t("none", "None")} />
           <Radio value="redmine" label="Redmine" />
         </RadioGroup>
       </FormControl>
 
       {((data.redmine && !issueTracker) || issueTracker == "redmine") && (
         <Card>
-          <Typography level="h4">Redmine settings</Typography>
+          <Typography level="h4">
+            <Trans i18nKey="sg_settings" values={{ sg: "Redmine" }}>
+              {"{{sg}}"} settings
+            </Trans>
+          </Typography>
           <FormControl>
-            <FormLabel>URL</FormLabel>
+            <FormLabel>
+              <Trans i18nKey="url">URL</Trans>
+            </FormLabel>
             <Input
               name="redmine_url"
               defaultValue={
@@ -92,23 +103,32 @@ const Projects: React.FC = () => {
               }
             />
             <FormHelperText>
-              Base URL for all API requests and opening the web interface, e.g.
-              <code>https://example.com</code>
+              <Trans i18nKey="redmineUrlHelper">
+                Base URL for all API requests and opening the web interface,
+                e.g.
+                <code>https://example.com</code>
+              </Trans>
             </FormHelperText>
           </FormControl>
           <FormControl>
-            <FormLabel>API key</FormLabel>
+            <FormLabel>
+              <Trans i18nKey="apiKey">API key</Trans>
+            </FormLabel>
             <Input
               name="redmine_api_key"
               defaultValue={data.redmine ? data.redmine.api_key : undefined}
             />
             <FormHelperText>
-              Key can be created under <i>My account</i>. REST web service has
-              to be enabled.
+              <Trans i18nKey="redmineApiKeyHelper">
+                Key can be created under <i>My account</i>. REST web service has
+                to be enabled.
+              </Trans>
             </FormHelperText>
           </FormControl>
           <FormControl>
-            <FormLabel>In Progress status ID</FormLabel>
+            <FormLabel>
+              <Trans i18nKey="inProgessId">In Progress status ID</Trans>
+            </FormLabel>
             <Input
               type="number"
               name="redmine_inprogress_status_id"
@@ -117,19 +137,25 @@ const Projects: React.FC = () => {
               }
             />
             <FormHelperText>
-              All statuses are just plain-text labels in Redmine. By default,
-              the In Progress gets assigned number 2.
+              <Trans i18nKey="redmineInProgessIdHelper">
+                All statuses are just plain-text labels in Redmine. By default,
+                the In Progress gets assigned number <code>2</code>.
+              </Trans>
             </FormHelperText>
           </FormControl>
           <FormControl>
-            <FormLabel>Agile board URL</FormLabel>
+            <FormLabel>
+              <Trans i18nKey="agileBoardUrl">Agile board URL</Trans>
+            </FormLabel>
             <Input
               name="redmine_board_url"
               defaultValue={data.redmine ? data.redmine.board_url : ""}
             />
             <FormHelperText>
-              Optional. If an agile plugin is installed on this instance, you
-              may want to access a kanban board via this URL.
+              <Trans i18nKey="redmineAgileBoardUrlHelper">
+                Optional. If an agile plugin is installed on this instance, you
+                may want to access a kanban board via this URL.
+              </Trans>
             </FormHelperText>
           </FormControl>
         </Card>
@@ -137,7 +163,7 @@ const Projects: React.FC = () => {
 
       <Stack sx={{ mt: 2 }}>
         <Button type="submit" loading={isSaving} startDecorator={<SaveIcon />}>
-          Submit
+          <Trans i18nKey="save">Save</Trans>
         </Button>
       </Stack>
     </form>

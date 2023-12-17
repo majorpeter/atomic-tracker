@@ -1,5 +1,8 @@
 import { useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
+
 import { Button, IconButton, Input, Stack, Table } from "@mui/joy";
+
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -12,6 +15,7 @@ import {
 let uniqueId = 1;
 
 const Radios: React.FC = () => {
+  const { t } = useTranslation();
   const { data } = useApiQuery_config_radios();
   const [stations, setStations] =
     useState<{ name: string; url: string; id: number }[]>();
@@ -58,8 +62,12 @@ const Radios: React.FC = () => {
       <Table>
         <thead>
           <tr>
-            <th>Label</th>
-            <th>URL</th>
+            <th>
+              <Trans i18nKey="label">Label</Trans>
+            </th>
+            <th>
+              <Trans i18nKey="url">URL</Trans>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -73,7 +81,10 @@ const Radios: React.FC = () => {
                   <Input name="url[]" defaultValue={item.url} />
                 </td>
                 <td>
-                  <IconButton onClick={() => handleDeleteClick(index)}>
+                  <IconButton
+                    onClick={() => handleDeleteClick(index)}
+                    title={t("delete", "Delete")}
+                  >
                     <DeleteIcon />
                   </IconButton>
                 </td>
@@ -81,7 +92,9 @@ const Radios: React.FC = () => {
             ))}
           <tr>
             <td>
-              <Button onClick={handleAddClick}>Add</Button>
+              <Button onClick={handleAddClick}>
+                <Trans i18nKey="add">Add</Trans>
+              </Button>
             </td>
           </tr>
         </tbody>
@@ -89,7 +102,7 @@ const Radios: React.FC = () => {
 
       <Stack sx={{ mt: 2 }}>
         <Button type="submit" loading={isSaving} startDecorator={<SaveIcon />}>
-          Submit
+          <Trans i18nKey="save">Save</Trans>
         </Button>
       </Stack>
     </form>
