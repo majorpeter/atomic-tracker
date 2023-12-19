@@ -10,7 +10,13 @@ I personally find it useful to have a graphical overview of the things I'm worki
 
 ## Installation
 
-Clone the repository and build the container:
+Pull the container from GitHub Packages:
+
+```sh
+docker pull ghcr.io/majorpeter/atomic-tracker:latest
+```
+
+Or clone the repository and build the container locally:
 
 ```sh
 docker build -t atomic-tracker .
@@ -19,6 +25,10 @@ docker build -t atomic-tracker .
 Run locally:
 
 ```sh
+# for GitHub build
+docker run --rm --name my-atomic-tracker -p 8080:8080 -v ./config:/config ghcr.io/majorpeter/atomic-tracker:latest
+
+# for local build
 docker run --rm --name my-atomic-tracker -p 8080:8080 -v ./config:/config atomic-tracker:latest
 ```
 
