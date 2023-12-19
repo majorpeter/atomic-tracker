@@ -38,4 +38,10 @@ export class LimitedMemoryStore extends MemoryStore {
 
     super.set(sid, session, callback);
   }
+
+  getSessionsOfUser(userId: number): SessionData[] {
+    return Object.values(this.sessions)
+      .map((item) => JSON.parse(item) as SessionData)
+      .filter((session) => session.userId === userId);
+  }
 }

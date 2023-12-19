@@ -3,9 +3,8 @@ import session, { MemoryStore } from "express-session";
 import path from "path";
 
 import { init as initDb } from "./lib/db";
-import { LimitedMemoryStore } from "./lib/session";
 
-import auth from "./controllers/auth";
+import auth, { sessionStore } from "./controllers/auth";
 import install from "./controllers/install";
 import habits from "./controllers/habits";
 import todos from "./controllers/todos";
@@ -31,7 +30,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 7 * 24 * 3600 * 1e3 },
-    store: new LimitedMemoryStore(15),
+    store: sessionStore,
   })
 );
 

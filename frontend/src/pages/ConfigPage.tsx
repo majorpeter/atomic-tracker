@@ -10,6 +10,7 @@ import Todos from "../components/ConfigPage/Todos";
 import Agenda from "../components/ConfigPage/Agenda";
 import Projects from "../components/ConfigPage/Projects";
 import Radios from "../components/ConfigPage/Radios";
+import Security from "../components/ConfigPage/Security";
 
 import { dashboardRoute } from "./Dashboard";
 
@@ -41,6 +42,7 @@ const ConfigPage: React.FC = () => {
           <Tab value="agenda">{t("agenda", "Agenda")}</Tab>
           <Tab value="projects">{t("projects", "Projects")}</Tab>
           <Tab value="radios">{t("radios", "Radios")}</Tab>
+          <Tab value="security">{t("security", "Security")}</Tab>
         </TabList>
         <TabPanel value="user">
           <UserPrefs />
@@ -59,6 +61,9 @@ const ConfigPage: React.FC = () => {
         </TabPanel>
         <TabPanel value="radios">
           <Radios />
+        </TabPanel>
+        <TabPanel value="security">
+          <Security />
         </TabPanel>
       </Tabs>
     </>

@@ -35,6 +35,13 @@ export namespace Api {
         language?: string;
       };
     }
+
+    export namespace Sessions {
+      export const path = "/api/auth/sessions";
+      export type type = {
+        sessions: { userAgent: string; expiresIsoDate: string }[];
+      };
+    }
   }
 
   export namespace Habits {

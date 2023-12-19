@@ -1,8 +1,9 @@
 import { Express, NextFunction, Request, Response } from "express";
+import crypto from "node:crypto";
+
 import { Api } from "../lib/api";
 import { User } from "../models/user";
-
-import crypto from "node:crypto";
+import { LimitedMemoryStore } from "../lib/session";
 
 export function hashAndSaltPassword(password: string): string {
   const salt = crypto.randomBytes(64);
@@ -43,6 +44,8 @@ export const isLoggedInMiddleware = (
   }
 };
 
+export const sessionStore = new LimitedMemoryStore(15);
+
 export default function (app: Express) {
   app.get<{}, Api.Auth.Login.get_resp>(Api.Auth.Login.path, async (_, res) => {
     const hasUser = (await User.findOne()) !== null;
@@ -80,6 +83,8 @@ export default function (app: Express) {
             req.session.userId = user.id;
             req.session.userName = user.name;
             req.session.interfaceLanguage = user.language;
+            req.session.userAgent = req.headers["user-agent"];
+
             req.session.pendingConfig = {};
 
             res.send({
@@ -131,6 +136,20 @@ export default function (app: Express) {
       } else {
         res.sendStatus(500);
       }
+    }
+  );
+
+  app.get<{}, Api.Auth.Sessions.type>(
+    Api.Auth.Sessions.path,
+    isLoggedInMiddleware,
+    (req, res) => {
+      const mySessions = sessionStore.getSessionsOfUser(req.session.userId!);
+      res.send({
+        sessions: mySessions.map((session) => ({
+          userAgent: session.userAgent,
+          expiresIsoDate: session.cookie.expires as unknown as string, // JSON parsing keeps it as string
+        })),
+      });
     }
   );
 }

@@ -66,6 +66,7 @@ export const queryKeys = {
   config_projects: ["projects", "config"],
   config_radio: ["radio", "config"],
   config_agenda_state: ["calendar", "state"],
+  config_sessions: ["config", "sessions"],
 };
 
 export function useApiQuery_habits() {
@@ -215,6 +216,13 @@ export function useApiQuery_config_radios() {
     queryFn: async () => {
       return apiFetchJson(Api.Config.Radio.path);
     },
+  });
+}
+
+export function useApiQuery_config_sessions() {
+  return useQuery<Api.Auth.Sessions.type>({
+    queryKey: queryKeys.config_sessions,
+    queryFn: async () => apiFetchJson(Api.Auth.Sessions.path),
   });
 }
 

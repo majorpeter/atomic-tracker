@@ -5,6 +5,7 @@ declare module "express-session" {
     userId: number;
     userName: string;
     interfaceLanguage: string;
+    userAgent: string;
     pendingConfig: {
       gCal?: {
         client_id: string;
