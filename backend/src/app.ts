@@ -1,8 +1,9 @@
 import express from "express";
-import session from "express-session";
+import session, { MemoryStore } from "express-session";
 import path from "path";
 
 import { init as initDb } from "./lib/db";
+import { LimitedMemoryStore } from "./lib/session";
 
 import auth from "./controllers/auth";
 import install from "./controllers/install";
@@ -29,7 +30,8 @@ app.use(
     secret: Math.random().toString(),
     resave: false,
     saveUninitialized: false,
-    //TODO limit store memory usage
+    cookie: { maxAge: 7 * 24 * 3600 * 1e3 },
+    store: new LimitedMemoryStore(15),
   })
 );
 
