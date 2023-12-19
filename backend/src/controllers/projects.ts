@@ -33,6 +33,7 @@ export default function (app: Express, useDummyData: boolean) {
           if (data != null) {
             res.send({
               ...data,
+              url: integrations.Projects.redmine.url + "/projects",
               board_url: integrations.Projects.redmine.board_url,
             });
           } else {
