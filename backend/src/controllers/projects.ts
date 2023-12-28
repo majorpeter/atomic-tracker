@@ -72,10 +72,12 @@ export default function (app: Express, useDummyData: boolean) {
 
       if (integrations && integrations.Projects.redmine) {
         // redmine project ID -> habit ID
-        const PROJECT_HABIT_MAPPING = {};
+        // TODO provide config
+        const PROJECT_HABIT_MAPPING = { 8: 1 };
 
         let cachedItem = await RedmineJournalCache.findOne({
           where: {
+            projectId: Object.keys(PROJECT_HABIT_MAPPING),
             state: State.New,
             ownerId: req.session.userId,
           },
@@ -125,6 +127,7 @@ export default function (app: Express, useDummyData: boolean) {
 
         cachedItem = await RedmineJournalCache.findOne({
           where: {
+            projectId: Object.keys(PROJECT_HABIT_MAPPING),
             state: State.New,
             ownerId: req.session.userId,
           },
@@ -134,15 +137,29 @@ export default function (app: Express, useDummyData: boolean) {
         });
 
         if (cachedItem) {
-          res.send({
-            event: {
-              issueSubject: "TODO",
-              url:
-                integrations.Projects.redmine.url +
-                "/issues/" +
-                cachedItem.issueId.toString(),
-            },
+          const issue = await redmine.getIssue(cachedItem.issueId, {
+            url: integrations.Projects.redmine.url,
+            api_key: integrations.Projects.redmine.api_key,
           });
+
+          const event: Api.Projects.Recent.type["event"] = {
+            issueSubject: issue.issue.subject,
+            url:
+              integrations.Projects.redmine.url +
+              "/issues/" +
+              cachedItem.issueId.toString(),
+          };
+
+          const progress = cachedItem.data.details.find(
+            (item) => item.name == "done_ratio"
+          );
+          if (progress) {
+            event.progressChanged = {
+              from: progress.old_value ? parseInt(progress.old_value) : 0,
+              to: parseInt(progress.new_value),
+            };
+          }
+          res.send({ event });
         } else {
           res.send({});
         }

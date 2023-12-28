@@ -184,6 +184,7 @@ export namespace Api {
         event?: {
           issueSubject: string;
           url: string;
+          progressChanged?: { from: number; to: number };
         };
       };
     }
