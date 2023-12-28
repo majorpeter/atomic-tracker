@@ -62,3 +62,105 @@ export async function fetchInProgress(config: {
 
   return null;
 }
+
+export async function fetchUpdatedSince(
+  since: Date | undefined,
+  config: {
+    url: string;
+    api_key: string;
+  }
+) {
+  const LIMIT = 100;
+  const changes = [];
+  try {
+    for (let offset = 0; ; offset += LIMIT) {
+      const listingUrl =
+        config.url +
+        "/issues.json?" +
+        new URLSearchParams({
+          offset: offset.toString(),
+          limit: LIMIT.toString(),
+          status_id: "*",
+          sort: "updated_on",
+          ...(since
+            ? {
+                updated_on: ">=" + since.toISOString().split(".")[0] + "Z",
+              }
+            : {}),
+        });
+      const listingResp = await fetch(listingUrl, {
+        headers: {
+          "X-Redmine-API-Key": config.api_key,
+        },
+      });
+      const listingBody = (await listingResp.json()) as {
+        issues: {
+          id: number;
+          subject: string;
+          description: string;
+          created_on: string; // iso date
+          updated_on: string; // iso date
+          status: { id: number; name: string };
+        }[];
+        limit: number;
+        offset: number;
+        total_count: number;
+      };
+
+      for (const issue of listingBody.issues) {
+        const issueUrl =
+          config.url +
+          "/issues/" +
+          issue.id.toString() +
+          ".json?" +
+          new URLSearchParams({
+            include: "journals",
+          });
+
+        const issueResp = await fetch(issueUrl, {
+          headers: {
+            "X-Redmine-API-Key": config.api_key,
+          },
+        });
+        const issueBody = (await issueResp.json()) as {
+          issue: {
+            id: number;
+            journals: {
+              id: number;
+              created_on: string;
+              details: {
+                property: string;
+                name: string;
+                old_value: string | null;
+                new_value: string;
+              }[];
+              notes: string;
+            }[];
+          };
+        };
+
+        issueBody.issue.journals
+          .filter((item) =>
+            since
+              ? new Date(item.created_on).getTime() >= since.getTime()
+              : true
+          )
+          .every((item) => {
+            changes.push({
+              journal_created: new Date(item.created_on),
+              issue_updated: new Date(issue.updated_on),
+              journal: item,
+              issue: issue,
+            });
+          });
+      }
+      if (listingBody.offset + LIMIT >= listingBody.total_count) {
+        break;
+      }
+    }
+  } catch (e) {
+    console.log(e);
+  }
+
+  return;
+}
