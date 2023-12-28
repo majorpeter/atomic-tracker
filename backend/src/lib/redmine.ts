@@ -75,6 +75,48 @@ export async function fetchInProgress(config: {
   return null;
 }
 
+export async function getIssue(
+  id: number,
+  config: {
+    url: string;
+    api_key: string;
+  }
+): Promise<{
+  issue: {
+    id: number;
+    author: { id: number; name: string };
+    project: { id: number; name: string };
+    subject: string;
+    journals: {
+      id: number;
+      created_on: string;
+      details: {
+        property: string;
+        name: string;
+        old_value: string | null;
+        new_value: string;
+      }[];
+      notes: string;
+    }[];
+  };
+}> {
+  const issueUrl =
+    config.url +
+    "/issues/" +
+    id.toString() +
+    ".json?" +
+    new URLSearchParams({
+      include: "journals",
+    });
+
+  const issueResp = await fetch(issueUrl, {
+    headers: {
+      "X-Redmine-API-Key": config.api_key,
+    },
+  });
+  return await issueResp.json();
+}
+
 export async function fetchUpdatedSince(params: {
   since?: Date;
   maxIssues?: number;
@@ -123,36 +165,10 @@ export async function fetchUpdatedSince(params: {
       };
 
       for (const issue of listingBody.issues) {
-        const issueUrl =
-          params.url +
-          "/issues/" +
-          issue.id.toString() +
-          ".json?" +
-          new URLSearchParams({
-            include: "journals",
-          });
-
-        const issueResp = await fetch(issueUrl, {
-          headers: {
-            "X-Redmine-API-Key": params.api_key,
-          },
+        const issueBody = await getIssue(issue.id, {
+          url: params.url,
+          api_key: params.api_key,
         });
-        const issueBody = (await issueResp.json()) as {
-          issue: {
-            id: number;
-            journals: {
-              id: number;
-              created_on: string;
-              details: {
-                property: string;
-                name: string;
-                old_value: string | null;
-                new_value: string;
-              }[];
-              notes: string;
-            }[];
-          };
-        };
 
         issueBody.issue.journals
           .filter((item) =>
