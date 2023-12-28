@@ -160,21 +160,33 @@ export namespace Api {
   }
 
   export namespace Projects {
-    export const path = "/api/projects/inprogress";
-    export type get_query = { dummy?: unknown };
+    export namespace InProgress {
+      export const path = "/api/projects/inprogress";
 
-    export type type = {
-      inprogress: {
-        id: number;
-        subject: string;
-        donePercent: number;
-        createdAt: string;
-        updatedAt: string;
+      export type type = {
+        inprogress: {
+          id: number;
+          subject: string;
+          donePercent: number;
+          createdAt: string;
+          updatedAt: string;
+          url?: string;
+        }[];
         url?: string;
-      }[];
-      url?: string;
-      board_url?: string;
-    };
+        board_url?: string;
+      };
+    }
+
+    export namespace Recent {
+      export const path = "/api/projects/recent";
+
+      export type type = {
+        event?: {
+          issueSubject: string;
+          url: string;
+        };
+      };
+    }
   }
 
   export namespace Weather {

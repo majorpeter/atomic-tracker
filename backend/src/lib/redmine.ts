@@ -1,6 +1,18 @@
 import fetch from "node-fetch";
 import { xml2js } from "xml-js";
 
+export type Journal = {
+  id: number;
+  created_on: string;
+  details: {
+    property: string;
+    name: string;
+    old_value: string | null;
+    new_value: string;
+  }[];
+  notes: string;
+};
+
 function getElementText(key: string, element: any): string | null {
   const item = element.elements.find((item: any) => item.name == key);
   if (!item) {
@@ -63,34 +75,36 @@ export async function fetchInProgress(config: {
   return null;
 }
 
-export async function fetchUpdatedSince(
-  since: Date | undefined,
-  config: {
-    url: string;
-    api_key: string;
-  }
-) {
+export async function fetchUpdatedSince(params: {
+  since?: Date;
+  maxIssues?: number;
+  url: string;
+  api_key: string;
+}) {
   const LIMIT = 100;
-  const changes = [];
+
+  let issuesCount = 0;
+  const changes: { journal: Journal; issue: any }[] = [];
   try {
     for (let offset = 0; ; offset += LIMIT) {
       const listingUrl =
-        config.url +
+        params.url +
         "/issues.json?" +
         new URLSearchParams({
           offset: offset.toString(),
           limit: LIMIT.toString(),
           status_id: "*",
           sort: "updated_on",
-          ...(since
+          ...(params.since
             ? {
-                updated_on: ">=" + since.toISOString().split(".")[0] + "Z",
+                updated_on:
+                  ">=" + params.since.toISOString().split(".")[0] + "Z",
               }
             : {}),
         });
       const listingResp = await fetch(listingUrl, {
         headers: {
-          "X-Redmine-API-Key": config.api_key,
+          "X-Redmine-API-Key": params.api_key,
         },
       });
       const listingBody = (await listingResp.json()) as {
@@ -101,6 +115,7 @@ export async function fetchUpdatedSince(
           created_on: string; // iso date
           updated_on: string; // iso date
           status: { id: number; name: string };
+          project: { id: number; name: string };
         }[];
         limit: number;
         offset: number;
@@ -109,7 +124,7 @@ export async function fetchUpdatedSince(
 
       for (const issue of listingBody.issues) {
         const issueUrl =
-          config.url +
+          params.url +
           "/issues/" +
           issue.id.toString() +
           ".json?" +
@@ -119,7 +134,7 @@ export async function fetchUpdatedSince(
 
         const issueResp = await fetch(issueUrl, {
           headers: {
-            "X-Redmine-API-Key": config.api_key,
+            "X-Redmine-API-Key": params.api_key,
           },
         });
         const issueBody = (await issueResp.json()) as {
@@ -141,18 +156,21 @@ export async function fetchUpdatedSince(
 
         issueBody.issue.journals
           .filter((item) =>
-            since
-              ? new Date(item.created_on).getTime() >= since.getTime()
+            params.since
+              ? new Date(item.created_on).getTime() >= params.since.getTime()
               : true
           )
           .every((item) => {
             changes.push({
-              journal_created: new Date(item.created_on),
-              issue_updated: new Date(issue.updated_on),
               journal: item,
               issue: issue,
             });
           });
+
+        issuesCount++;
+        if (params.maxIssues && issuesCount == params.maxIssues) {
+          return changes;
+        }
       }
       if (listingBody.offset + LIMIT >= listingBody.total_count) {
         break;
@@ -162,5 +180,5 @@ export async function fetchUpdatedSince(
     console.log(e);
   }
 
-  return;
+  return changes;
 }
