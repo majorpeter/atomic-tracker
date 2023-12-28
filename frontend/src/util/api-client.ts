@@ -130,10 +130,10 @@ export function useApiQuery_journal_day(date: Date) {
 }
 
 export function useApiQuery_projectsInProgress() {
-  return useQuery<Api.Projects.type>({
+  return useQuery<Api.Projects.InProgress.type>({
     queryKey: queryKeys.projects_inprogress,
     queryFn: async () => {
-      return apiFetchJson(Api.Projects.path);
+      return apiFetchJson(Api.Projects.InProgress.path);
     },
   });
 }
