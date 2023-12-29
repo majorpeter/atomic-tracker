@@ -8,6 +8,7 @@ import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 
 import {
+  useApiMutation_projectsRecentTrack,
   useApiMutation_projectsRecentDismiss,
   useApiQuery_projectsRecent,
 } from "../../util/api-client";
@@ -15,15 +16,25 @@ import {
 const ProjectImportNotification: React.FC = () => {
   const [state, setState] = useState<{ open: boolean }>({ open: true });
   const { data, refetch } = useApiQuery_projectsRecent();
-  const { mutate: mutateDismiss } =
-    useApiMutation_projectsRecentDismiss(onDismissSuccess);
+  const { mutate: mutateTrack } = useApiMutation_projectsRecentTrack(
+    onTrackDismissSuccess
+  );
+  const { mutate: mutateDismiss } = useApiMutation_projectsRecentDismiss(
+    onTrackDismissSuccess
+  );
 
-  async function onDismissSuccess() {
+  async function onTrackDismissSuccess() {
     const data = await refetch();
-    console.log(data);
 
     if (data.data?.event) {
       setState((s) => ({ ...s, open: true }));
+    }
+  }
+
+  function handleTrack(activityId: number) {
+    if (data && data.event) {
+      setState((s) => ({ ...s, open: false }));
+      mutateTrack({ activityId, id: data.event.id });
     }
   }
 
@@ -86,6 +97,7 @@ const ProjectImportNotification: React.FC = () => {
                 <Button
                   key={a.id}
                   color="primary"
+                  onClick={() => handleTrack(a.id)}
                   startDecorator={<LinkIcon />}
                 >
                   {a.name}

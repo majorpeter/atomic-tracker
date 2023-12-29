@@ -5,7 +5,7 @@ import { isLoggedInMiddleware } from "./auth";
 
 import { Integration } from "../models/integration";
 import { RedmineJournalCache, State } from "../models/redminejournalcache";
-import { Activity, Habit } from "../models/habit";
+import { Activity, Habit, TrackedActivity } from "../models/habit";
 
 import * as redmine from "../lib/redmine";
 
@@ -191,10 +191,42 @@ export default function (app: Express, useDummyData: boolean) {
     Api.Projects.Recent.path,
     isLoggedInMiddleware,
     async (req, res) => {
-      if (req.body.dismiss) {
+      if (req.body.action == "track") {
         const journal = await RedmineJournalCache.findOne({
           where: {
-            id: req.body.dismiss.id,
+            id: req.body.id,
+            ownerId: req.session.userId,
+          },
+        });
+
+        const activity = await Activity.findOne({
+          where: {
+            id: req.body.activityId,
+            ownerId: req.session.userId,
+          },
+        });
+
+        if (journal && activity) {
+          await TrackedActivity.create({
+            ActivityId: activity.id,
+            HabitId: activity.HabitId,
+            ownerId: req.session.userId!,
+            createdAt: journal.createdAt,
+          });
+
+          journal.state = State.Processed;
+          await journal.save();
+
+          //TODO link tables
+
+          res.sendStatus(200);
+        } else {
+          res.sendStatus(404);
+        }
+      } else if (req.body.action == "dismiss") {
+        const journal = await RedmineJournalCache.findOne({
+          where: {
+            id: req.body.id,
             ownerId: req.session.userId,
           },
         });

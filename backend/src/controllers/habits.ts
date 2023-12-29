@@ -141,7 +141,7 @@ export default function (app: Express) {
       });
       if (activity) {
         const record = await TrackedActivity.create({
-          ownerId: req.session.userId!, //TODO validate user logged in
+          ownerId: req.session.userId!,
           ActivityId: activity.id,
           HabitId: activity.HabitId,
           createdAt: new Date(req.body.date),

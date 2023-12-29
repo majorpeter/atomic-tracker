@@ -193,9 +193,16 @@ export namespace Api {
         }[];
       };
 
-      export type post_req = {
-        dismiss?: { id: number };
-      };
+      export type post_req =
+        | {
+            action: "dismiss";
+            id: number;
+          }
+        | {
+            action: "track";
+            id: number;
+            activityId: number;
+          };
     }
   }
 

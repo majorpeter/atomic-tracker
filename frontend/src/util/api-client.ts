@@ -346,10 +346,33 @@ export function useApiMutation_journal(onSuccess?: () => void) {
   });
 }
 
-export function useApiMutation_projectsRecentDismiss(onSuccess?: () => void) {
-  return useMutation<unknown, Error, Api.Projects.Recent.post_req["dismiss"]>({
+export function useApiMutation_projectsRecentTrack(onSuccess?: () => void) {
+  return useMutation<unknown, Error, { id: number; activityId: number }>({
     mutationFn: async (params) => {
-      const body: Api.Projects.Recent.post_req = { dismiss: params };
+      const body: Api.Projects.Recent.post_req = {
+        action: "track",
+        ...params,
+      };
+      await fetch(API_URL + Api.Projects.Recent.path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      queryClient.invalidateQueries({ queryKey: queryKeys.habits });
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects_recent });
+    },
+    onSuccess,
+  });
+}
+
+export function useApiMutation_projectsRecentDismiss(onSuccess?: () => void) {
+  return useMutation<unknown, Error, { id: number }>({
+    mutationFn: async (params) => {
+      const body: Api.Projects.Recent.post_req = {
+        action: "dismiss",
+        ...params,
+      };
       await fetch(API_URL + Api.Projects.Recent.path, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
