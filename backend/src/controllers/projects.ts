@@ -5,6 +5,7 @@ import { isLoggedInMiddleware } from "./auth";
 
 import { Integration } from "../models/integration";
 import { RedmineJournalCache, State } from "../models/redminejournalcache";
+import { Activity, Habit } from "../models/habit";
 
 import * as redmine from "../lib/redmine";
 
@@ -137,6 +138,15 @@ export default function (app: Express, useDummyData: boolean) {
         });
 
         if (cachedItem) {
+          const habit = await Habit.findOne({
+            where: {
+              id: Object.entries(PROJECT_HABIT_MAPPING).find(
+                (item) => item[0] == cachedItem!.projectId.toString()
+              )?.[1],
+              ownerId: req.session.userId,
+            },
+            include: [Activity],
+          });
           const issue = await redmine.getIssue(cachedItem.issueId, {
             url: integrations.Projects.redmine.url,
             api_key: integrations.Projects.redmine.api_key,
@@ -160,7 +170,14 @@ export default function (app: Express, useDummyData: boolean) {
               to: parseInt(progress.new_value),
             };
           }
-          res.send({ event });
+
+          res.send({
+            event,
+            activities: habit?.Activities!.map((a) => ({
+              id: a.id,
+              name: a.name,
+            })),
+          });
         } else {
           res.send({});
         }

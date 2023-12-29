@@ -187,6 +187,10 @@ export namespace Api {
           url: string;
           progressChanged?: { from: number; to: number };
         };
+        activities?: {
+          id: number;
+          name: string;
+        }[];
       };
 
       export type post_req = {

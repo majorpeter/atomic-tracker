@@ -72,10 +72,25 @@ const ProjectImportNotification: React.FC = () => {
               <Chip color="primary">{data.event.progressChanged.to}%</Chip>
             </>
           )}
-          <Stack direction="row" spacing="5px" sx={{ mt: 2 }}>
-            <Button color="primary" startDecorator={<LinkIcon />}>
-              Track as ASD
-            </Button>
+          <Stack
+            direction="row"
+            spacing="4"
+            flexWrap="wrap"
+            sx={{
+              mt: 2,
+              "& > *": { mr: "5px !important", mb: "5px !important" },
+            }}
+          >
+            {data.activities &&
+              data.activities.map((a) => (
+                <Button
+                  key={a.id}
+                  color="primary"
+                  startDecorator={<LinkIcon />}
+                >
+                  {a.name}
+                </Button>
+              ))}
             <Button
               color="danger"
               onClick={handleDismiss}
