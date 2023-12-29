@@ -140,7 +140,7 @@ export function useApiQuery_projectsInProgress() {
 }
 
 export function useApiQuery_projectsRecent() {
-  return useQuery<Api.Projects.Recent.type>({
+  return useQuery<Api.Projects.Recent.get_type>({
     queryKey: queryKeys.projects_recent,
     queryFn: async () => {
       return apiFetchJson(Api.Projects.Recent.path);
@@ -341,6 +341,22 @@ export function useApiMutation_journal(onSuccess?: () => void) {
 
       // invalidate all journals in case 'today' was edited
       queryClient.invalidateQueries({ queryKey: queryKeys.journal_overview });
+    },
+    onSuccess,
+  });
+}
+
+export function useApiMutation_projectsRecentDismiss(onSuccess?: () => void) {
+  return useMutation<unknown, Error, Api.Projects.Recent.post_req["dismiss"]>({
+    mutationFn: async (params) => {
+      const body: Api.Projects.Recent.post_req = { dismiss: params };
+      await fetch(API_URL + Api.Projects.Recent.path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects_recent });
     },
     onSuccess,
   });

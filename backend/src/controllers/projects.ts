@@ -62,7 +62,7 @@ export default function (app: Express, useDummyData: boolean) {
     }
   );
 
-  app.get<{}, Api.Projects.Recent.type>(
+  app.get<{}, Api.Projects.Recent.get_type>(
     Api.Projects.Recent.path,
     isLoggedInMiddleware,
     async (req, res) => {
@@ -142,7 +142,8 @@ export default function (app: Express, useDummyData: boolean) {
             api_key: integrations.Projects.redmine.api_key,
           });
 
-          const event: Api.Projects.Recent.type["event"] = {
+          const event: Api.Projects.Recent.get_type["event"] = {
+            id: cachedItem.id,
             issueSubject: issue.issue.subject,
             url:
               integrations.Projects.redmine.url +
@@ -165,6 +166,32 @@ export default function (app: Express, useDummyData: boolean) {
         }
       } else {
         res.send({});
+      }
+    }
+  );
+
+  app.post<{}, {}, Api.Projects.Recent.post_req>(
+    Api.Projects.Recent.path,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      if (req.body.dismiss) {
+        const journal = await RedmineJournalCache.findOne({
+          where: {
+            id: req.body.dismiss.id,
+            ownerId: req.session.userId,
+          },
+        });
+
+        if (journal) {
+          journal.state = State.Ignored;
+          await journal.save();
+
+          res.sendStatus(200);
+        } else {
+          res.sendStatus(404);
+        }
+      } else {
+        res.sendStatus(400);
       }
     }
   );
