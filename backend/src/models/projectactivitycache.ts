@@ -9,11 +9,13 @@ import {
 } from "sequelize";
 
 import db from "../lib/db";
+import * as redmine from "../lib/redmine";
 
 import { User } from "./user";
 
 import { Journal } from "../lib/redmine";
 import { Api } from "../lib/api";
+import { Integration } from "./integration";
 
 export enum State {
   New = 0,
@@ -36,28 +38,41 @@ export class ProjectActivityCache extends Model<
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
-  activity(
-    issueSubject: string,
-    url: string
-  ): Api.Projects.Recent.ProjectActivity {
-    const activity: Api.Projects.Recent.ProjectActivity = {
-      projectActivityId: this.id,
-      issueSubject,
-      url,
-    };
+  async activity(): Promise<Api.Projects.Activity | null> {
+    const integrations = await Integration.findOne({
+      where: { ownerId: this.ownerId },
+    });
 
-    const progress = this.data.details.find(
-      (item) => item.name == "done_ratio"
-    );
+    if (integrations && integrations.Projects.redmine) {
+      const issue = await redmine.getIssue(this.issueId, {
+        url: integrations.Projects.redmine.url,
+        api_key: integrations.Projects.redmine.api_key,
+      });
 
-    if (progress) {
-      activity.progressChanged = {
-        from: progress.old_value ? parseInt(progress.old_value) : 0,
-        to: parseInt(progress.new_value),
+      const activity: Api.Projects.Activity = {
+        projectActivityId: this.id,
+        issueSubject: issue.issue.subject,
+        url:
+          integrations.Projects.redmine.url +
+          "/issues/" +
+          this.issueId.toString(),
       };
+
+      const progress = this.data.details.find(
+        (item) => item.name == "done_ratio"
+      );
+
+      if (progress) {
+        activity.progressChanged = {
+          from: progress.old_value ? parseInt(progress.old_value) : 0,
+          to: parseInt(progress.new_value),
+        };
+      }
+
+      return activity;
     }
 
-    return activity;
+    return null;
   }
 }
 

@@ -160,6 +160,13 @@ export namespace Api {
   }
 
   export namespace Projects {
+    export type Activity = {
+      projectActivityId: number;
+      issueSubject: string;
+      url: string;
+      progressChanged?: { from: number; to: number };
+    };
+
     export namespace InProgress {
       export const path = "/api/projects/inprogress";
 
@@ -180,15 +187,8 @@ export namespace Api {
     export namespace Recent {
       export const path = "/api/projects/recent";
 
-      export type ProjectActivity = {
-        projectActivityId: number;
-        issueSubject: string;
-        url: string;
-        progressChanged?: { from: number; to: number };
-      };
-
       export type get_type = {
-        projectActivity?: ProjectActivity;
+        projectActivity?: Activity;
         activities?: {
           id: number;
           name: string;

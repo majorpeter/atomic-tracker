@@ -138,32 +138,29 @@ export default function (app: Express, useDummyData: boolean) {
         });
 
         if (cachedItem) {
-          const habit = await Habit.findOne({
-            where: {
-              id: Object.entries(PROJECT_HABIT_MAPPING).find(
-                (item) => item[0] == cachedItem!.projectId.toString()
-              )?.[1],
-              ownerId: req.session.userId,
-            },
-            include: [Activity],
-          });
-          const issue = await redmine.getIssue(cachedItem.issueId, {
-            url: integrations.Projects.redmine.url,
-            api_key: integrations.Projects.redmine.api_key,
-          });
+          const projectActivity = await cachedItem.activity();
 
-          res.send({
-            projectActivity: cachedItem.activity(
-              issue.issue.subject,
-              integrations.Projects.redmine.url +
-                "/issues/" +
-                cachedItem.issueId.toString()
-            ),
-            activities: habit?.Activities!.map((a) => ({
-              id: a.id,
-              name: a.name,
-            })),
-          });
+          if (projectActivity) {
+            const habit = await Habit.findOne({
+              where: {
+                id: Object.entries(PROJECT_HABIT_MAPPING).find(
+                  (item) => item[0] == cachedItem!.projectId.toString()
+                )?.[1],
+                ownerId: req.session.userId,
+              },
+              include: [Activity],
+            });
+
+            res.send({
+              projectActivity,
+              activities: habit?.Activities!.map((a) => ({
+                id: a.id,
+                name: a.name,
+              })),
+            });
+          } else {
+            res.send({});
+          }
         } else {
           res.send({});
         }
