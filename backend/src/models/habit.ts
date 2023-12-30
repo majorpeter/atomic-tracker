@@ -29,6 +29,8 @@ export class Habit extends Model<
   declare targetValue: number;
   declare periodLength: number;
   declare historyLength: number;
+  // ID in configured project integration, not foreign key in this db
+  declare projectId: number | null;
   declare Owner: NonAttribute<User>;
   declare ownerId: ForeignKey<User["id"]>;
   declare archived: CreationOptional<boolean>;
@@ -72,6 +74,10 @@ Habit.init(
     historyLength: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    projectId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
     },
     ownerId: {
       type: DataTypes.INTEGER,

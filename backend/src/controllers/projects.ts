@@ -6,6 +6,7 @@ import { isLoggedInMiddleware } from "./auth";
 import { Integration } from "../models/integration";
 import { ProjectActivityCache, State } from "../models/projectactivitycache";
 import { Activity, Habit, TrackedActivity } from "../models/habit";
+import { Op } from "sequelize";
 
 import * as redmine from "../lib/redmine";
 
@@ -72,97 +73,102 @@ export default function (app: Express, useDummyData: boolean) {
       });
 
       if (integrations && integrations.Projects.redmine) {
-        // redmine project ID -> habit ID
-        // TODO provide config
-        const PROJECT_HABIT_MAPPING = { 8: 1 };
-
-        let cachedItem = await ProjectActivityCache.findOne({
+        const habits = await Habit.findAll({
           where: {
-            projectId: Object.keys(PROJECT_HABIT_MAPPING),
-            state: State.New,
             ownerId: req.session.userId,
+            projectId: { [Op.not]: null },
           },
-          order: [
-            [ProjectActivityCache.getAttributes().createdAt.field!, "ASC"],
-          ],
         });
 
-        if (cachedItem == null) {
-          const cachedLastItem = await ProjectActivityCache.findOne({
-            where: { ownerId: req.session.userId },
+        if (habits.length == 0) {
+          res.send({});
+        } else {
+          let cachedItem = await ProjectActivityCache.findOne({
+            where: {
+              projectId: habits.map((h) => h.projectId!),
+              state: State.New,
+              ownerId: req.session.userId,
+            },
             order: [
-              [ProjectActivityCache.getAttributes().createdAt.field!, "DESC"],
+              [ProjectActivityCache.getAttributes().createdAt.field!, "ASC"],
             ],
           });
 
-          const data = await redmine.fetchUpdatedSince({
-            since: cachedLastItem
-              ? new Date(cachedLastItem.createdAt.getTime() + 1000)
-              : new Date(new Date().getTime() - 7 * 24 * 3600e3),
-            maxIssues: 10,
-            url: integrations.Projects.redmine.url,
-            api_key: integrations.Projects.redmine.api_key,
-          });
-
-          for (let i of data) {
-            const cached = await ProjectActivityCache.findOne({
-              where: {
-                ownerId: req.session.userId,
-                redmineJournalId: i.journal.id,
-              },
+          if (cachedItem == null) {
+            const cachedLastItem = await ProjectActivityCache.findOne({
+              where: { ownerId: req.session.userId },
+              order: [
+                [ProjectActivityCache.getAttributes().createdAt.field!, "DESC"],
+              ],
             });
 
-            if (!cached) {
-              await ProjectActivityCache.create({
-                data: i.journal,
-                redmineJournalId: i.journal.id,
-                projectId: i.issue.project.id,
-                issueId: i.issue.id,
-                state: State.New,
-                createdAt: new Date(i.journal.created_on),
-                ownerId: req.session.userId,
+            const data = await redmine.fetchUpdatedSince({
+              since: cachedLastItem
+                ? new Date(cachedLastItem.createdAt.getTime() + 1000)
+                : new Date(new Date().getTime() - 7 * 24 * 3600e3),
+              maxIssues: 10,
+              url: integrations.Projects.redmine.url,
+              api_key: integrations.Projects.redmine.api_key,
+            });
+
+            for (let i of data) {
+              const cached = await ProjectActivityCache.findOne({
+                where: {
+                  ownerId: req.session.userId,
+                  redmineJournalId: i.journal.id,
+                },
               });
+
+              if (!cached) {
+                await ProjectActivityCache.create({
+                  data: i.journal,
+                  redmineJournalId: i.journal.id,
+                  projectId: i.issue.project.id,
+                  issueId: i.issue.id,
+                  state: State.New,
+                  createdAt: new Date(i.journal.created_on),
+                  ownerId: req.session.userId,
+                });
+              }
             }
           }
-        }
 
-        cachedItem = await ProjectActivityCache.findOne({
-          where: {
-            projectId: Object.keys(PROJECT_HABIT_MAPPING),
-            state: State.New,
-            ownerId: req.session.userId,
-          },
-          order: [
-            [ProjectActivityCache.getAttributes().createdAt.field!, "ASC"],
-          ],
-        });
+          cachedItem = await ProjectActivityCache.findOne({
+            where: {
+              projectId: habits.map((h) => h.projectId!),
+              state: State.New,
+              ownerId: req.session.userId,
+            },
+            order: [
+              [ProjectActivityCache.getAttributes().createdAt.field!, "ASC"],
+            ],
+          });
 
-        if (cachedItem) {
-          const projectActivity = await cachedItem.activity();
+          if (cachedItem) {
+            const projectActivity = await cachedItem.activity();
 
-          if (projectActivity) {
-            const habit = await Habit.findOne({
-              where: {
-                id: Object.entries(PROJECT_HABIT_MAPPING).find(
-                  (item) => item[0] == cachedItem!.projectId.toString()
-                )?.[1],
-                ownerId: req.session.userId,
-              },
-              include: [Activity],
-            });
+            if (projectActivity) {
+              const habit = await Habit.findOne({
+                where: {
+                  projectId: cachedItem!.projectId,
+                  ownerId: req.session.userId,
+                },
+                include: [Activity],
+              });
 
-            res.send({
-              projectActivity,
-              activities: habit?.Activities!.map((a) => ({
-                id: a.id,
-                name: a.name,
-              })),
-            });
+              res.send({
+                projectActivity,
+                activities: habit?.Activities!.map((a) => ({
+                  id: a.id,
+                  name: a.name,
+                })),
+              });
+            } else {
+              res.send({});
+            }
           } else {
             res.send({});
           }
-        } else {
-          res.send({});
         }
       } else {
         res.send({});
