@@ -55,7 +55,9 @@ export class ProjectActivityCache extends Model<
         url:
           integrations.Projects.redmine.url +
           "/issues/" +
-          this.issueId.toString(),
+          this.issueId.toString() +
+          "#change-" +
+          this.redmineJournalId.toString(),
       };
 
       const progress = this.data.details.find(
