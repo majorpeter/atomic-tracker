@@ -176,7 +176,7 @@ export async function fetchUpdatedSince(params: {
               ? new Date(item.created_on).getTime() >= params.since.getTime()
               : true
           )
-          .every((item) => {
+          .forEach((item) => {
             changes.push({
               journal: item,
               issue: issue,
