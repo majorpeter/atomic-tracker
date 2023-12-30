@@ -8,8 +8,8 @@ export function formatTime(d: Date, needSeconds: boolean = false) {
   });
 }
 
-export function formatDate(d: Date) {
-  return d.toLocaleDateString(AppLocalStorage.getLanguage());
+export function formatDate(d: Date, options?: Intl.DateTimeFormatOptions) {
+  return d.toLocaleDateString(AppLocalStorage.getLanguage(), options);
 }
 
 /**
