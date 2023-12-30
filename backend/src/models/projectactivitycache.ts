@@ -9,7 +9,9 @@ import {
 } from "sequelize";
 
 import db from "../lib/db";
+
 import { User } from "./user";
+
 import { Journal } from "../lib/redmine";
 
 export enum State {
@@ -50,9 +52,6 @@ ProjectActivityCache.init(
       get() {
         return State[this.getDataValue("state") as number];
       },
-      /*set(value: State) {
-        this.setDataValue("state", State[value] as unknown as State);
-      },*/
     },
     ownerId: {
       type: DataTypes.INTEGER,

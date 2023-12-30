@@ -14,6 +14,7 @@ import {
 
 import db from "../lib/db";
 import { User } from "./user";
+import { ProjectActivityCache } from "./projectactivitycache";
 
 const typeValueSet = ["good", "bad"] as const;
 
@@ -149,6 +150,8 @@ export class TrackedActivity extends Model<
   declare HabitId: ForeignKey<Habit["id"]>;
   declare Activity?: NonAttribute<Activity>;
   declare ActivityId: ForeignKey<Activity["id"]>;
+  declare ProjectActivityCacheEntry: NonAttribute<ProjectActivityCache>;
+  declare ProjectActivityCacheEntryId: ForeignKey<ProjectActivityCache["id"]>;
   declare ownerId: number; //TODO foreign key later
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -200,6 +203,7 @@ TrackedActivity.init(
     ownerId: { type: DataTypes.INTEGER },
     HabitId: { type: DataTypes.INTEGER, allowNull: false },
     ActivityId: { type: DataTypes.INTEGER, allowNull: false },
+    ProjectActivityCacheEntryId: { type: DataTypes.INTEGER, allowNull: true },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },

@@ -210,14 +210,13 @@ export default function (app: Express, useDummyData: boolean) {
           await TrackedActivity.create({
             ActivityId: activity.id,
             HabitId: activity.HabitId,
+            ProjectActivityCacheEntryId: journal.id,
             ownerId: req.session.userId!,
             createdAt: journal.createdAt,
           });
 
           journal.state = State.Processed;
           await journal.save();
-
-          //TODO link tables
 
           res.sendStatus(200);
         } else {
