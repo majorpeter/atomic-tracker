@@ -107,7 +107,7 @@ const Agenda: React.FC = () => {
       </Sheet>
       <CardOverflow variant="soft">
         <Divider inset="context" />
-        <CardActions>
+        <CardActions sx={{ flexWrap: "wrap" }}>
           <Typography sx={{ mr: "auto" }}>
             {data?.today
               ? t("n_eventsToday", { count: data.today.length })

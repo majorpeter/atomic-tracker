@@ -95,8 +95,8 @@ const Projects: React.FC = () => {
       </CardContent>
       <CardOverflow variant="soft">
         <Divider inset="context" />
-        <CardActions>
-          <Typography mr="auto">
+        <CardActions sx={{ flexWrap: "wrap" }}>
+          <Typography mr="auto" sx={{ width: { xs: "100%", md: "auto" } }}>
             {data &&
               t("n_projectsInProgress", { count: data.inprogress.length })}
           </Typography>
