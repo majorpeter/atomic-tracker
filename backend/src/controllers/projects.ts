@@ -64,112 +64,127 @@ export default function (app: Express, useDummyData: boolean) {
     }
   );
 
+  async function importJournalsFromRedmine(params: {
+    userId: number;
+    redmine: { url: string; api_key: string };
+  }) {
+    const cachedLastItem = await ProjectActivityCache.findOne({
+      where: { ownerId: params.userId },
+      order: [[ProjectActivityCache.getAttributes().createdAt.field!, "DESC"]],
+    });
+
+    const data = await redmine.fetchUpdatedSince({
+      since: cachedLastItem
+        ? new Date(cachedLastItem.createdAt.getTime() + 1000)
+        : new Date(new Date().getTime() - 7 * 24 * 3600e3),
+      maxIssues: 10,
+      url: params.redmine.url,
+      api_key: params.redmine.api_key,
+    });
+
+    for (let i of data) {
+      const cached = await ProjectActivityCache.findOne({
+        where: {
+          ownerId: params.userId,
+          redmineJournalId: i.journal.id,
+        },
+      });
+
+      if (!cached) {
+        await ProjectActivityCache.create({
+          data: i.journal,
+          redmineJournalId: i.journal.id,
+          projectId: i.issue.project.id,
+          issueId: i.issue.id,
+          state: State.New,
+          createdAt: new Date(i.journal.created_on),
+          ownerId: params.userId,
+        });
+      }
+    }
+  }
+
+  async function fetchNewProjectActivity(params: {
+    userId: number;
+  }): Promise<{ activity: Api.Projects.Activity; projectId: number } | null> {
+    const integrations = await Integration.findOne({
+      where: { ownerId: params.userId },
+    });
+
+    if (integrations && integrations.Projects.redmine) {
+      const habits = await Habit.findAll({
+        where: {
+          ownerId: params.userId,
+          projectId: { [Op.not]: null },
+        },
+      });
+
+      if (habits.length > 0) {
+        let cachedItem = await ProjectActivityCache.findOne({
+          where: {
+            projectId: habits.map((h) => h.projectId!),
+            state: State.New,
+            ownerId: params.userId,
+          },
+          order: [
+            [ProjectActivityCache.getAttributes().createdAt.field!, "ASC"],
+          ],
+        });
+
+        if (cachedItem == null) {
+          await importJournalsFromRedmine({
+            userId: params.userId!,
+            redmine: integrations.Projects.redmine,
+          });
+        }
+
+        cachedItem = await ProjectActivityCache.findOne({
+          where: {
+            projectId: habits.map((h) => h.projectId!),
+            state: State.New,
+            ownerId: params.userId,
+          },
+          order: [
+            [ProjectActivityCache.getAttributes().createdAt.field!, "ASC"],
+          ],
+        });
+
+        if (cachedItem) {
+          const activity = await cachedItem.activity();
+          if (activity) {
+            return { projectId: cachedItem.projectId, activity };
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
   app.get<{}, Api.Projects.Recent.get_type>(
     Api.Projects.Recent.path,
     isLoggedInMiddleware,
     async (req, res) => {
-      const integrations = await Integration.findOne({
-        where: { ownerId: req.session.userId },
+      const activity = await fetchNewProjectActivity({
+        userId: req.session.userId!,
       });
 
-      if (integrations && integrations.Projects.redmine) {
-        const habits = await Habit.findAll({
+      if (activity) {
+        const habit = await Habit.findOne({
           where: {
+            projectId: activity.projectId,
             ownerId: req.session.userId,
-            projectId: { [Op.not]: null },
           },
+          include: [Activity],
         });
 
-        if (habits.length == 0) {
-          res.send({});
-        } else {
-          let cachedItem = await ProjectActivityCache.findOne({
-            where: {
-              projectId: habits.map((h) => h.projectId!),
-              state: State.New,
-              ownerId: req.session.userId,
-            },
-            order: [
-              [ProjectActivityCache.getAttributes().createdAt.field!, "ASC"],
-            ],
-          });
-
-          if (cachedItem == null) {
-            const cachedLastItem = await ProjectActivityCache.findOne({
-              where: { ownerId: req.session.userId },
-              order: [
-                [ProjectActivityCache.getAttributes().createdAt.field!, "DESC"],
-              ],
-            });
-
-            const data = await redmine.fetchUpdatedSince({
-              since: cachedLastItem
-                ? new Date(cachedLastItem.createdAt.getTime() + 1000)
-                : new Date(new Date().getTime() - 7 * 24 * 3600e3),
-              maxIssues: 10,
-              url: integrations.Projects.redmine.url,
-              api_key: integrations.Projects.redmine.api_key,
-            });
-
-            for (let i of data) {
-              const cached = await ProjectActivityCache.findOne({
-                where: {
-                  ownerId: req.session.userId,
-                  redmineJournalId: i.journal.id,
-                },
-              });
-
-              if (!cached) {
-                await ProjectActivityCache.create({
-                  data: i.journal,
-                  redmineJournalId: i.journal.id,
-                  projectId: i.issue.project.id,
-                  issueId: i.issue.id,
-                  state: State.New,
-                  createdAt: new Date(i.journal.created_on),
-                  ownerId: req.session.userId,
-                });
-              }
-            }
-          }
-
-          cachedItem = await ProjectActivityCache.findOne({
-            where: {
-              projectId: habits.map((h) => h.projectId!),
-              state: State.New,
-              ownerId: req.session.userId,
-            },
-            order: [
-              [ProjectActivityCache.getAttributes().createdAt.field!, "ASC"],
-            ],
-          });
-
-          if (cachedItem) {
-            const projectActivity = await cachedItem.activity();
-
-            if (projectActivity) {
-              const habit = await Habit.findOne({
-                where: {
-                  projectId: cachedItem!.projectId,
-                  ownerId: req.session.userId,
-                },
-                include: [Activity],
-              });
-
-              res.send({
-                projectActivity,
-                activities: habit?.Activities!.map((a) => ({
-                  id: a.id,
-                  name: a.name,
-                })),
-              });
-            } else {
-              res.send({});
-            }
-          } else {
-            res.send({});
-          }
-        }
+        res.send({
+          projectActivity: activity.activity,
+          activities: habit?.Activities!.map((a) => ({
+            id: a.id,
+            name: a.name,
+          })),
+        });
       } else {
         res.send({});
       }
