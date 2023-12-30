@@ -77,13 +77,28 @@ const ProjectImportNotification: React.FC = () => {
             </Link>
           </Typography>
           {data.projectActivity.progressChanged && (
-            <>
+            <Box>
               Progress changed from{" "}
               <Chip>{data.projectActivity.progressChanged.from}%</Chip> to{" "}
               <Chip color="primary">
                 {data.projectActivity.progressChanged.to}%
               </Chip>
-            </>
+            </Box>
+          )}
+          {data.projectActivity.statusChanged && (
+            <Box>
+              Status changed from{" "}
+              <Chip>{data.projectActivity.statusChanged.from}</Chip> to{" "}
+              <Chip
+                color={
+                  data.projectActivity.statusChanged.closed
+                    ? "success"
+                    : "primary"
+                }
+              >
+                {data.projectActivity.statusChanged.to}
+              </Chip>
+            </Box>
           )}
           <Stack
             direction="row"

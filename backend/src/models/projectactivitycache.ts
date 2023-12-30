@@ -63,11 +63,33 @@ export class ProjectActivityCache extends Model<
       const progress = this.data.details.find(
         (item) => item.name == "done_ratio"
       );
-
       if (progress) {
         activity.progressChanged = {
           from: progress.old_value ? parseInt(progress.old_value) : 0,
           to: parseInt(progress.new_value),
+        };
+      }
+      const status = this.data.details.find((item) => item.name == "status_id");
+      if (status) {
+        const statuses = await redmine.getStatusMapping({
+          url: integrations.Projects.redmine.url,
+          api_key: integrations.Projects.redmine.api_key,
+        });
+
+        activity.statusChanged = {
+          from: status.old_value
+            ? statuses.issue_statuses.find(
+                (item) => item.id === parseInt(status.old_value!)
+              )?.name ?? "?"
+            : "?",
+          to:
+            statuses.issue_statuses.find(
+              (item) => item.id === parseInt(status.new_value)
+            )?.name ?? "?",
+          closed:
+            statuses.issue_statuses.find(
+              (item) => item.id === parseInt(status.new_value)
+            )?.is_closed ?? false,
         };
       }
 

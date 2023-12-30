@@ -166,6 +166,7 @@ export namespace Api {
       issueSubject: string;
       url: string;
       progressChanged?: { from: number; to: number };
+      statusChanged?: { from: string; to: string; closed: boolean };
     };
 
     export namespace InProgress {

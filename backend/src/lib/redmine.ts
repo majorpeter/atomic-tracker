@@ -75,6 +75,24 @@ export async function fetchInProgress(config: {
   return null;
 }
 
+export async function getStatusMapping(config: {
+  url: string;
+  api_key: string;
+}): Promise<{
+  issue_statuses: {
+    id: number;
+    name: string;
+    is_closed: boolean;
+  }[];
+}> {
+  const resp = await fetch(config.url + "/issue_statuses.json", {
+    headers: {
+      "X-Redmine-API-Key": config.api_key,
+    },
+  });
+  return await resp.json();
+}
+
 export async function getIssue(
   id: number,
   config: {
