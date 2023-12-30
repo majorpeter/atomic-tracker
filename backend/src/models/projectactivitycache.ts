@@ -18,12 +18,12 @@ export enum State {
   Ignored = 2,
 }
 
-export class RedmineJournalCache extends Model<
-  InferAttributes<RedmineJournalCache>,
-  InferCreationAttributes<RedmineJournalCache>
+export class ProjectActivityCache extends Model<
+  InferAttributes<ProjectActivityCache>,
+  InferCreationAttributes<ProjectActivityCache>
 > {
   declare id: CreationOptional<number>;
-  declare journalId: number;
+  declare redmineJournalId: number;
   declare projectId: number;
   declare issueId: number;
   declare data: Journal;
@@ -34,14 +34,14 @@ export class RedmineJournalCache extends Model<
   declare updatedAt: CreationOptional<Date>;
 }
 
-RedmineJournalCache.init(
+ProjectActivityCache.init(
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
-    journalId: DataTypes.INTEGER,
+    redmineJournalId: DataTypes.INTEGER,
     projectId: DataTypes.INTEGER,
     issueId: DataTypes.INTEGER,
     data: DataTypes.JSON,

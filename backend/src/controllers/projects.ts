@@ -4,7 +4,7 @@ import { Api } from "../lib/api";
 import { isLoggedInMiddleware } from "./auth";
 
 import { Integration } from "../models/integration";
-import { RedmineJournalCache, State } from "../models/redminejournalcache";
+import { ProjectActivityCache, State } from "../models/projectactivitycache";
 import { Activity, Habit, TrackedActivity } from "../models/habit";
 
 import * as redmine from "../lib/redmine";
@@ -76,22 +76,22 @@ export default function (app: Express, useDummyData: boolean) {
         // TODO provide config
         const PROJECT_HABIT_MAPPING = { 8: 1 };
 
-        let cachedItem = await RedmineJournalCache.findOne({
+        let cachedItem = await ProjectActivityCache.findOne({
           where: {
             projectId: Object.keys(PROJECT_HABIT_MAPPING),
             state: State.New,
             ownerId: req.session.userId,
           },
           order: [
-            [RedmineJournalCache.getAttributes().createdAt.field!, "ASC"],
+            [ProjectActivityCache.getAttributes().createdAt.field!, "ASC"],
           ],
         });
 
         if (cachedItem == null) {
-          const cachedLastItem = await RedmineJournalCache.findOne({
+          const cachedLastItem = await ProjectActivityCache.findOne({
             where: { ownerId: req.session.userId },
             order: [
-              [RedmineJournalCache.getAttributes().createdAt.field!, "DESC"],
+              [ProjectActivityCache.getAttributes().createdAt.field!, "DESC"],
             ],
           });
 
@@ -105,17 +105,17 @@ export default function (app: Express, useDummyData: boolean) {
           });
 
           for (let i of data) {
-            const cached = await RedmineJournalCache.findOne({
+            const cached = await ProjectActivityCache.findOne({
               where: {
                 ownerId: req.session.userId,
-                journalId: i.journal.id,
+                redmineJournalId: i.journal.id,
               },
             });
 
             if (!cached) {
-              await RedmineJournalCache.create({
+              await ProjectActivityCache.create({
                 data: i.journal,
-                journalId: i.journal.id,
+                redmineJournalId: i.journal.id,
                 projectId: i.issue.project.id,
                 issueId: i.issue.id,
                 state: State.New,
@@ -126,14 +126,14 @@ export default function (app: Express, useDummyData: boolean) {
           }
         }
 
-        cachedItem = await RedmineJournalCache.findOne({
+        cachedItem = await ProjectActivityCache.findOne({
           where: {
             projectId: Object.keys(PROJECT_HABIT_MAPPING),
             state: State.New,
             ownerId: req.session.userId,
           },
           order: [
-            [RedmineJournalCache.getAttributes().createdAt.field!, "ASC"],
+            [ProjectActivityCache.getAttributes().createdAt.field!, "ASC"],
           ],
         });
 
@@ -192,7 +192,7 @@ export default function (app: Express, useDummyData: boolean) {
     isLoggedInMiddleware,
     async (req, res) => {
       if (req.body.action == "track") {
-        const journal = await RedmineJournalCache.findOne({
+        const journal = await ProjectActivityCache.findOne({
           where: {
             id: req.body.id,
             ownerId: req.session.userId,
@@ -224,7 +224,7 @@ export default function (app: Express, useDummyData: boolean) {
           res.sendStatus(404);
         }
       } else if (req.body.action == "dismiss") {
-        const journal = await RedmineJournalCache.findOne({
+        const journal = await ProjectActivityCache.findOne({
           where: {
             id: req.body.id,
             ownerId: req.session.userId,
