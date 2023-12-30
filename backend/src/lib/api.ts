@@ -79,6 +79,7 @@ export namespace Api {
         activityName: string;
         value: number;
         date: string;
+        project?: Projects.Activity;
       }[];
     };
 

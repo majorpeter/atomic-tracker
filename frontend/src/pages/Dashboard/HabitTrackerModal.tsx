@@ -19,13 +19,16 @@ import {
   DialogTitle,
   IconButton,
   Input,
+  Link,
   List,
   ListItem,
   ListItemButton,
+  ListItemContent,
   ListItemDecorator,
   Modal,
   ModalClose,
   ModalDialog,
+  Stack,
   Table,
   Typography,
 } from "@mui/joy";
@@ -177,10 +180,26 @@ const HabitTrackerModal: React.FC = () => {
                       {formatDate(new Date(item.date))}
                     </ListItemDecorator>
 
-                    <Typography fontWeight="lg" sx={{ ml: 2 }}>
-                      {item.activityName}
-                    </Typography>
-                    <Chip color="success">+{item.value}</Chip>
+                    <ListItemContent>
+                      <Stack direction="row">
+                        <Typography fontWeight="lg" sx={{ ml: 2 }}>
+                          {item.activityName}
+                        </Typography>
+                        <Chip color="success">+{item.value}</Chip>
+                      </Stack>
+
+                      {item.project && (
+                        <Typography noWrap>
+                          <Link
+                            href={item.project.url}
+                            target="_blank"
+                            sx={{ display: "inline" }}
+                          >
+                            {item.project.issueSubject}
+                          </Link>
+                        </Typography>
+                      )}
+                    </ListItemContent>
 
                     <ListItemDecorator sx={{ ml: "auto" }}>
                       <IconButton

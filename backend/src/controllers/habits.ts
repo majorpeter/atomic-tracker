@@ -2,7 +2,9 @@ import { Express } from "express";
 import { Api } from "../lib/api";
 
 import { Activity, Habit, TrackedActivity } from "../models/habit";
+import { ProjectActivityCache } from "../models/projectactivitycache";
 import { Op } from "sequelize";
+
 import { isLoggedInMiddleware } from "./auth";
 
 export default function (app: Express) {
@@ -94,7 +96,7 @@ export default function (app: Express) {
             [TrackedActivity.getAttributes().createdAt.field!, "DESC"],
             [TrackedActivity.getAttributes().updatedAt.field!, "DESC"],
           ],
-          include: [Activity],
+          include: [Activity, ProjectActivityCache],
         });
 
         res.send({
@@ -116,12 +118,17 @@ export default function (app: Express) {
                 })
               )
             : [],
-          history: trackedInHistory.map((item) => ({
-            id: item.id,
-            activityName: item.Activity!.name,
-            value: item.Activity!.value,
-            date: item.createdAt.toISOString(),
-          })),
+          history: await Promise.all(
+            trackedInHistory.map(async (item) => ({
+              id: item.id,
+              activityName: item.Activity!.name,
+              value: item.Activity!.value,
+              date: item.createdAt.toISOString(),
+              project: item.ProjectActivityCache
+                ? (await item.ProjectActivityCache.activity()) ?? undefined
+                : undefined,
+            }))
+          ),
         });
       } else {
         res.sendStatus(404);

@@ -150,7 +150,7 @@ export class TrackedActivity extends Model<
   declare HabitId: ForeignKey<Habit["id"]>;
   declare Activity?: NonAttribute<Activity>;
   declare ActivityId: ForeignKey<Activity["id"]>;
-  declare ProjectActivityCacheEntry: NonAttribute<ProjectActivityCache>;
+  declare ProjectActivityCache: NonAttribute<ProjectActivityCache | null>;
   declare ProjectActivityCacheEntryId: ForeignKey<ProjectActivityCache["id"]>;
   declare ownerId: number; //TODO foreign key later
   declare createdAt: CreationOptional<Date>;
@@ -218,3 +218,6 @@ Habit.hasMany(TrackedActivity);
 TrackedActivity.belongsTo(Habit);
 Activity.hasMany(TrackedActivity);
 TrackedActivity.belongsTo(Activity);
+TrackedActivity.belongsTo(ProjectActivityCache, {
+  foreignKey: TrackedActivity.getAttributes().ProjectActivityCacheEntryId.field,
+});
