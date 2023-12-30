@@ -13,6 +13,7 @@ import db from "../lib/db";
 import { User } from "./user";
 
 import { Journal } from "../lib/redmine";
+import { Api } from "../lib/api";
 
 export enum State {
   New = 0,
@@ -34,6 +35,30 @@ export class ProjectActivityCache extends Model<
   declare ownerId: ForeignKey<User["id"]>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+
+  activity(
+    issueSubject: string,
+    url: string
+  ): Api.Projects.Recent.ProjectActivity {
+    const activity: Api.Projects.Recent.ProjectActivity = {
+      projectActivityId: this.id,
+      issueSubject,
+      url,
+    };
+
+    const progress = this.data.details.find(
+      (item) => item.name == "done_ratio"
+    );
+
+    if (progress) {
+      activity.progressChanged = {
+        from: progress.old_value ? parseInt(progress.old_value) : 0,
+        to: parseInt(progress.new_value),
+      };
+    }
+
+    return activity;
+  }
 }
 
 ProjectActivityCache.init(

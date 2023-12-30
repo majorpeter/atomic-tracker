@@ -26,22 +26,22 @@ const ProjectImportNotification: React.FC = () => {
   async function onTrackDismissSuccess() {
     const data = await refetch();
 
-    if (data.data?.event) {
+    if (data.data?.projectActivity) {
       setState((s) => ({ ...s, open: true }));
     }
   }
 
   function handleTrack(activityId: number) {
-    if (data && data.event) {
+    if (data && data.projectActivity) {
       setState((s) => ({ ...s, open: false }));
-      mutateTrack({ activityId, id: data.event.id });
+      mutateTrack({ activityId, id: data.projectActivity.projectActivityId });
     }
   }
 
   function handleDismiss() {
-    if (data && data.event) {
+    if (data && data.projectActivity) {
       setState((s) => ({ ...s, open: false }));
-      mutateDismiss({ id: data.event.id });
+      mutateDismiss({ id: data.projectActivity.projectActivityId });
     }
   }
   function handleClose() {
@@ -50,7 +50,7 @@ const ProjectImportNotification: React.FC = () => {
 
   return (
     data &&
-    data.event && (
+    data.projectActivity && (
       <Snackbar
         open={state.open}
         onClose={handleClose}
@@ -69,18 +69,20 @@ const ProjectImportNotification: React.FC = () => {
             }}
           >
             <Link
-              href={data.event.url}
+              href={data.projectActivity.url}
               target="_blank"
               sx={{ display: "inline" }}
             >
-              {data.event.issueSubject}
+              {data.projectActivity.issueSubject}
             </Link>
           </Typography>
-          {data.event.progressChanged && (
+          {data.projectActivity.progressChanged && (
             <>
               Progress changed from{" "}
-              <Chip>{data.event.progressChanged.from}%</Chip> to{" "}
-              <Chip color="primary">{data.event.progressChanged.to}%</Chip>
+              <Chip>{data.projectActivity.progressChanged.from}%</Chip> to{" "}
+              <Chip color="primary">
+                {data.projectActivity.progressChanged.to}%
+              </Chip>
             </>
           )}
           <Stack

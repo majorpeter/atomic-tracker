@@ -152,27 +152,13 @@ export default function (app: Express, useDummyData: boolean) {
             api_key: integrations.Projects.redmine.api_key,
           });
 
-          const event: Api.Projects.Recent.get_type["event"] = {
-            id: cachedItem.id,
-            issueSubject: issue.issue.subject,
-            url:
-              integrations.Projects.redmine.url +
-              "/issues/" +
-              cachedItem.issueId.toString(),
-          };
-
-          const progress = cachedItem.data.details.find(
-            (item) => item.name == "done_ratio"
-          );
-          if (progress) {
-            event.progressChanged = {
-              from: progress.old_value ? parseInt(progress.old_value) : 0,
-              to: parseInt(progress.new_value),
-            };
-          }
-
           res.send({
-            event,
+            projectActivity: cachedItem.activity(
+              issue.issue.subject,
+              integrations.Projects.redmine.url +
+                "/issues/" +
+                cachedItem.issueId.toString()
+            ),
             activities: habit?.Activities!.map((a) => ({
               id: a.id,
               name: a.name,

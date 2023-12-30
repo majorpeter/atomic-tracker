@@ -180,13 +180,15 @@ export namespace Api {
     export namespace Recent {
       export const path = "/api/projects/recent";
 
+      export type ProjectActivity = {
+        projectActivityId: number;
+        issueSubject: string;
+        url: string;
+        progressChanged?: { from: number; to: number };
+      };
+
       export type get_type = {
-        event?: {
-          id: number;
-          issueSubject: string;
-          url: string;
-          progressChanged?: { from: number; to: number };
-        };
+        projectActivity?: ProjectActivity;
         activities?: {
           id: number;
           name: string;
