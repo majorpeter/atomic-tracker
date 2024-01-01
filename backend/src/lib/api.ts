@@ -238,6 +238,7 @@ export namespace Api {
         targetValue: number;
         periodLength: number;
         historyLength: number;
+        projectId: number | null;
         activities: {
           id?: number;
           name: string;
@@ -264,6 +265,11 @@ export namespace Api {
           }
         | { action: "move"; direction: "up" | "down"; id: number }
         | { action: "delete"; id: number };
+
+      export namespace Projects {
+        export const path = "/api/config/habits/projects";
+        export type type = { id: number; name: string }[];
+      }
     }
 
     export namespace Todos {

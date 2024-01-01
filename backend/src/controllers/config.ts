@@ -6,6 +6,7 @@ import { isLoggedInMiddleware } from "./auth";
 import { Habit, Activity } from "../models/habit";
 import { Integration } from "../models/integration";
 import db from "../lib/db";
+import * as redmine from "../lib/redmine";
 import { generateAuthUrl, getTokenFromCode } from "../lib/google-account";
 
 export default function (app: Express) {
@@ -37,6 +38,7 @@ export default function (app: Express) {
           targetValue: item.targetValue,
           periodLength: item.periodLength,
           historyLength: item.historyLength,
+          projectId: item.projectId,
           activities: item
             .Activities!.filter((a) => !a.archived)
             .sort((a, b) => b.value - a.value)
@@ -231,6 +233,29 @@ export default function (app: Express) {
         }
       } else {
         res.sendStatus(400);
+      }
+    }
+  );
+
+  app.get<{}, Api.Config.Habits.Projects.type>(
+    Api.Config.Habits.Projects.path,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      const integrations = await Integration.findOne({
+        where: { ownerId: req.session.userId! },
+      });
+      if (
+        integrations &&
+        integrations.Projects.schema == 1 &&
+        integrations.Projects.redmine
+      ) {
+        const projects = await redmine.getProjects({
+          url: integrations.Projects.redmine.url,
+          api_key: integrations.Projects.redmine.api_key,
+        });
+        res.send(projects.projects.map((p) => ({ id: p.id, name: p.name })));
+      } else {
+        res.send([]);
       }
     }
   );

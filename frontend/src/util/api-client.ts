@@ -63,6 +63,7 @@ export const queryKeys = {
   weather: ["weather"],
   radio: ["radio"],
   config_habits: ["habits", "config"],
+  config_habits_projects: ["projects", "config", "project"],
   config_todos: ["todos", "config"],
   config_projects: ["projects", "config"],
   config_radio: ["radio", "config"],
@@ -185,6 +186,15 @@ export function useApiQuery_config_habits(
         onSuccess(result);
       }
       return result;
+    },
+  });
+}
+
+export function useApiQuery_config_habits_projects() {
+  return useQuery<Api.Config.Habits.Projects.type>({
+    queryKey: queryKeys.config_habits_projects,
+    queryFn: async () => {
+      return apiFetchJson(Api.Config.Habits.Projects.path);
     },
   });
 }
