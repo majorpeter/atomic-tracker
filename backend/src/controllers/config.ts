@@ -414,7 +414,16 @@ export default function (app: Express) {
         },
       });
       if (int) {
-        res.send(int.Projects);
+        const linkedHabits = await Habit.findAll({
+          where: {
+            projectId: { [Op.not]: null },
+            ownerId: req.session.userId,
+          },
+        });
+        res.send({
+          ...int.Projects,
+          status: { linkedProjects: linkedHabits.length > 0 },
+        });
       } else {
         res.send({ schema: 1 });
       }

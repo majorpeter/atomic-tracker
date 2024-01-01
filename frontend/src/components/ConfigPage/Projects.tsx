@@ -2,6 +2,7 @@ import React, { ChangeEvent, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 
 import {
+  Alert,
   Button,
   Card,
   FormControl,
@@ -15,6 +16,7 @@ import {
 } from "@mui/joy";
 
 import SaveIcon from "@mui/icons-material/Save";
+import WarningIcon from "@mui/icons-material/Warning";
 
 import {
   useApiMutation_config_projects,
@@ -28,6 +30,7 @@ const Projects: React.FC = () => {
   const { data } = useApiQuery_config_projects();
   const { mutate, isPending: isSaving } = useApiMutation_config_projects();
   const [issueTracker, setIssueTracker] = useState<"none" | "redmine">();
+  const [baseUrlChanged, setBaseUrlChanged] = useState<boolean>(false);
 
   function handleIssueTrackerChange(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.value == "none" || e.target.value == "redmine") {
@@ -35,6 +38,10 @@ const Projects: React.FC = () => {
     } else {
       console.error("Invald input value: ", e.target.value);
     }
+  }
+
+  function handleBaseUrlChange(e: ChangeEvent<HTMLInputElement>) {
+    setBaseUrlChanged(e.target.value !== data?.redmine?.url);
   }
 
   function handleSave(e: React.FormEvent) {
@@ -101,13 +108,26 @@ const Projects: React.FC = () => {
               defaultValue={
                 data.redmine ? data.redmine.url : "https://example.com"
               }
+              onChange={handleBaseUrlChange}
             />
-            <FormHelperText>
+            <FormHelperText sx={{ display: "block" }}>
               <Trans i18nKey="redmineUrlHelper">
                 Base URL for all API requests and opening the web interface,
                 e.g.
                 <code>https://example.com</code>
               </Trans>
+              {data.status?.linkedProjects && (
+                <Alert
+                  color={baseUrlChanged ? "danger" : "neutral"}
+                  variant={baseUrlChanged ? "soft" : "plain"}
+                  startDecorator={baseUrlChanged && <WarningIcon />}
+                >
+                  <Trans i18nKey="redmineUrlLinkedProjectsWarning">
+                    Changing this URL will clear linked projects from all Habits
+                    and delete cached project activities.
+                  </Trans>
+                </Alert>
+              )}
             </FormHelperText>
           </FormControl>
           <FormControl>

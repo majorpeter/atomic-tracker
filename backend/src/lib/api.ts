@@ -320,6 +320,9 @@ export namespace Api {
           inprogress_status_id: number;
           board_url?: string;
         };
+        status?: {
+          linkedProjects: boolean;
+        };
       };
     }
 
