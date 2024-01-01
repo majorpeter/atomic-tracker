@@ -145,6 +145,12 @@ export function useApiQuery_projectsRecent() {
     queryFn: async () => {
       return apiFetchJson(Api.Projects.Recent.path);
     },
+    meta: {
+      cache: false,
+    },
+    refetchInterval: (query) => {
+      return query.state.data?.importStatus ? 500 : false;
+    },
   });
 }
 

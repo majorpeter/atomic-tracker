@@ -195,6 +195,7 @@ export namespace Api {
           id: number;
           name: string;
         }[];
+        importStatus?: { processedIssues: number; totalIssues: number };
       };
 
       export type post_req =

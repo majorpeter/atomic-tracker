@@ -140,6 +140,10 @@ export async function fetchUpdatedSince(params: {
   maxIssues?: number;
   url: string;
   api_key: string;
+  statusCallback?: (status: {
+    processedIssues: number;
+    totalIssues: number;
+  }) => void;
 }) {
   const LIMIT = 100;
 
@@ -182,6 +186,13 @@ export async function fetchUpdatedSince(params: {
         total_count: number;
       };
 
+      if (params.statusCallback) {
+        params.statusCallback({
+          processedIssues: issuesCount,
+          totalIssues: listingBody.total_count,
+        });
+      }
+
       for (const issue of listingBody.issues) {
         const issueBody = await getIssue(issue.id, {
           url: params.url,
@@ -202,6 +213,13 @@ export async function fetchUpdatedSince(params: {
           });
 
         issuesCount++;
+        if (params.statusCallback) {
+          params.statusCallback({
+            processedIssues: issuesCount,
+            totalIssues: listingBody.total_count,
+          });
+        }
+
         if (params.maxIssues && issuesCount == params.maxIssues) {
           return changes;
         }

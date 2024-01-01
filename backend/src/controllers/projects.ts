@@ -12,6 +12,11 @@ import * as redmine from "../lib/redmine";
 
 import { DUMMY_PROJECTS } from "../misc/dummy_data";
 
+/**
+ * project activitiy is considered up-to-date for this time after a refresh
+ */
+const PROJECT_IMPORT_REFRESH_MIN_INTERVAL_MS = 10e3;
+
 export default function (app: Express, useDummyData: boolean) {
   app.get<{}, Api.Projects.InProgress.type>(
     Api.Projects.InProgress.path,
@@ -64,49 +69,104 @@ export default function (app: Express, useDummyData: boolean) {
     }
   );
 
-  async function importJournalsFromRedmine(params: {
+  type ImportProgress = {
+    counts: { processedIssues: number; totalIssues: number };
+    /// when was the import completed (if set)
+    doneAt?: Date;
+  };
+
+  const importInProgressForUserIds = new Map<number, ImportProgress>();
+
+  async function startImportJournalsFromRedmine(params: {
     userId: number;
     redmine: { url: string; api_key: string };
-  }) {
-    const cachedLastItem = await ProjectActivityCache.findOne({
-      where: { ownerId: params.userId },
-      order: [[ProjectActivityCache.getAttributes().createdAt.field!, "DESC"]],
+  }): Promise<ImportProgress> {
+    const inProgress = importInProgressForUserIds.get(params.userId);
+    if (
+      inProgress &&
+      (!inProgress.doneAt ||
+        new Date().getTime() - inProgress.doneAt.getTime() <
+          PROJECT_IMPORT_REFRESH_MIN_INTERVAL_MS)
+    ) {
+      return inProgress;
+    }
+
+    importInProgressForUserIds.set(params.userId, {
+      counts: { processedIssues: 0, totalIssues: 0 },
     });
 
-    const data = await redmine.fetchUpdatedSince({
-      since: cachedLastItem
-        ? new Date(cachedLastItem.createdAt.getTime() + 1000)
-        : new Date(new Date().getTime() - 7 * 24 * 3600e3),
-      maxIssues: 10,
-      url: params.redmine.url,
-      api_key: params.redmine.api_key,
-    });
+    return new Promise(async (resolve) => {
+      try {
+        const cachedLastItem = await ProjectActivityCache.findOne({
+          where: { ownerId: params.userId },
+          order: [
+            [ProjectActivityCache.getAttributes().createdAt.field!, "DESC"],
+          ],
+        });
 
-    for (let i of data) {
-      const cached = await ProjectActivityCache.findOne({
-        where: {
-          ownerId: params.userId,
-          redmineJournalId: i.journal.id,
-        },
-      });
+        const data = await redmine.fetchUpdatedSince({
+          since: cachedLastItem
+            ? new Date(cachedLastItem.createdAt.getTime() + 1000)
+            : new Date(new Date().getTime() - 7 * 24 * 3600e3),
+          url: params.redmine.url,
+          api_key: params.redmine.api_key,
+          statusCallback: (status) => {
+            importInProgressForUserIds.set(params.userId, { counts: status });
+            resolve({ counts: status });
+          },
+        });
 
-      if (!cached) {
-        await ProjectActivityCache.create({
-          data: i.journal,
-          redmineJournalId: i.journal.id,
-          projectId: i.issue.project.id,
-          issueId: i.issue.id,
-          state: State.New,
-          createdAt: new Date(i.journal.created_on),
-          ownerId: params.userId,
+        for (let i of data) {
+          const existing = await ProjectActivityCache.findOne({
+            where: {
+              ownerId: params.userId,
+              redmineJournalId: i.journal.id,
+            },
+          });
+
+          if (existing == null) {
+            await ProjectActivityCache.create({
+              data: i.journal,
+              redmineJournalId: i.journal.id,
+              projectId: i.issue.project.id,
+              issueId: i.issue.id,
+              state: State.New,
+              createdAt: new Date(i.journal.created_on),
+              ownerId: params.userId,
+            });
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        importInProgressForUserIds.set(params.userId, {
+          ...importInProgressForUserIds.get(params.userId)!,
+          doneAt: new Date(),
         });
       }
-    }
+    });
   }
 
-  async function fetchNewProjectActivity(params: {
-    userId: number;
-  }): Promise<{ activity: Api.Projects.Activity; projectId: number } | null> {
+  async function fetchCachedNewProjectActivity(habits: Habit[]) {
+    return ProjectActivityCache.findOne({
+      where: {
+        projectId: habits.map((h) => h.projectId!),
+        state: State.New,
+        ownerId: habits[0].ownerId,
+      },
+      order: [[ProjectActivityCache.getAttributes().createdAt.field!, "ASC"]],
+    });
+  }
+
+  async function fetchNewProjectActivity(params: { userId: number }): Promise<
+    | {
+        status: "found";
+        activity: Api.Projects.Activity;
+        projectId: number;
+      }
+    | { status: "busy"; processedIssues: number; totalIssues: number }
+    | { status: "notfound" }
+  > {
     const integrations = await Integration.findOne({
       where: { ownerId: params.userId },
     });
@@ -120,45 +180,38 @@ export default function (app: Express, useDummyData: boolean) {
       });
 
       if (habits.length > 0) {
-        let cachedItem = await ProjectActivityCache.findOne({
-          where: {
-            projectId: habits.map((h) => h.projectId!),
-            state: State.New,
-            ownerId: params.userId,
-          },
-          order: [
-            [ProjectActivityCache.getAttributes().createdAt.field!, "ASC"],
-          ],
-        });
+        // try to get from local db first
+        let cachedItem = await fetchCachedNewProjectActivity(habits);
 
+        // start/continue an import if not found
         if (cachedItem == null) {
-          await importJournalsFromRedmine({
+          const status = await startImportJournalsFromRedmine({
             userId: params.userId!,
             redmine: integrations.Projects.redmine,
           });
-        }
 
-        cachedItem = await ProjectActivityCache.findOne({
-          where: {
-            projectId: habits.map((h) => h.projectId!),
-            state: State.New,
-            ownerId: params.userId,
-          },
-          order: [
-            [ProjectActivityCache.getAttributes().createdAt.field!, "ASC"],
-          ],
-        });
+          if (!status.doneAt) {
+            return { status: "busy", ...status.counts };
+          }
+
+          // previous import finished, try to find new activity
+          cachedItem = await fetchCachedNewProjectActivity(habits);
+        }
 
         if (cachedItem) {
           const activity = await cachedItem.activity();
           if (activity) {
-            return { projectId: cachedItem.projectId, activity };
+            return {
+              status: "found",
+              projectId: cachedItem.projectId,
+              activity,
+            };
           }
         }
       }
     }
 
-    return null;
+    return { status: "notfound" };
   }
 
   app.get<{}, Api.Projects.Recent.get_type>(
@@ -169,7 +222,7 @@ export default function (app: Express, useDummyData: boolean) {
         userId: req.session.userId!,
       });
 
-      if (activity) {
+      if (activity.status == "found") {
         const habit = await Habit.findOne({
           where: {
             projectId: activity.projectId,
@@ -184,6 +237,13 @@ export default function (app: Express, useDummyData: boolean) {
             id: a.id,
             name: a.name,
           })),
+        });
+      } else if (activity.status == "busy") {
+        res.send({
+          importStatus: {
+            processedIssues: activity.processedIssues,
+            totalIssues: activity.totalIssues,
+          },
         });
       } else {
         res.send({});

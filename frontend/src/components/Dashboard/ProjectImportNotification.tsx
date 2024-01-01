@@ -1,6 +1,15 @@
 import { useState } from "react";
 
-import { Box, Button, Chip, Link, Snackbar, Stack, Typography } from "@mui/joy";
+import {
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Link,
+  Snackbar,
+  Stack,
+  Typography,
+} from "@mui/joy";
 
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import LinkIcon from "@mui/icons-material/Link";
@@ -48,9 +57,8 @@ const ProjectImportNotification: React.FC = () => {
     setState((s) => ({ ...s, open: false }));
   }
 
-  return (
-    data &&
-    data.projectActivity && (
+  if (data && data.projectActivity) {
+    return (
       <Snackbar
         open={state.open}
         onClose={handleClose}
@@ -137,8 +145,27 @@ const ProjectImportNotification: React.FC = () => {
           </Stack>
         </Box>
       </Snackbar>
-    )
-  );
+    );
+  } else if (data && data.importStatus) {
+    const percent =
+      (data.importStatus.processedIssues / data.importStatus.totalIssues) * 100;
+    return (
+      <Snackbar
+        open
+        startDecorator={
+          <CircularProgress determinate value={percent}>
+            <Typography fontSize="12px">{Math.round(percent)}%</Typography>
+          </CircularProgress>
+        }
+      >
+        <Box>
+          <Typography level="title-md">Importing project activity</Typography>
+          {data.importStatus.processedIssues} of {data.importStatus.totalIssues}{" "}
+          issues processed.
+        </Box>
+      </Snackbar>
+    );
+  }
 };
 
 export default ProjectImportNotification;
