@@ -30,15 +30,14 @@ import {
 import Activities from "./Activities";
 import { Handlers } from "../Habits";
 import { Trans, useTranslation } from "react-i18next";
-import { useApiQuery_config_habits_projects } from "../../../util/api-client";
 
 const HabitEditor: React.FC<{
   habit: Api.Config.Habits.HabitDescriptor;
   isCreatingNew: boolean;
   handlers: Handlers;
-}> = ({ habit, isCreatingNew, handlers }) => {
+  projects?: Api.Config.Habits.Projects.type;
+}> = ({ habit, isCreatingNew, handlers, projects }) => {
   const { t } = useTranslation();
-  const { data: projects } = useApiQuery_config_habits_projects();
   const formRef = useRef<HTMLFormElement>(null);
 
   function collectFormData(): Api.Config.Habits.HabitDescriptor {
