@@ -146,7 +146,7 @@ const ProjectImportNotification: React.FC = () => {
         </Box>
       </Snackbar>
     );
-  } else if (data && data.importStatus) {
+  } else if (data && data.importStatus && data.importStatus.totalIssues > 0) {
     const percent =
       (data.importStatus.processedIssues / data.importStatus.totalIssues) * 100;
     return (

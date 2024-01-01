@@ -249,11 +249,16 @@ export default function (app: Express) {
         integrations.Projects.schema == 1 &&
         integrations.Projects.redmine
       ) {
-        const projects = await redmine.getProjects({
-          url: integrations.Projects.redmine.url,
-          api_key: integrations.Projects.redmine.api_key,
-        });
-        res.send(projects.projects.map((p) => ({ id: p.id, name: p.name })));
+        try {
+          const projects = await redmine.getProjects({
+            url: integrations.Projects.redmine.url,
+            api_key: integrations.Projects.redmine.api_key,
+          });
+          res.send(projects.projects.map((p) => ({ id: p.id, name: p.name })));
+        } catch (e) {
+          console.error(e);
+          res.sendStatus(500);
+        }
       } else {
         res.send([]);
       }

@@ -32,20 +32,25 @@ export default function (app: Express, useDummyData: boolean) {
           integrations.Projects.schema == 1 &&
           integrations.Projects.redmine
         ) {
-          const data = await redmine.fetchInProgress({
-            url: integrations.Projects.redmine.url,
-            api_key: integrations.Projects.redmine.api_key,
-            inprogress_status_id:
-              integrations.Projects.redmine.inprogress_status_id,
-          });
-
-          if (data != null) {
-            res.send({
-              ...data,
-              url: integrations.Projects.redmine.url + "/projects",
-              board_url: integrations.Projects.redmine.board_url,
+          try {
+            const data = await redmine.fetchInProgress({
+              url: integrations.Projects.redmine.url,
+              api_key: integrations.Projects.redmine.api_key,
+              inprogress_status_id:
+                integrations.Projects.redmine.inprogress_status_id,
             });
-          } else {
+
+            if (data != null) {
+              res.send({
+                ...data,
+                url: integrations.Projects.redmine.url + "/projects",
+                board_url: integrations.Projects.redmine.board_url,
+              });
+            } else {
+              res.sendStatus(500);
+            }
+          } catch (e) {
+            console.error(e);
             res.sendStatus(500);
           }
         } else {

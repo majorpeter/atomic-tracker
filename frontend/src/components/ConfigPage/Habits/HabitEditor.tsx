@@ -48,6 +48,7 @@ const HabitEditor: React.FC<{
     const activityId = fd.getAll("activityId[]") as string[];
     const activityName = fd.getAll("activityName[]") as string[];
     const activityValue = fd.getAll("activityValue[]") as string[];
+    const projectId = parseInt(data.projectId as string);
 
     return {
       name: data.name as string,
@@ -56,6 +57,7 @@ const HabitEditor: React.FC<{
       targetValue: parseInt(data.targetValue as string),
       periodLength: parseInt(data.periodLength as string),
       historyLength: parseInt(data.historyLength as string),
+      projectId: projectId ? projectId : null,
       activities: activityId.map((id, index) => ({
         id: parseInt(id) > 0 ? parseInt(id) : undefined,
         name: activityName[index],
@@ -174,7 +176,12 @@ const HabitEditor: React.FC<{
             <FormLabel>
               <Trans i18nKey="linkedProject">Linked Project</Trans>
             </FormLabel>
-            <Select defaultValue={habit.projectId}>
+            <Select
+              defaultValue={habit.projectId ?? 0}
+              name="projectId"
+              disabled={!projects || !projects.length}
+            >
+              <Option value={0}>(None)</Option>
               {projects &&
                 projects.map((project) => (
                   <Option key={project.id} value={project.id}>
