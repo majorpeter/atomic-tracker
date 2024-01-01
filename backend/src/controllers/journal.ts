@@ -19,8 +19,12 @@ export default function (app: Express) {
         },
       });
 
-      const historyStartDateRaw =
-        Journal.dateToRawValue(getIsoDate(new Date())) - HISTORY_LENGTH;
+      const historyStartDate = new Date();
+      historyStartDate.setDate(historyStartDate.getDate() - HISTORY_LENGTH);
+      const historyStartDateRaw = Journal.dateToRawValue(
+        getIsoDate(historyStartDate)
+      );
+
       const historyEntries = await Journal.findAll({
         where: {
           date: { [Op.gte]: historyStartDateRaw },
