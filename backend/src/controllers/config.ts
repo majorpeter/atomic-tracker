@@ -8,6 +8,7 @@ import { Integration } from "../models/integration";
 import db from "../lib/db";
 import * as redmine from "../lib/redmine";
 import { generateAuthUrl, getTokenFromCode } from "../lib/google-account";
+import { ProjectActivityCache } from "../models/projectactivitycache";
 
 export default function (app: Express) {
   app.get<{}, Api.Config.Habits.get_type>(
@@ -257,7 +258,8 @@ export default function (app: Express) {
           res.send(projects.projects.map((p) => ({ id: p.id, name: p.name })));
         } catch (e) {
           console.error(e);
-          res.sendStatus(500);
+          // TODO include status field?
+          res.send([]);
         }
       } else {
         res.send([]);
@@ -441,6 +443,19 @@ export default function (app: Express) {
       });
 
       if (int) {
+        if (int.Projects.redmine && req.body.redmine) {
+          if (int.Projects.redmine.url != req.body.redmine.url) {
+            // if this is a different redmine instance, the old project ID's and cached journals are no longer valid
+            await Habit.update(
+              { projectId: null },
+              { where: { ownerId: req.session.userId } }
+            );
+            await ProjectActivityCache.destroy({
+              where: { ownerId: req.session.userId },
+            });
+          }
+        }
+
         int.Projects = req.body;
         await int.save();
       } else {

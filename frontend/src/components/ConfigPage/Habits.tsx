@@ -102,7 +102,7 @@ const Habits: React.FC = () => {
         activities: [
           {
             id: -1, // negative values used on frontend for key, not sent over API
-            name: "Activity",
+            name: t("newActivity", "New Activity"),
             value: 1,
           },
         ],
