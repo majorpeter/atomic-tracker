@@ -22,7 +22,8 @@
     "sequelize": "^6.35.1",
     "sqlite3": "^5.1.6",
     "tsc-watch": "^6.0.4",
-    "tsdav": "^2.0.6"
+    "tsdav": "^2.0.6",
+    "umzug": "^3.5.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.21"

@@ -177,7 +177,10 @@ const HabitTrackerModal: React.FC = () => {
                     selected={trackPostedResp?.id == item.id}
                   >
                     <ListItemDecorator>
-                      {formatDate(new Date(item.date))}
+                      {formatDate(new Date(item.date), {
+                        day: "numeric",
+                        month: "numeric",
+                      })}
                     </ListItemDecorator>
 
                     <ListItemContent>

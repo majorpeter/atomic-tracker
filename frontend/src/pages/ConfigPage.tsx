@@ -35,7 +35,7 @@ const ConfigPage: React.FC = () => {
         </Button>
       </Sheet>
       <Tabs defaultValue={agendaSelected ? "agenda" : "user"}>
-        <TabList>
+        <TabList sx={{ flexWrap: "wrap" }}>
           <Tab value="user">{t("userPrefs", "User Preferences")}</Tab>
           <Tab value="habits">{t("habits", "Habits")}</Tab>
           <Tab value="todos">{t("todos", "Todos")}</Tab>
