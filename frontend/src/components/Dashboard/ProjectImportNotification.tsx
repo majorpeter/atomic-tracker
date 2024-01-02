@@ -15,8 +15,9 @@ import ChecklistIcon from "@mui/icons-material/Checklist";
 import LinkIcon from "@mui/icons-material/Link";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import ScheduleIcon from "@mui/icons-material/Schedule";
+import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 
 import {
   useApiMutation_projectsRecentTrack,
@@ -24,8 +25,29 @@ import {
   useApiQuery_projectsRecent,
 } from "../../util/api-client";
 
+import { formatDate } from "../../util/formatter";
+
+function formatActivityAge(
+  when: Date,
+  t: (s: string, options?: {}) => string
+): string {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const age = today.getTime() - when.getTime();
+
+  if (age < 0) {
+    return t("today");
+  }
+  if (age < 3 * 24 * 3600e3) {
+    return t("n_daysAgo", { count: Math.ceil(age / (24 * 3600e3)) });
+  }
+
+  return formatDate(when);
+}
+
 const ProjectImportNotification: React.FC = () => {
   const [state, setState] = useState<{ open: boolean }>({ open: true });
+  const { t } = useTranslation();
   const { data, refetch } = useApiQuery_projectsRecent();
   const { mutate: mutateTrack } = useApiMutation_projectsRecentTrack(
     onTrackDismissSuccess
@@ -122,6 +144,15 @@ const ProjectImportNotification: React.FC = () => {
               </Trans>
             </Box>
           )}
+          <Box>
+            <Typography
+              startDecorator={<ScheduleIcon />}
+              color="neutral"
+              title={formatDate(new Date(data.projectActivity.when))}
+            >
+              {formatActivityAge(new Date(data.projectActivity.when), t)}
+            </Typography>
+          </Box>
           <Stack
             direction="row"
             spacing="4"
@@ -152,7 +183,7 @@ const ProjectImportNotification: React.FC = () => {
             <Button
               color="neutral"
               onClick={handleClose}
-              startDecorator={<ScheduleIcon />}
+              startDecorator={<DoubleArrowIcon />}
             >
               <Trans i18nKey="later">Later</Trans>
             </Button>

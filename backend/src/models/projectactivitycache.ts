@@ -58,6 +58,7 @@ export class ProjectActivityCache extends Model<
           this.issueId.toString() +
           "#change-" +
           this.redmineJournalId.toString(),
+        when: this.createdAt.toISOString()
       };
 
       const progress = this.data.details.find(

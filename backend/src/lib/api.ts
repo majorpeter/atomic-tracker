@@ -167,6 +167,7 @@ export namespace Api {
       url: string;
       progressChanged?: { from: number; to: number };
       statusChanged?: { from: string; to: string; closed: boolean };
+      when: string;  // ISO datetime
     };
 
     export namespace InProgress {

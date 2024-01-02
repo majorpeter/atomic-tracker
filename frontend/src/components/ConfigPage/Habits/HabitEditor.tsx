@@ -180,7 +180,7 @@ const HabitEditor: React.FC<{
               name="projectId"
               disabled={!projects || !projects.length}
             >
-              <Option value={0}>(None)</Option>
+              <Option value={0}>(<Trans i18nKey="none">None</Trans>)</Option>
               {projects &&
                 projects.map((project) => (
                   <Option key={project.id} value={project.id}>
