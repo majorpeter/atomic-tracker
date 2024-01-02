@@ -58,7 +58,7 @@ export class ProjectActivityCache extends Model<
           this.issueId.toString() +
           "#change-" +
           this.redmineJournalId.toString(),
-        when: this.createdAt.toISOString()
+        when: this.createdAt.toISOString(),
       };
 
       const progress = this.data.details.find(
@@ -66,8 +66,8 @@ export class ProjectActivityCache extends Model<
       );
       if (progress) {
         activity.progressChanged = {
-          from: progress.old_value ? parseInt(progress.old_value) : 0,
-          to: parseInt(progress.new_value),
+          from: progress.old_value !== null ? parseInt(progress.old_value) : 0,
+          to: progress.new_value !== null ? parseInt(progress.new_value) : 0,
         };
       }
       const status = this.data.details.find((item) => item.name == "status_id");
@@ -85,13 +85,23 @@ export class ProjectActivityCache extends Model<
             : "?",
           to:
             statuses.issue_statuses.find(
-              (item) => item.id === parseInt(status.new_value)
+              (item) => item.id === parseInt(status.new_value!)
             )?.name ?? "?",
           closed:
             statuses.issue_statuses.find(
-              (item) => item.id === parseInt(status.new_value)
+              (item) => item.id === parseInt(status.new_value!)
             )?.is_closed ?? false,
         };
+      }
+      const others = this.data.details.filter(
+        (item) => item.name != "done_ratio" && item.name != "status_id"
+      );
+      if (others.length > 0) {
+        activity.otherChanged = others.map((item) => ({
+          name: item.name,
+          from: item.old_value,
+          to: item.new_value,
+        }));
       }
 
       return activity;

@@ -8,7 +8,7 @@ export type Journal = {
     property: string;
     name: string;
     old_value: string | null;
-    new_value: string;
+    new_value: string | null;
   }[];
   notes: string;
 };

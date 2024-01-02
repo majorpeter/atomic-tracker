@@ -144,6 +144,25 @@ const ProjectImportNotification: React.FC = () => {
               </Trans>
             </Box>
           )}
+          {data.projectActivity.otherChanged &&
+            data.projectActivity.otherChanged.map((change) => (
+              <Box key={change.name}>
+                <Trans
+                  i18nKey="otherFieldChangedFromTo"
+                  values={{
+                    name: change.name,
+                    from: change.from ?? t("none"),
+                    to: change.to ?? "(" + t("none") + ")",
+                  }}
+                >
+                  <Chip>
+                    <code>{"{{name}}"}</code>
+                  </Chip>{" "}
+                  changed from <Chip>{"{{from}}"}</Chip> to{" "}
+                  <Chip>{"{{to}}"}</Chip>
+                </Trans>
+              </Box>
+            ))}
           <Box>
             <Typography
               startDecorator={<ScheduleIcon />}
