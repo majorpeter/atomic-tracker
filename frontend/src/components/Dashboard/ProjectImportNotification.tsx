@@ -16,6 +16,8 @@ import LinkIcon from "@mui/icons-material/Link";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 
+import { Trans } from "react-i18next";
+
 import {
   useApiMutation_projectsRecentTrack,
   useApiMutation_projectsRecentDismiss,
@@ -86,26 +88,38 @@ const ProjectImportNotification: React.FC = () => {
           </Typography>
           {data.projectActivity.progressChanged && (
             <Box>
-              Progress changed from{" "}
-              <Chip>{data.projectActivity.progressChanged.from}%</Chip> to{" "}
-              <Chip color="primary">
-                {data.projectActivity.progressChanged.to}%
-              </Chip>
+              <Trans
+                i18nKey="progressChangedFromTo"
+                values={{
+                  from: data.projectActivity.progressChanged.from + "%",
+                  to: data.projectActivity.progressChanged.to + "%",
+                }}
+              >
+                Progress changed from <Chip>{"{{from}}"}</Chip> to{" "}
+                <Chip color="primary">{"{{to}}"}</Chip>
+              </Trans>
             </Box>
           )}
           {data.projectActivity.statusChanged && (
             <Box>
-              Status changed from{" "}
-              <Chip>{data.projectActivity.statusChanged.from}</Chip> to{" "}
-              <Chip
-                color={
-                  data.projectActivity.statusChanged.closed
-                    ? "success"
-                    : "primary"
-                }
+              <Trans
+                i18nKey="statusChangedFromTo"
+                values={{
+                  from: data.projectActivity.statusChanged.from,
+                  to: data.projectActivity.statusChanged.to,
+                }}
               >
-                {data.projectActivity.statusChanged.to}
-              </Chip>
+                Status changed from <Chip>{"{{from}}"}</Chip> to{" "}
+                <Chip
+                  color={
+                    data.projectActivity.statusChanged.closed
+                      ? "success"
+                      : "primary"
+                  }
+                >
+                  {"{{to}}"}
+                </Chip>
+              </Trans>
             </Box>
           )}
           <Stack
@@ -133,14 +147,14 @@ const ProjectImportNotification: React.FC = () => {
               onClick={handleDismiss}
               startDecorator={<HighlightOffIcon />}
             >
-              Dismiss
+              <Trans i18nKey="dismiss">Dismiss</Trans>
             </Button>
             <Button
               color="neutral"
               onClick={handleClose}
               startDecorator={<ScheduleIcon />}
             >
-              Later
+              <Trans i18nKey="later">Later</Trans>
             </Button>
           </Stack>
         </Box>
@@ -159,9 +173,20 @@ const ProjectImportNotification: React.FC = () => {
         }
       >
         <Box>
-          <Typography level="title-md">Importing project activity</Typography>
-          {data.importStatus.processedIssues} of {data.importStatus.totalIssues}{" "}
-          issues processed.
+          <Typography level="title-md">
+            <Trans i18nKey="importingProjActivity">
+              Importing project activity
+            </Trans>
+          </Typography>
+          <Trans
+            i18nKey="importIssuesProcessedProgress"
+            values={{
+              processed: data.importStatus.processedIssues,
+              total: data.importStatus.totalIssues,
+            }}
+          >
+            {"{{processed}}"} of {"{{total}}"} issues processed.
+          </Trans>
         </Box>
       </Snackbar>
     );

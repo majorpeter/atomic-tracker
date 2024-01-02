@@ -31,7 +31,7 @@ const Journal: React.FC = () => {
     <Card>
       <Stack direction="row">
         <Typography fontSize="lg" fontWeight="lg">
-          <Trans>journal</Trans>
+          <Trans i18nKey="journal">Journal</Trans>
         </Typography>
         <Typography fontSize="md" sx={{ ml: "auto" }} title="Number of entries">
           {data?.today.count}
