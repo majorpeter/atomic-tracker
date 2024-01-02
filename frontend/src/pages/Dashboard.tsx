@@ -12,6 +12,7 @@ import { habitTrackerRoute } from "./Dashboard/HabitTrackerModal.tsx";
 import { todosModalRoute } from "./Dashboard/TodosModal.tsx";
 import { journalEditorRoute } from "./Dashboard/JournalEditorModal.tsx";
 import { radioPickerRoute } from "./Dashboard/RadioPickerModal.tsx";
+import ProjectImportNotification from "../components/Dashboard/ProjectImportNotification.tsx";
 
 function Dashboard() {
   return (
@@ -33,6 +34,7 @@ function Dashboard() {
           <Journal />
         </Grid>
       </Grid>
+      <ProjectImportNotification />
     </>
   );
 }

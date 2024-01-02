@@ -59,9 +59,11 @@ export const queryKeys = {
   journal_day: (date: Date) => ["journal", getIsoDate(date)],
   projects: ["projects"],
   projects_inprogress: ["projects", "inprogress"],
+  projects_recent: ["projects", "recent"],
   weather: ["weather"],
   radio: ["radio"],
   config_habits: ["habits", "config"],
+  config_habits_projects: ["projects", "config", "project"],
   config_todos: ["todos", "config"],
   config_projects: ["projects", "config"],
   config_radio: ["radio", "config"],
@@ -130,10 +132,25 @@ export function useApiQuery_journal_day(date: Date) {
 }
 
 export function useApiQuery_projectsInProgress() {
-  return useQuery<Api.Projects.type>({
+  return useQuery<Api.Projects.InProgress.type>({
     queryKey: queryKeys.projects_inprogress,
     queryFn: async () => {
-      return apiFetchJson(Api.Projects.path);
+      return apiFetchJson(Api.Projects.InProgress.path);
+    },
+  });
+}
+
+export function useApiQuery_projectsRecent() {
+  return useQuery<Api.Projects.Recent.get_type>({
+    queryKey: queryKeys.projects_recent,
+    queryFn: async () => {
+      return apiFetchJson(Api.Projects.Recent.path);
+    },
+    meta: {
+      cache: false,
+    },
+    refetchInterval: (query) => {
+      return query.state.data?.importStatus ? 500 : false;
     },
   });
 }
@@ -169,6 +186,15 @@ export function useApiQuery_config_habits(
         onSuccess(result);
       }
       return result;
+    },
+  });
+}
+
+export function useApiQuery_config_habits_projects() {
+  return useQuery<Api.Config.Habits.Projects.type>({
+    queryKey: queryKeys.config_habits_projects,
+    queryFn: async () => {
+      return apiFetchJson(Api.Config.Habits.Projects.path);
     },
   });
 }
@@ -331,6 +357,45 @@ export function useApiMutation_journal(onSuccess?: () => void) {
 
       // invalidate all journals in case 'today' was edited
       queryClient.invalidateQueries({ queryKey: queryKeys.journal_overview });
+    },
+    onSuccess,
+  });
+}
+
+export function useApiMutation_projectsRecentTrack(onSuccess?: () => void) {
+  return useMutation<unknown, Error, { id: number; activityId: number }>({
+    mutationFn: async (params) => {
+      const body: Api.Projects.Recent.post_req = {
+        action: "track",
+        ...params,
+      };
+      await fetch(API_URL + Api.Projects.Recent.path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      queryClient.invalidateQueries({ queryKey: queryKeys.habits });
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects_recent });
+    },
+    onSuccess,
+  });
+}
+
+export function useApiMutation_projectsRecentDismiss(onSuccess?: () => void) {
+  return useMutation<unknown, Error, { id: number }>({
+    mutationFn: async (params) => {
+      const body: Api.Projects.Recent.post_req = {
+        action: "dismiss",
+        ...params,
+      };
+      await fetch(API_URL + Api.Projects.Recent.path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects_recent });
     },
     onSuccess,
   });

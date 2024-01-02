@@ -79,6 +79,7 @@ export namespace Api {
         activityName: string;
         value: number;
         date: string;
+        project?: Projects.Activity;
       }[];
     };
 
@@ -160,21 +161,54 @@ export namespace Api {
   }
 
   export namespace Projects {
-    export const path = "/api/projects/inprogress";
-    export type get_query = { dummy?: unknown };
-
-    export type type = {
-      inprogress: {
-        id: number;
-        subject: string;
-        donePercent: number;
-        createdAt: string;
-        updatedAt: string;
-        url?: string;
-      }[];
-      url?: string;
-      board_url?: string;
+    export type Activity = {
+      projectActivityId: number;
+      issueSubject: string;
+      url: string;
+      progressChanged?: { from: number; to: number };
+      statusChanged?: { from: string; to: string; closed: boolean };
     };
+
+    export namespace InProgress {
+      export const path = "/api/projects/inprogress";
+
+      export type type = {
+        inprogress: {
+          id: number;
+          subject: string;
+          donePercent: number;
+          createdAt: string;
+          updatedAt: string;
+          url?: string;
+        }[];
+        url?: string;
+        board_url?: string;
+      };
+    }
+
+    export namespace Recent {
+      export const path = "/api/projects/recent";
+
+      export type get_type = {
+        projectActivity?: Activity;
+        activities?: {
+          id: number;
+          name: string;
+        }[];
+        importStatus?: { processedIssues: number; totalIssues: number };
+      };
+
+      export type post_req =
+        | {
+            action: "dismiss";
+            id: number;
+          }
+        | {
+            action: "track";
+            id: number;
+            activityId: number;
+          };
+    }
   }
 
   export namespace Weather {
@@ -204,6 +238,7 @@ export namespace Api {
         targetValue: number;
         periodLength: number;
         historyLength: number;
+        projectId: number | null;
         activities: {
           id?: number;
           name: string;
@@ -230,6 +265,11 @@ export namespace Api {
           }
         | { action: "move"; direction: "up" | "down"; id: number }
         | { action: "delete"; id: number };
+
+      export namespace Projects {
+        export const path = "/api/config/habits/projects";
+        export type type = { id: number; name: string }[];
+      }
     }
 
     export namespace Todos {
@@ -279,6 +319,9 @@ export namespace Api {
           api_key: string;
           inprogress_status_id: number;
           board_url?: string;
+        };
+        status?: {
+          linkedProjects: boolean;
         };
       };
     }

@@ -14,6 +14,7 @@ import {
 
 import db from "../lib/db";
 import { User } from "./user";
+import { ProjectActivityCache } from "./projectactivitycache";
 
 const typeValueSet = ["good", "bad"] as const;
 
@@ -28,6 +29,8 @@ export class Habit extends Model<
   declare targetValue: number;
   declare periodLength: number;
   declare historyLength: number;
+  // ID in configured project integration, not foreign key in this db
+  declare projectId: number | null;
   declare Owner: NonAttribute<User>;
   declare ownerId: ForeignKey<User["id"]>;
   declare archived: CreationOptional<boolean>;
@@ -71,6 +74,10 @@ Habit.init(
     historyLength: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    projectId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
     },
     ownerId: {
       type: DataTypes.INTEGER,
@@ -149,6 +156,8 @@ export class TrackedActivity extends Model<
   declare HabitId: ForeignKey<Habit["id"]>;
   declare Activity?: NonAttribute<Activity>;
   declare ActivityId: ForeignKey<Activity["id"]>;
+  declare ProjectActivityCache: NonAttribute<ProjectActivityCache | null>;
+  declare ProjectActivityCacheEntryId: ForeignKey<ProjectActivityCache["id"]>;
   declare ownerId: number; //TODO foreign key later
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -200,6 +209,7 @@ TrackedActivity.init(
     ownerId: { type: DataTypes.INTEGER },
     HabitId: { type: DataTypes.INTEGER, allowNull: false },
     ActivityId: { type: DataTypes.INTEGER, allowNull: false },
+    ProjectActivityCacheEntryId: { type: DataTypes.INTEGER, allowNull: true },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
@@ -214,3 +224,6 @@ Habit.hasMany(TrackedActivity);
 TrackedActivity.belongsTo(Habit);
 Activity.hasMany(TrackedActivity);
 TrackedActivity.belongsTo(Activity);
+TrackedActivity.belongsTo(ProjectActivityCache, {
+  foreignKey: TrackedActivity.getAttributes().ProjectActivityCacheEntryId.field,
+});

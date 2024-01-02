@@ -6,7 +6,9 @@ import { isLoggedInMiddleware } from "./auth";
 import { Habit, Activity } from "../models/habit";
 import { Integration } from "../models/integration";
 import db from "../lib/db";
+import * as redmine from "../lib/redmine";
 import { generateAuthUrl, getTokenFromCode } from "../lib/google-account";
+import { ProjectActivityCache } from "../models/projectactivitycache";
 
 export default function (app: Express) {
   app.get<{}, Api.Config.Habits.get_type>(
@@ -37,6 +39,7 @@ export default function (app: Express) {
           targetValue: item.targetValue,
           periodLength: item.periodLength,
           historyLength: item.historyLength,
+          projectId: item.projectId,
           activities: item
             .Activities!.filter((a) => !a.archived)
             .sort((a, b) => b.value - a.value)
@@ -235,6 +238,35 @@ export default function (app: Express) {
     }
   );
 
+  app.get<{}, Api.Config.Habits.Projects.type>(
+    Api.Config.Habits.Projects.path,
+    isLoggedInMiddleware,
+    async (req, res) => {
+      const integrations = await Integration.findOne({
+        where: { ownerId: req.session.userId! },
+      });
+      if (
+        integrations &&
+        integrations.Projects.schema == 1 &&
+        integrations.Projects.redmine
+      ) {
+        try {
+          const projects = await redmine.getProjects({
+            url: integrations.Projects.redmine.url,
+            api_key: integrations.Projects.redmine.api_key,
+          });
+          res.send(projects.projects.map((p) => ({ id: p.id, name: p.name })));
+        } catch (e) {
+          console.error(e);
+          // TODO include status field?
+          res.send([]);
+        }
+      } else {
+        res.send([]);
+      }
+    }
+  );
+
   app.get<{}, Api.Config.Todos.type>(
     Api.Config.Todos.path,
     isLoggedInMiddleware,
@@ -384,7 +416,16 @@ export default function (app: Express) {
         },
       });
       if (int) {
-        res.send(int.Projects);
+        const linkedHabits = await Habit.findAll({
+          where: {
+            projectId: { [Op.not]: null },
+            ownerId: req.session.userId,
+          },
+        });
+        res.send({
+          ...int.Projects,
+          status: { linkedProjects: linkedHabits.length > 0 },
+        });
       } else {
         res.send({ schema: 1 });
       }
@@ -402,6 +443,19 @@ export default function (app: Express) {
       });
 
       if (int) {
+        if (int.Projects.redmine && req.body.redmine) {
+          if (int.Projects.redmine.url != req.body.redmine.url) {
+            // if this is a different redmine instance, the old project ID's and cached journals are no longer valid
+            await Habit.update(
+              { projectId: null },
+              { where: { ownerId: req.session.userId } }
+            );
+            await ProjectActivityCache.destroy({
+              where: { ownerId: req.session.userId },
+            });
+          }
+        }
+
         int.Projects = req.body;
         await int.save();
       } else {

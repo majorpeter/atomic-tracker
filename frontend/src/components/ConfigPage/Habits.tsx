@@ -28,6 +28,7 @@ import {
   useApiMutation_config_habits_move,
   useApiMutation_config_habits_unarchive,
   useApiQuery_config_habits,
+  useApiQuery_config_habits_projects,
 } from "../../util/api-client";
 import { Api } from "@api";
 
@@ -64,6 +65,7 @@ const Habits: React.FC = () => {
       handleHabitSelection(state.selectedExistingHabitId, newData);
     }
   });
+  const { data: projects } = useApiQuery_config_habits_projects();
   const { mutate: habitAddMutate } = useApiMutation_config_habits_add();
   const { mutate: habitEditMutate } = useApiMutation_config_habits_edit();
   const { mutate: habitArchiveMutate } = useApiMutation_config_habits_archive();
@@ -96,10 +98,11 @@ const Habits: React.FC = () => {
         targetValue: 1,
         periodLength: 7,
         historyLength: 14,
+        projectId: null,
         activities: [
           {
             id: -1, // negative values used on frontend for key, not sent over API
-            name: "Activity",
+            name: t("newActivity", "New Activity"),
             value: 1,
           },
         ],
@@ -306,6 +309,7 @@ const Habits: React.FC = () => {
           habit={state.habit}
           isCreatingNew={state.isCreatingNew}
           handlers={handlers}
+          projects={projects}
         />
       )}
     </>

@@ -6,8 +6,10 @@ import {
   FormLabel,
   IconButton,
   Input,
+  Option,
   Radio,
   RadioGroup,
+  Select,
   Sheet,
   Stack,
   Typography,
@@ -33,7 +35,8 @@ const HabitEditor: React.FC<{
   habit: Api.Config.Habits.HabitDescriptor;
   isCreatingNew: boolean;
   handlers: Handlers;
-}> = ({ habit, isCreatingNew, handlers }) => {
+  projects?: Api.Config.Habits.Projects.type;
+}> = ({ habit, isCreatingNew, handlers, projects }) => {
   const { t } = useTranslation();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -44,6 +47,7 @@ const HabitEditor: React.FC<{
     const activityId = fd.getAll("activityId[]") as string[];
     const activityName = fd.getAll("activityName[]") as string[];
     const activityValue = fd.getAll("activityValue[]") as string[];
+    const projectId = parseInt(data.projectId as string);
 
     return {
       name: data.name as string,
@@ -52,6 +56,7 @@ const HabitEditor: React.FC<{
       targetValue: parseInt(data.targetValue as string),
       periodLength: parseInt(data.periodLength as string),
       historyLength: parseInt(data.historyLength as string),
+      projectId: projectId ? projectId : null,
       activities: activityId.map((id, index) => ({
         id: parseInt(id) > 0 ? parseInt(id) : undefined,
         name: activityName[index],
@@ -163,6 +168,31 @@ const HabitEditor: React.FC<{
               <Trans i18nKey="historyLengthHelper">
                 How many days the history affects the display of progress bars
                 on the dashboard.
+              </Trans>
+            </FormHelperText>
+          </FormControl>
+          <FormControl>
+            <FormLabel>
+              <Trans i18nKey="linkedProject">Linked Project</Trans>
+            </FormLabel>
+            <Select
+              defaultValue={habit.projectId ?? 0}
+              name="projectId"
+              disabled={!projects || !projects.length}
+            >
+              <Option value={0}>(None)</Option>
+              {projects &&
+                projects.map((project) => (
+                  <Option key={project.id} value={project.id}>
+                    {project.name}
+                  </Option>
+                ))}
+            </Select>
+            <FormHelperText>
+              <Trans i18nKey="linkedProjectHelper">
+                Link this habit to a Project in an external issue tracker. Any
+                activity there will be imported and can be tracked with this
+                habit.
               </Trans>
             </FormHelperText>
           </FormControl>

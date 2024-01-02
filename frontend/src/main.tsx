@@ -17,6 +17,7 @@ import { configPageRoute } from "./pages/ConfigPage.tsx";
 import { loginRoute, logoutRoute } from "./pages/LoginPage.tsx";
 import { installRoute } from "./pages/InstallPage.tsx";
 import { notfoundFallbackRoute } from "./pages/NotFound.tsx";
+import { defaultShouldDehydrateQuery } from "@tanstack/react-query";
 
 const router = createBrowserRouter([
   {
@@ -42,7 +43,17 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <PersistQueryClientProvider
       client={queryClient}
-      persistOptions={{ persister, buster: BUILD_NUMBER.toString() }}
+      persistOptions={{
+        persister,
+        buster: BUILD_NUMBER.toString(),
+        dehydrateOptions: {
+          shouldDehydrateQuery: (query) => {
+            return (
+              defaultShouldDehydrateQuery(query) && query.meta?.cache !== false
+            );
+          },
+        },
+      }}
     >
       <RouterProvider router={router} />
     </PersistQueryClientProvider>
