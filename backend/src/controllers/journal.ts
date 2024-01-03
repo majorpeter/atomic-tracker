@@ -21,13 +21,12 @@ export default function (app: Express) {
 
       const historyStartDate = new Date();
       historyStartDate.setDate(historyStartDate.getDate() - HISTORY_LENGTH);
-      const historyStartDateRaw = Journal.dateToRawValue(
-        getIsoDate(historyStartDate)
-      );
 
       const historyEntries = await Journal.findAll({
         where: {
-          date: { [Op.gte]: historyStartDateRaw },
+          date: {
+            [Op.gte]: Journal.dateToRawValue(getIsoDate(historyStartDate)),
+          },
           ownerId: req.session.userId!,
         },
         attributes: [
@@ -45,7 +44,10 @@ export default function (app: Express) {
             }
           : { text: "", count: 0 },
         history: [...Array(HISTORY_LENGTH).keys()].map((item) => {
-          const dateRaw = historyStartDateRaw + item;
+          const date = new Date(historyStartDate);
+          date.setDate(date.getDate() + item);
+          const dateRaw = Journal.dateToRawValue(getIsoDate(date));
+
           return {
             date: Journal.rawToIsoDateValue(dateRaw),
             count:
