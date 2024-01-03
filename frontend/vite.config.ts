@@ -12,6 +12,7 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    open: "/",
   },
   resolve: {
     alias: {
