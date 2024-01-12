@@ -11,6 +11,7 @@ import {
 } from "react-router-dom";
 
 import {
+  Badge,
   Button,
   Chip,
   ColorPaletteProp,
@@ -241,27 +242,37 @@ const HabitTrackerModal: React.FC = () => {
           </DialogContent>
           <DialogActions
             sx={{
-              flexDirection: {
-                xs: "column",
-                md: "row",
-              },
+              flexDirection: "row",
+              flexWrap: "wrap",
+              flexGrow: 1,
               alignItems: { xs: "normal" },
             }}
           >
             {data.activities.map((activity) => (
-              <Button
+              <Badge
                 key={activity.id}
-                onClick={() => handleTrack(activity.id)}
-                loading={trackPosting}
+                badgeContent={"+" + activity.value}
                 color={data.type == "good" ? "primary" : "warning"}
+                variant="solid"
+                sx={{
+                  flexGrow: 1,
+                  maxWidth: { md: 300 },
+                }}
               >
-                <Trans
-                  i18nKey="trackActivityName"
-                  values={{ name: activity.name }}
+                <Button
+                  onClick={() => handleTrack(activity.id)}
+                  loading={trackPosting}
+                  color={data.type == "good" ? "primary" : "warning"}
+                  sx={{ flexGrow: 1 }}
                 >
-                  Track "{"{{name}}"}"
-                </Trans>
-              </Button>
+                  <Trans
+                    i18nKey="trackActivityName"
+                    values={{ name: activity.name }}
+                  >
+                    Track "{"{{name}}"}"
+                  </Trans>
+                </Button>
+              </Badge>
             ))}
             <Input
               type="date"
@@ -272,7 +283,10 @@ const HabitTrackerModal: React.FC = () => {
                   disabled: trackPosting,
                 },
               }}
-              sx={{ ml: { md: "auto" } }}
+              sx={{
+                ml: { md: "auto" },
+                width: { xs: "100%", md: "auto" },
+              }}
             />
           </DialogActions>
         </ModalDialog>

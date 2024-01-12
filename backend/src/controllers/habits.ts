@@ -115,6 +115,7 @@ export default function (app: Express) {
                 (activity) => ({
                   id: activity.id,
                   name: activity.name,
+                  value: activity.value,
                 })
               )
             : [],
