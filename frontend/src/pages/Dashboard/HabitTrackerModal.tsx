@@ -45,6 +45,7 @@ import {
 
 import { formatDate, getIsoDate } from "../../util/formatter";
 import { getHabitIconByName } from "../../util/habit-icons";
+import { useResponsiveBreakpoint } from "../../util/responsive-breakpoint";
 
 function colorValue(
   type: "good" | "bad",
@@ -94,11 +95,12 @@ const HabitTrackerModal: React.FC = () => {
     useApiMutation_habit_track_delete();
 
   const Icon = getHabitIconByName(data?.iconName);
+  const responsiveSmOrLarger = useResponsiveBreakpoint("sm");
 
   return (
     data && (
       <Modal open onClose={handleClose}>
-        <ModalDialog>
+        <ModalDialog layout={responsiveSmOrLarger ? "center" : "fullscreen"}>
           <ModalClose />
           <DialogTitle>
             <Icon />
