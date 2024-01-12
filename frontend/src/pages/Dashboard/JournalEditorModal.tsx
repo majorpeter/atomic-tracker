@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { RouteObject, useNavigate, useParams } from "react-router-dom";
 import { Trans } from "react-i18next";
 
@@ -29,6 +29,7 @@ import {
 } from "../../util/api-client";
 
 import { getIsoDate } from "../../util/formatter";
+import { useResponsiveBreakpoint } from "../../util/responsive-breakpoint";
 
 const JournalEditorModal: React.FC = () => {
   const navigate = useNavigate();
@@ -39,17 +40,7 @@ const JournalEditorModal: React.FC = () => {
   const [userInput, setUserInput] = useState<string | undefined>();
   const { data } = useApiQuery_journal_day(new Date(params.date!));
 
-  const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
-  const onWindowResize = useCallback(() => {
-    setWindowWidth(window.innerWidth);
-  }, []);
-  useEffect(() => {
-    window.addEventListener("resize", onWindowResize);
-    return () => {
-      window.removeEventListener("resize", onWindowResize);
-    };
-  }, []);
-  const fullscreen = windowWidth < 600;
+  const responsiveSmOrLarger = useResponsiveBreakpoint("sm");
 
   const {
     mutate: mutateSave,
@@ -103,7 +94,7 @@ const JournalEditorModal: React.FC = () => {
 
   return (
     <Modal open onClose={handleClose}>
-      <ModalDialog layout={fullscreen ? "fullscreen" : "center"}>
+      <ModalDialog layout={responsiveSmOrLarger ? "center" : "fullscreen"}>
         {!isSaving && <ModalClose />}
         <DialogTitle>
           <Trans i18nKey="journal">Journal</Trans>
