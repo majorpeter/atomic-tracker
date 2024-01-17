@@ -6,12 +6,13 @@ import { ProjectActivityCache } from "../models/projectactivitycache";
 import { Op } from "sequelize";
 
 import { isLoggedInMiddleware } from "./auth";
+import catchAsync from "../lib/catchAsync";
 
 export default function (app: Express) {
   app.get<{}, Api.Habits.type>(
     Api.Habits.path,
     isLoggedInMiddleware,
-    async (req, res) => {
+    catchAsync(async (req, res) => {
       const result: Api.Habits.type = [];
       const habits = await Habit.findAll({
         where: {
@@ -60,13 +61,13 @@ export default function (app: Express) {
       }
 
       res.send(result);
-    }
+    })
   );
 
   app.get<Api.Habit.get_params, Api.Habit.type>(
     Api.Habit.path,
     isLoggedInMiddleware,
-    async (req, res) => {
+    catchAsync(async (req, res) => {
       const habit = await Habit.findOne({
         where: {
           id: req.params.id,
@@ -134,13 +135,13 @@ export default function (app: Express) {
       } else {
         res.sendStatus(404);
       }
-    }
+    })
   );
 
   app.post<{}, Api.Habit.Track.post_resp, Api.Habit.Track.post_type>(
     Api.Habit.Track.path,
     isLoggedInMiddleware,
-    async (req, res) => {
+    catchAsync(async (req, res) => {
       const activity = await Activity.findOne({
         where: {
           id: req.body.activityId,
@@ -160,13 +161,13 @@ export default function (app: Express) {
       } else {
         res.sendStatus(400);
       }
-    }
+    })
   );
 
-  app.delete(
+  app.delete<Api.Habit.Track.deleteParams>(
     Api.Habit.Track.pathWithId,
     isLoggedInMiddleware,
-    async (req, res) => {
+    catchAsync(async (req, res) => {
       await TrackedActivity.destroy({
         where: {
           id: req.params.id,
@@ -174,6 +175,6 @@ export default function (app: Express) {
         },
       });
       res.sendStatus(200);
-    }
+    })
   );
 }

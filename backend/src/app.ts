@@ -1,5 +1,5 @@
-import express from "express";
-import session, { MemoryStore } from "express-session";
+import express, { Request, Response, NextFunction } from "express";
+import session from "express-session";
 import path from "path";
 
 import { init as initDb } from "./lib/db";
@@ -69,6 +69,14 @@ app.get("/api/*", (_, res) => {
  */
 app.get("*", (_, res) => {
   res.sendFile(path.resolve(__dirname, FRONTEND_RELATIVE_PATH, "index.html"));
+});
+
+/**
+ * error handler is the last handler registered before `app.listen()`
+ */
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error(err);
+  res.sendStatus(500);
 });
 
 initDb();
