@@ -54,7 +54,11 @@ const LoginPage: React.FC = () => {
           )}
           <FormControl>
             <FormLabel>Username</FormLabel>
-            <Input name="userName" autoFocus />
+            <Input
+              name="userName"
+              autoFocus
+              slotProps={{ input: { autoCapitalize: "off" } }}
+            />
           </FormControl>
           <FormControl>
             <FormLabel>Password</FormLabel>

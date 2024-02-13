@@ -125,6 +125,7 @@ const JournalEditorModal: React.FC = () => {
               textarea: {
                 ref: textAreaRef,
                 autoFocus: true,
+                autocapitalize: "off",
               },
             }}
             value={userInput || data?.text}
