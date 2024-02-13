@@ -138,7 +138,7 @@ export async function getIssue(
       notes: string;
     }[];
   };
-}> {
+} | null> {
   const issueUrl =
     config.url +
     "/issues/" +
@@ -153,6 +153,11 @@ export async function getIssue(
       "X-Redmine-API-Key": config.api_key,
     },
   });
+
+  if (issueResp.status == 404) {
+    return null;
+  }
+
   return await issueResp.json();
 }
 
@@ -220,20 +225,23 @@ export async function fetchUpdatedSince(params: {
           api_key: params.api_key,
         });
 
-        issueBody.issue.journals
-          .filter((item) =>
-            params.since
-              ? new Date(item.created_on).getTime() >= params.since.getTime()
-              : true
-          )
-          .forEach((item) => {
-            changes.push({
-              journal: item,
-              issue: issue,
+        if (issueBody) {
+          issueBody.issue.journals
+            .filter((item) =>
+              params.since
+                ? new Date(item.created_on).getTime() >= params.since.getTime()
+                : true
+            )
+            .forEach((item) => {
+              changes.push({
+                journal: item,
+                issue: issue,
+              });
             });
-          });
 
-        issuesCount++;
+          issuesCount++;
+        }
+
         if (params.statusCallback) {
           params.statusCallback({
             processedIssues: issuesCount,

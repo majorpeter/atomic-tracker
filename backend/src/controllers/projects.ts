@@ -9,6 +9,7 @@ import { Activity, Habit, TrackedActivity } from "../models/habit";
 import { Op } from "sequelize";
 
 import * as redmine from "../lib/redmine";
+import catchAsync from "../lib/catchAsync";
 
 import { DUMMY_PROJECTS } from "../misc/dummy_data";
 
@@ -21,7 +22,7 @@ export default function (app: Express, useDummyData: boolean) {
   app.get<{}, Api.Projects.InProgress.type>(
     Api.Projects.InProgress.path,
     isLoggedInMiddleware,
-    async (req, res) => {
+    catchAsync(async (req, res) => {
       if (!useDummyData) {
         const integrations = await Integration.findOne({
           where: { ownerId: req.session.userId! },
@@ -71,7 +72,7 @@ export default function (app: Express, useDummyData: boolean) {
           }),
         });
       }
-    }
+    })
   );
 
   type ImportProgress = {
@@ -222,7 +223,7 @@ export default function (app: Express, useDummyData: boolean) {
   app.get<{}, Api.Projects.Recent.get_type>(
     Api.Projects.Recent.path,
     isLoggedInMiddleware,
-    async (req, res) => {
+    catchAsync(async (req, res) => {
       const activity = await fetchNewProjectActivity({
         userId: req.session.userId!,
       });
@@ -253,13 +254,13 @@ export default function (app: Express, useDummyData: boolean) {
       } else {
         res.send({});
       }
-    }
+    })
   );
 
   app.post<{}, {}, Api.Projects.Recent.post_req>(
     Api.Projects.Recent.path,
     isLoggedInMiddleware,
-    async (req, res) => {
+    catchAsync(async (req, res) => {
       if (req.body.action == "track") {
         const journal = await ProjectActivityCache.findOne({
           where: {
@@ -310,6 +311,6 @@ export default function (app: Express, useDummyData: boolean) {
       } else {
         res.sendStatus(400);
       }
-    }
+    })
   );
 }

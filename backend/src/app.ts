@@ -75,6 +75,7 @@ app.get("*", (_, res) => {
  * error handler is the last handler registered before `app.listen()`
  */
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error("Exception at url: %s", req.url);
   console.error(err);
   res.sendStatus(500);
 });

@@ -51,7 +51,7 @@ export class ProjectActivityCache extends Model<
 
       const activity: Api.Projects.Activity = {
         projectActivityId: this.id,
-        issueSubject: issue.issue.subject,
+        issueSubject: issue ? issue.issue.subject : "N/A",
         url:
           integrations.Projects.redmine.url +
           "/issues/" +
