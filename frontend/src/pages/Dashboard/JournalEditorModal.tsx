@@ -166,7 +166,7 @@ const JournalEditorModal: React.FC = () => {
                   autocapitalize: "off",
                 },
               }}
-              value={userInput || data?.text}
+              value={userInput !== undefined ? userInput : data?.text}
               onChange={handleInput}
               disabled={isSaving}
               sx={{
