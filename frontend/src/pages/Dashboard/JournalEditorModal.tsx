@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { RouteObject, useNavigate, useParams } from "react-router-dom";
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 
 import {
   Alert,
@@ -31,13 +31,19 @@ import {
 import { getIsoDate } from "../../util/formatter";
 import { useResponsiveBreakpoint } from "../../util/responsive-breakpoint";
 
+import YesNoModal from "./YesNoModal";
+
 const JournalEditorModal: React.FC = () => {
   const navigate = useNavigate();
   const params = useParams<{ date: string }>();
+  const { t } = useTranslation();
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   const [userInput, setUserInput] = useState<string | undefined>();
+  const [yesNoState, setYesNoState] = useState<
+    React.ComponentProps<typeof YesNoModal>
+  >({ open: false });
   const { data } = useApiQuery_journal_day(new Date(params.date!));
 
   const responsiveSmOrLarger = useResponsiveBreakpoint("sm");
@@ -75,9 +81,40 @@ const JournalEditorModal: React.FC = () => {
   }
 
   function handleClose() {
-    if (!isSaving) {
-      navigate("..");
+    if (isSaving) {
+      return;
     }
+
+    if (userInput === undefined) {
+      navigate("..");
+    } else {
+      showYesNoModal(
+        t("unsavedChanges", "Unsaved Changes"),
+        t("discardChangesClose", "Discard changes and close editor?"),
+        () => {
+          navigate("..");
+        }
+      );
+    }
+  }
+
+  function showYesNoModal(
+    title: string,
+    message: string,
+    onYesClicked: () => void
+  ) {
+    setYesNoState({
+      open: true,
+      title,
+      message,
+      onYesClicked() {
+        onYesClicked();
+        setYesNoState({ open: false });
+      },
+      onNoClicked() {
+        setYesNoState({ open: false });
+      },
+    });
   }
 
   function handleSave() {
@@ -93,84 +130,87 @@ const JournalEditorModal: React.FC = () => {
   }
 
   return (
-    <Modal open onClose={handleClose}>
-      <ModalDialog layout={responsiveSmOrLarger ? "center" : "fullscreen"}>
-        {!isSaving && <ModalClose />}
-        <DialogTitle>
-          <Trans i18nKey="journal">Journal</Trans>
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: "flex" }}>
-            <IconButton onClick={handleDayPrev} disabled={isSaving}>
-              <KeyboardArrowLeftIcon />
-            </IconButton>
-            <Input
-              sx={{ flexGrow: 1 }}
+    <>
+      <Modal open onClose={handleClose}>
+        <ModalDialog layout={responsiveSmOrLarger ? "center" : "fullscreen"}>
+          {!isSaving && <ModalClose />}
+          <DialogTitle>
+            <Trans i18nKey="journal">Journal</Trans>
+          </DialogTitle>
+          <DialogContent>
+            <Box sx={{ display: "flex" }}>
+              <IconButton onClick={handleDayPrev} disabled={isSaving}>
+                <KeyboardArrowLeftIcon />
+              </IconButton>
+              <Input
+                sx={{ flexGrow: 1 }}
+                slotProps={{
+                  input: {
+                    type: "date",
+                    value: params.date,
+                    onChange: handleDayChange,
+                    disabled: isSaving,
+                  },
+                }}
+              />
+              <IconButton onClick={handleDayNext} disabled={isSaving}>
+                <KeyboardArrowRightIcon />
+              </IconButton>
+            </Box>
+
+            <Textarea
               slotProps={{
-                input: {
-                  type: "date",
-                  value: params.date,
-                  onChange: handleDayChange,
-                  disabled: isSaving,
+                textarea: {
+                  ref: textAreaRef,
+                  autoFocus: true,
+                  autocapitalize: "off",
                 },
               }}
-            />
-            <IconButton onClick={handleDayNext} disabled={isSaving}>
-              <KeyboardArrowRightIcon />
-            </IconButton>
-          </Box>
+              value={userInput || data?.text}
+              onChange={handleInput}
+              disabled={isSaving}
+              sx={{
+                width: { sm: 400 },
+                minHeight: 200,
+                height: "100%",
+              }}
+            ></Textarea>
 
-          <Textarea
-            slotProps={{
-              textarea: {
-                ref: textAreaRef,
-                autoFocus: true,
-                autocapitalize: "off",
-              },
-            }}
-            value={userInput || data?.text}
-            onChange={handleInput}
-            disabled={isSaving}
-            sx={{
-              width: { sm: 400 },
-              minHeight: 200,
-              height: "100%",
-            }}
-          ></Textarea>
-
-          {saveFailed && (
-            <Alert
-              color="danger"
-              variant="outlined"
-              startDecorator={<WarningIcon />}
+            {saveFailed && (
+              <Alert
+                color="danger"
+                variant="outlined"
+                startDecorator={<WarningIcon />}
+              >
+                <Trans i18nKey="savingFailedTryAgain">
+                  Saving failed, please try again.
+                </Trans>
+              </Alert>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button
+              color="success"
+              onClick={handleSave}
+              loading={isSaving}
+              disabled={userInput === undefined}
+              startDecorator={<DoneIcon />}
             >
-              <Trans i18nKey="savingFailedTryAgain">
-                Saving failed, please try again.
-              </Trans>
-            </Alert>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button
-            color="success"
-            onClick={handleSave}
-            loading={isSaving}
-            disabled={userInput === undefined}
-            startDecorator={<DoneIcon />}
-          >
-            <Trans i18nKey="save">Save</Trans>
-          </Button>
-          <Button
-            color="neutral"
-            onClick={handleClose}
-            disabled={isSaving}
-            startDecorator={<CancelIcon />}
-          >
-            <Trans i18nKey="close">Close</Trans>
-          </Button>
-        </DialogActions>
-      </ModalDialog>
-    </Modal>
+              <Trans i18nKey="save">Save</Trans>
+            </Button>
+            <Button
+              color="neutral"
+              onClick={handleClose}
+              disabled={isSaving}
+              startDecorator={<CancelIcon />}
+            >
+              <Trans i18nKey="close">Close</Trans>
+            </Button>
+          </DialogActions>
+        </ModalDialog>
+      </Modal>
+      <YesNoModal {...yesNoState} />
+    </>
   );
 };
 

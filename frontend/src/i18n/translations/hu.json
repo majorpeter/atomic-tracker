@@ -108,9 +108,13 @@
   "targetScoreOverPeriodLength": "<0>{{target}}</0> minden {{length}} napban",
   "habitNotTrackedRecently": "Ez a szokás mostanában nem volt rögzítve.",
   "trackActivityName": "\"{{name}}\" rögzítése",
+  "unsavedChanges": "Nem mentett változtatások",
+  "discardChangesClose": "Dobjam el a változtatásokat és zárjam be a szerkesztőt?",
   "savingFailedTryAgain": "Sikertelen mentés, próbáld újra.",
   "close": "Bezárás",
   "selectRadio": "Rádió választása...",
+  "yes": "Igen",
+  "no": "Nem",
   "notFound": "Nem található",
   "thisPageCannotBeFound": "Az oldal nem található: <1>{{path}}</1>",
   "gotoDashboard": "Tovább az Irányítópultra"
