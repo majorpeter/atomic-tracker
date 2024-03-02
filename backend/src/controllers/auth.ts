@@ -56,10 +56,17 @@ export const isLoggedInMiddleware = (
 export const sessionStore = new LimitedMemoryStore(15);
 
 export default function (app: Express) {
+  const googleLoginAvailable =
+    (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) !=
+    undefined;
+
   app.get<{}, Api.Auth.Login.get_resp>(Api.Auth.Login.path, async (_, res) => {
     const hasUser = (await User.findOne()) !== null;
     res.send({
       installed: hasUser,
+      social: {
+        google: googleLoginAvailable,
+      },
     });
   });
 
@@ -163,12 +170,12 @@ export default function (app: Express) {
   );
 
   // enable API paths for Google OAuth2 login if environment variables are set
-  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  if (googleLoginAvailable) {
     passport.use(
       new GoogleStrategy(
         {
-          clientID: process.env.GOOGLE_CLIENT_ID,
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          clientID: process.env.GOOGLE_CLIENT_ID!,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
           callbackURL: "/oauth2/redirect/google",
           scope: ["email", "openid", "profile"],
         },
@@ -205,7 +212,7 @@ export default function (app: Express) {
       done(null, user as User);
     });
 
-    app.get("/login/google", passport.authenticate("google"));
+    app.get(Api.Auth.Login.Google.path, passport.authenticate("google"));
 
     app.get(
       "/oauth2/redirect/google",

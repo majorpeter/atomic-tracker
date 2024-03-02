@@ -16,12 +16,19 @@ export namespace Api {
 
       export type get_resp = {
         installed: boolean;
+        social: {
+          google: boolean;
+        };
       };
 
       export type post_type = {
         userName: string;
         password: string;
       };
+
+      export namespace Google {
+        export const path = "/login/google";
+      }
     }
 
     export namespace Logout {
