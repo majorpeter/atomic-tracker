@@ -86,4 +86,14 @@ Once the database is created, it can be populated via the seeders:
 
 This creates an `admin` account with empty password.
 
+### Adding migrations
+
+Migrations are in `backend/migrations/`, use the following command and follow the naming scheme used before:
+
+```sh
+npx sequelize-cli migration:create --migrations-path src/migrations/ --name <name>
+```
+
+Or just copy from an existing file. Make sure to shut down backend development server before editing migrations since they are applied automatically.
+
 ![](doc/dashboard.png)

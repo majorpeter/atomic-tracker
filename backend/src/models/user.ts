@@ -15,6 +15,8 @@ export class User extends Model<
   declare name: string;
   declare passwordHash: string;
   declare language: string;
+  declare email: CreationOptional<string>;
+  declare googleUid: CreationOptional<string>;
 }
 
 User.init(
@@ -33,6 +35,8 @@ User.init(
       allowNull: false,
     },
     language: { type: new DataTypes.STRING(5), allowNull: false },
+    email: { type: DataTypes.STRING, allowNull: true },
+    googleUid: { type: DataTypes.STRING, allowNull: true },
   },
   { sequelize: db }
 );

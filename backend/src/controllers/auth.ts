@@ -40,6 +40,12 @@ export const isLoggedInMiddleware = (
     req.session.userId = 1;
   }
 
+  // temporary hack for passport integration to old session management
+  if (req.session.passport) {
+    req.session.userId = req.session.passport.user.id;
+    req.session.interfaceLanguage = req.session.passport.user.lang;
+  }
+
   if ((req as Request).session.userId) {
     next();
   } else {
@@ -166,11 +172,25 @@ export default function (app: Express) {
           callbackURL: "/oauth2/redirect/google",
           scope: ["email", "openid", "profile"],
         },
-        (_accessToken, _refreshToken, profile, done) => {
-          console.log(profile._json.email);
+        async (_accessToken, _refreshToken, profile, done) => {
+          let user = await User.findOne({
+            where: {
+              googleUid: profile.id,
+            },
+          });
+
+          if (!user) {
+            user = await User.create({
+              name: profile._json.email!,
+              passwordHash: "google",
+              language: profile._json.locale!, //TODO transform locale to lang
+              email: profile._json.email!,
+              googleUid: profile.id,
+            });
+          }
+
           done(null, {
-            email: profile._json.email,
-            uid: profile._json.sub,
+            id: user.id,
             lang: profile._json.locale,
           });
         }
