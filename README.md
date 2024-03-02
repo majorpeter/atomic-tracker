@@ -36,6 +36,23 @@ Open `http://localhost:8080/` in a browser and create your user account. (Only o
 
 ## Integrations
 
+### Authentication
+
+#### Google OAuth2
+
+This requires OAuth 2.0 credentials from Google, which can be obtained by [setting up](https://developers.google.com/identity/protocols/oauth2/openid-connect#appsetup) a project in [Google API console](https://console.developers.google.com/apis/).
+
+The redirect URI of the OAuth client should be set to `<app-base-url>/oauth2/redirect/google`, e.g. `https://example.com/oauth2/redirect/google`.
+
+Once credentials have been obtained, pass the following environment variables, by e.g. creating a `.env` file:
+
+```
+GOOGLE_CLIENT_ID=__INSERT_CLIENT_ID_HERE__
+GOOGLE_CLIENT_SECRET=__INSERT_CLIENT_SECRET_HERE__
+```
+
+### Dashboard content
+
 - **Nextcloud Tasks:** Todos block can read from a Nextcloud instance
 - **Google Calendar:** Agenda block can fetch events from Google Calendar
 - **Redmine:** Projects block can read issues in progress from a Redmine instance

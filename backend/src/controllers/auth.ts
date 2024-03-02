@@ -1,6 +1,9 @@
 import { Express, NextFunction, Request, Response } from "express";
 import crypto from "node:crypto";
 
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+
 import { Api } from "../lib/api";
 import { User } from "../models/user";
 import { LimitedMemoryStore } from "../lib/session";
@@ -152,4 +155,48 @@ export default function (app: Express) {
       });
     }
   );
+
+  // enable API paths for Google OAuth2 login if environment variables are set
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    passport.use(
+      new GoogleStrategy(
+        {
+          clientID: process.env.GOOGLE_CLIENT_ID,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          callbackURL: "/oauth2/redirect/google",
+          scope: ["email", "openid", "profile"],
+        },
+        (_accessToken, _refreshToken, profile, done) => {
+          console.log(profile._json.email);
+          done(null, {
+            email: profile._json.email,
+            uid: profile._json.sub,
+            lang: profile._json.locale,
+          });
+        }
+      )
+    );
+
+    passport.serializeUser(function (user, done) {
+      done(null, user);
+    });
+
+    passport.deserializeUser(function (user, done) {
+      done(null, user as User);
+    });
+
+    app.get("/login/google", passport.authenticate("google"));
+
+    app.get(
+      "/oauth2/redirect/google",
+      passport.authenticate("google", {
+        failureRedirect: "/login",
+        failureMessage: true,
+      }),
+      function (_, res) {
+        console.log("redirecting");
+        res.redirect("/");
+      }
+    );
+  }
 }
