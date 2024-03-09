@@ -12,7 +12,7 @@ declare module "express-session" {
     };
     loginMethod?: "local" | "google";
     userAgent: string;
-    pendingConfig: {
+    pendingConfig?: {
       gCal?: {
         client_id: string;
         client_secret: string;

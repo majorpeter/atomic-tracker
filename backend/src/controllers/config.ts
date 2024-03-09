@@ -1,4 +1,4 @@
-import { Express } from "express";
+import { Express, Request } from "express";
 import { Api } from "../lib/api";
 import { Attributes, Op } from "sequelize";
 import { isLoggedInMiddleware } from "./auth";
@@ -9,6 +9,16 @@ import db from "../lib/db";
 import * as redmine from "../lib/redmine";
 import { generateAuthUrl, getTokenFromCode } from "../lib/google-account";
 import { ProjectActivityCache } from "../models/projectactivitycache";
+import { SessionData } from "express-session";
+
+function pendingConfig(
+  req: Request
+): Exclude<SessionData["pendingConfig"], undefined> {
+  if (req.session.pendingConfig === undefined) {
+    req.session.pendingConfig = {};
+  }
+  return req.session.pendingConfig;
+}
 
 export default function (app: Express) {
   app.get<{}, Api.Config.Habits.get_type>(
@@ -339,7 +349,7 @@ export default function (app: Express) {
     isLoggedInMiddleware,
     async (req, res) => {
       // save in session for later
-      req.session.pendingConfig!.gCal = {
+      pendingConfig(req).gCal = {
         client_id: req.body.client_id,
         client_secret: req.body.client_secret,
         redirect_uri: req.body.redirect_uri,
@@ -362,23 +372,24 @@ export default function (app: Express) {
       let config: Attributes<Integration>["Agenda"] | undefined;
 
       if (req.body.google) {
-        if (req.session.pendingConfig!.gCal && req.body.google?.code) {
+        const gCal = pendingConfig(req).gCal;
+        if (gCal && req.body.google?.code) {
           config = {
             schema: 1,
             google: {
-              clientId: req.session.pendingConfig!.gCal.client_id,
-              clientSecret: req.session.pendingConfig!.gCal.client_secret,
+              clientId: gCal.client_id,
+              clientSecret: gCal.client_secret,
               refreshToken: await getTokenFromCode({
-                clientId: req.session.pendingConfig!.gCal.client_id,
-                clientSecret: req.session.pendingConfig!.gCal.client_secret,
-                redirectUri: req.session.pendingConfig!.gCal.redirect_uri,
+                clientId: gCal.client_id,
+                clientSecret: gCal.client_secret,
+                redirectUri: gCal.redirect_uri,
                 code: req.body.google.code,
               }),
             },
           };
 
           // clear session just in case
-          req.session.pendingConfig!.gCal = undefined;
+          pendingConfig(req).gCal = undefined;
         } else {
           // need a pending config in session (leave config undefined)
         }

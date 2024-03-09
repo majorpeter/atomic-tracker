@@ -9,6 +9,7 @@ import { Api } from "../lib/api";
 import { User } from "../models/user";
 import { LimitedMemoryStore } from "../lib/session";
 import { SessionData } from "express-session";
+import { findLocaleForBcp47LangTag } from "../misc/locale";
 
 export function hashAndSaltPassword(password: string): string {
   const salt = crypto.randomBytes(64);
@@ -169,7 +170,7 @@ export default function (app: Express) {
         lang: user.language,
         name: user.name, // same for this type
         userName: user.name,
-      } satisfies SessionData["passport"]["user"]); //TODO pending config changes in session?
+      } satisfies SessionData["passport"]["user"]);
     })
   );
 
@@ -194,7 +195,7 @@ export default function (app: Express) {
             user = await User.create({
               name: profile._json.email!,
               passwordHash: "google",
-              language: profile._json.locale!, //TODO transform locale to lang
+              language: findLocaleForBcp47LangTag(profile._json.locale!),
               email: profile._json.email!,
               googleUid: profile.id,
             });
