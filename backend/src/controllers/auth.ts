@@ -78,6 +78,8 @@ export default function (app: Express) {
     passport.authenticate("local", { failureMessage: true }),
     (req, res) => {
       req.session.userAgent = req.headers["user-agent"];
+      req.session.loginMethod = "local";
+
       res.send({
         name: "user.name",
         language: req.session.passport!.user.lang,
@@ -134,6 +136,7 @@ export default function (app: Express) {
       );
       res.send({
         sessions: mySessions.map((session) => ({
+          loginMethod: session.loginMethod,
           userAgent: session.userAgent,
           expiresIsoDate: session.cookie.expires as unknown as string, // JSON parsing keeps it as string
         })),
@@ -225,6 +228,7 @@ export default function (app: Express) {
       }),
       function (req, res) {
         req.session.userAgent = req.headers["user-agent"];
+        req.session.loginMethod = "google";
         res.redirect("/");
       }
     );

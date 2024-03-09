@@ -47,7 +47,11 @@ export namespace Api {
     export namespace Sessions {
       export const path = "/api/auth/sessions";
       export type type = {
-        sessions: { userAgent: string; expiresIsoDate: string }[];
+        sessions: {
+          loginMethod?: "local" | "google";
+          userAgent: string;
+          expiresIsoDate: string;
+        }[];
       };
     }
   }

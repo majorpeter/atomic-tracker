@@ -10,6 +10,7 @@ declare module "express-session" {
         lang: string;
       };
     };
+    loginMethod?: "local" | "google";
     userAgent: string;
     pendingConfig: {
       gCal?: {
