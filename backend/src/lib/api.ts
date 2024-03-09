@@ -28,6 +28,7 @@ export namespace Api {
 
       export namespace Google {
         export const path = "/login/google";
+        export const callbackPath = "/oauth2/redirect/google";
       }
     }
 

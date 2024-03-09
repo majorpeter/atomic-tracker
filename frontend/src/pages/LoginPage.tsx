@@ -75,7 +75,7 @@ const LoginPage: React.FC = () => {
             </FormControl>
             <FormControl>
               <FormLabel>Password</FormLabel>
-              <Input name="password" type="password" />
+              <Input name="password" type="password" required />
             </FormControl>
           </CardContent>
           <CardActions>

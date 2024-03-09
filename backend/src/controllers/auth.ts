@@ -45,7 +45,6 @@ export const isLoggedInMiddleware = (
         lang: "en",
         name: "nobody",
         userName: "nobody",
-        userAgent: (req as Request).headers["user-agent"]!,
       },
     };
   }
@@ -78,6 +77,7 @@ export default function (app: Express) {
     Api.Auth.Login.path,
     passport.authenticate("local", { failureMessage: true }),
     (req, res) => {
+      req.session.userAgent = req.headers["user-agent"];
       res.send({
         name: "user.name",
         language: req.session.passport!.user.lang,
@@ -134,7 +134,7 @@ export default function (app: Express) {
       );
       res.send({
         sessions: mySessions.map((session) => ({
-          userAgent: session.passport!.user.userAgent,
+          userAgent: session.userAgent,
           expiresIsoDate: session.cookie.expires as unknown as string, // JSON parsing keeps it as string
         })),
       });
@@ -166,7 +166,6 @@ export default function (app: Express) {
         lang: user.language,
         name: user.name, // same for this type
         userName: user.name,
-        userAgent: "?", //TODO implement
       } satisfies SessionData["passport"]["user"]); //TODO pending config changes in session?
     })
   );
@@ -203,7 +202,6 @@ export default function (app: Express) {
             lang: profile._json.locale!,
             name: profile._json.name!,
             userName: profile._json.email!,
-            userAgent: "?", // TODO implement
           } satisfies SessionData["passport"]["user"]);
         }
       )
@@ -220,13 +218,13 @@ export default function (app: Express) {
     app.get(Api.Auth.Login.Google.path, passport.authenticate("google"));
 
     app.get(
-      "/oauth2/redirect/google",
+      Api.Auth.Login.Google.callbackPath,
       passport.authenticate("google", {
         failureRedirect: "/login",
         failureMessage: true,
       }),
-      function (_, res) {
-        console.log("redirecting");
+      function (req, res) {
+        req.session.userAgent = req.headers["user-agent"];
         res.redirect("/");
       }
     );
