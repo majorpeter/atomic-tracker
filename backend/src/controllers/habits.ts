@@ -16,7 +16,7 @@ export default function (app: Express) {
       const result: Api.Habits.type = [];
       const habits = await Habit.findAll({
         where: {
-          ownerId: req.session.userId,
+          ownerId: req.session.passport!.user.id,
           archived: false,
         },
         order: [[Habit.getAttributes().sortIndex.field!, "ASC"]],
@@ -29,13 +29,13 @@ export default function (app: Express) {
         historyStart.setDate(historyStart.getDate() - habit.historyLength);
 
         const trackedInPeriod = await TrackedActivity.getSummarized({
-          ownerId: req.session.userId,
+          ownerId: req.session.passport!.user.id,
           HabitId: habit.id,
           createdAt: { [Op.gt]: periodStart },
         });
 
         const trackedInHistory = await TrackedActivity.getSummarized({
-          ownerId: req.session.userId,
+          ownerId: req.session.passport!.user.id,
           HabitId: habit.id,
           createdAt: { [Op.gt]: historyStart },
         });
@@ -82,14 +82,14 @@ export default function (app: Express) {
         historyStart.setDate(historyStart.getDate() - habit.historyLength);
 
         const trackedInPeriod = await TrackedActivity.getSummarized({
-          ownerId: req.session.userId,
+          ownerId: req.session.passport!.user.id,
           HabitId: habit.id,
           createdAt: { [Op.gt]: periodStart },
         });
 
         const trackedInHistory = await TrackedActivity.findAll({
           where: {
-            ownerId: req.session.userId,
+            ownerId: req.session.passport!.user.id,
             HabitId: habit.id,
             createdAt: { [Op.gt]: historyStart },
           },
@@ -145,12 +145,12 @@ export default function (app: Express) {
       const activity = await Activity.findOne({
         where: {
           id: req.body.activityId,
-          ownerId: req.session.userId,
+          ownerId: req.session.passport!.user.id,
         },
       });
       if (activity) {
         const record = await TrackedActivity.create({
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
           ActivityId: activity.id,
           HabitId: activity.HabitId,
           createdAt: new Date(req.body.date),
@@ -171,7 +171,7 @@ export default function (app: Express) {
       await TrackedActivity.destroy({
         where: {
           id: req.params.id,
-          ownerId: req.session.userId,
+          ownerId: req.session.passport!.user.id,
         },
       });
       res.sendStatus(200);

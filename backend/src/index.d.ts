@@ -2,10 +2,15 @@ import session from "express-session";
 
 declare module "express-session" {
   interface SessionData {
-    userId: number;
-    userName: string;
-    interfaceLanguage: string;
-    userAgent: string;
+    passport: {
+      user: {
+        id: number;
+        name: string;
+        userName: string;
+        lang: string;
+        userAgent: string;
+      };
+    };
     pendingConfig: {
       gCal?: {
         client_id: string;

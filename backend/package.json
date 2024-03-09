@@ -23,6 +23,7 @@
     "googleapis": "^105.0.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0",
     "sequelize": "^6.35.1",
     "sqlite3": "^5.1.6",
     "tsc-watch": "^6.0.4",
@@ -30,6 +31,7 @@
     "umzug": "^3.5.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.21"
+    "@types/express": "^4.17.21",
+    "@types/passport-local": "^1.0.38"
   }
 }

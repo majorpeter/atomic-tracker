@@ -107,7 +107,7 @@ export default function (app: Express, useDummyData: boolean) {
     async (req, res) => {
       if (!useDummyData) {
         const integrations = await Integration.findOne({
-          where: { ownerId: req.session.userId! },
+          where: { ownerId: req.session.passport!.user.id },
         });
 
         if (

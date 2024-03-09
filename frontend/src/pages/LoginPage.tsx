@@ -47,7 +47,7 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     const data = Object.fromEntries(
       new FormData(e.target as HTMLFormElement)
-    ) as Api.Auth.Login.post_type;
+    ) as Api.Auth.Login.post_type; // TODO type check :(
     loginMutate(data);
   }
 
@@ -68,7 +68,7 @@ const LoginPage: React.FC = () => {
             <FormControl>
               <FormLabel>Username</FormLabel>
               <Input
-                name="userName"
+                name="username"
                 autoFocus
                 slotProps={{ input: { autoCapitalize: "off" } }}
               />

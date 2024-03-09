@@ -22,7 +22,7 @@ export namespace Api {
       };
 
       export type post_type = {
-        userName: string;
+        username: string;
         password: string;
       };
 

@@ -11,7 +11,7 @@ export default function (app: Express) {
     async (req, res) => {
       const int = await Integration.findOne({
         where: {
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
         },
       });
 
