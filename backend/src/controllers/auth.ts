@@ -39,7 +39,15 @@ export const isLoggedInMiddleware = (
   next: NextFunction
 ) => {
   if (process.env.BYPASS_LOGIN && parseInt(process.env.BYPASS_LOGIN)) {
-    req.session.userId = 1; //TODO fake passport
+    (req as Request).session.passport = {
+      user: {
+        id: 1,
+        lang: "en",
+        name: "nobody",
+        userName: "nobody",
+        userAgent: (req as Request).headers["user-agent"]!,
+      },
+    };
   }
 
   if ((req as Request).session.passport?.user.id) {
@@ -159,7 +167,7 @@ export default function (app: Express) {
         name: user.name, // same for this type
         userName: user.name,
         userAgent: "?", //TODO implement
-      } satisfies SessionData["passport"]["user"]);
+      } satisfies SessionData["passport"]["user"]); //TODO pending config changes in session?
     })
   );
 
