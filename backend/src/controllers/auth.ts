@@ -181,7 +181,8 @@ export default function (app: Express) {
         {
           clientID: process.env.GOOGLE_CLIENT_ID!,
           clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-          callbackURL: "/oauth2/redirect/google",
+          callbackURL:
+            process.env.GOOGLE_OAUTH_CALLBACK_URL || "/oauth2/redirect/google",
           scope: ["email", "openid", "profile"],
         },
         async (_accessToken, _refreshToken, profile, done) => {

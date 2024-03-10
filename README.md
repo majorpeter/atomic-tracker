@@ -49,7 +49,10 @@ Once credentials have been obtained, pass the following environment variables, b
 ```
 GOOGLE_CLIENT_ID=__INSERT_CLIENT_ID_HERE__
 GOOGLE_CLIENT_SECRET=__INSERT_CLIENT_SECRET_HERE__
+GOOGLE_OAUTH_CALLBACK_URL=https://<app-base-url>/oauth2/redirect/google
 ```
+
+The last one is required if the application is running behind a proxy (which should be the case since HTTPS should be used).
 
 ### Dashboard content
 
