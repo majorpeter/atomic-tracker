@@ -25,7 +25,7 @@ export default function (app: Express, useDummyData: boolean) {
     catchAsync(async (req, res) => {
       if (!useDummyData) {
         const integrations = await Integration.findOne({
-          where: { ownerId: req.session.userId! },
+          where: { ownerId: req.session.passport!.user.id },
         });
 
         if (
@@ -225,14 +225,14 @@ export default function (app: Express, useDummyData: boolean) {
     isLoggedInMiddleware,
     catchAsync(async (req, res) => {
       const activity = await fetchNewProjectActivity({
-        userId: req.session.userId!,
+        userId: req.session.passport!.user.id,
       });
 
       if (activity.status == "found") {
         const habit = await Habit.findOne({
           where: {
             projectId: activity.projectId,
-            ownerId: req.session.userId,
+            ownerId: req.session.passport!.user.id,
           },
           include: [Activity],
         });
@@ -265,14 +265,14 @@ export default function (app: Express, useDummyData: boolean) {
         const journal = await ProjectActivityCache.findOne({
           where: {
             id: req.body.id,
-            ownerId: req.session.userId,
+            ownerId: req.session.passport!.user.id,
           },
         });
 
         const activity = await Activity.findOne({
           where: {
             id: req.body.activityId,
-            ownerId: req.session.userId,
+            ownerId: req.session.passport!.user.id,
           },
         });
 
@@ -281,7 +281,7 @@ export default function (app: Express, useDummyData: boolean) {
             ActivityId: activity.id,
             HabitId: activity.HabitId,
             ProjectActivityCacheEntryId: journal.id,
-            ownerId: req.session.userId!,
+            ownerId: req.session.passport!.user.id,
             createdAt: journal.createdAt,
           });
 
@@ -296,7 +296,7 @@ export default function (app: Express, useDummyData: boolean) {
         const journal = await ProjectActivityCache.findOne({
           where: {
             id: req.body.id,
-            ownerId: req.session.userId,
+            ownerId: req.session.passport!.user.id,
           },
         });
 

@@ -34,7 +34,7 @@ export default function (app: Express, useDummyData: boolean) {
     async (req, res) => {
       if (!useDummyData) {
         const integration = await Integration.findOne({
-          where: { ownerId: req.session.userId! },
+          where: { ownerId: req.session.passport!.user.id },
         });
 
         if (integration?.Agenda.google) {

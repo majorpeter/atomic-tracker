@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import session from "express-session";
 import path from "path";
+import { configDotenv } from "dotenv";
 
 import { init as initDb } from "./lib/db";
 
@@ -14,6 +15,8 @@ import projects from "./controllers/projects";
 import weather from "./controllers/weather";
 import radio from "./controllers/radio";
 import config from "./controllers/config";
+
+configDotenv();
 
 const LISTENING_PORT = process.env.LISTENING_PORT || 8080;
 const USE_DUMMY_DATA =

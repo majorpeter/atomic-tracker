@@ -15,7 +15,7 @@ export default function (app: Express) {
       const today = await Journal.findOne({
         where: {
           date: Journal.dateToRawValue(getIsoDate(new Date())),
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
         },
       });
 
@@ -27,7 +27,7 @@ export default function (app: Express) {
           date: {
             [Op.gte]: Journal.dateToRawValue(getIsoDate(historyStartDate)),
           },
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
         },
         attributes: [
           Journal.getAttributes().date.field!,
@@ -67,7 +67,7 @@ export default function (app: Express) {
       const journal = await Journal.findOne({
         where: {
           date: Journal.dateToRawValue(req.params.date),
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
         },
       });
 
@@ -85,7 +85,7 @@ export default function (app: Express) {
     async (req, res) => {
       const journal = await Journal.findOne({
         where: {
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
           date: Journal.dateToRawValue(req.params.date),
         },
       });
@@ -106,7 +106,7 @@ export default function (app: Express) {
           date: req.params.date,
           content: text,
           count,
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
         });
       }
 

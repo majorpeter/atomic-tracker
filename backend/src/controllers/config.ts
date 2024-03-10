@@ -1,4 +1,4 @@
-import { Express } from "express";
+import { Express, Request } from "express";
 import { Api } from "../lib/api";
 import { Attributes, Op } from "sequelize";
 import { isLoggedInMiddleware } from "./auth";
@@ -9,6 +9,16 @@ import db from "../lib/db";
 import * as redmine from "../lib/redmine";
 import { generateAuthUrl, getTokenFromCode } from "../lib/google-account";
 import { ProjectActivityCache } from "../models/projectactivitycache";
+import { SessionData } from "express-session";
+
+function pendingConfig(
+  req: Request
+): Exclude<SessionData["pendingConfig"], undefined> {
+  if (req.session.pendingConfig === undefined) {
+    req.session.pendingConfig = {};
+  }
+  return req.session.pendingConfig;
+}
 
 export default function (app: Express) {
   app.get<{}, Api.Config.Habits.get_type>(
@@ -17,7 +27,7 @@ export default function (app: Express) {
     async (req, res) => {
       const habits = await Habit.findAll({
         where: {
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
           archived: false,
         },
         include: [Activity],
@@ -25,7 +35,7 @@ export default function (app: Express) {
       });
       const archived = await Habit.findAll({
         where: {
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
           archived: true,
         },
       });
@@ -78,7 +88,7 @@ export default function (app: Express) {
 
           const h = await Habit.create({
             ...habit,
-            ownerId: req.session.userId!,
+            ownerId: req.session.passport!.user.id,
             sortIndex: maxSortIndex + 1,
           });
 
@@ -87,7 +97,7 @@ export default function (app: Express) {
               name: a.name,
               value: a.value,
               HabitId: h.id,
-              ownerId: req.session.userId!,
+              ownerId: req.session.passport!.user.id,
             });
           }
 
@@ -100,7 +110,7 @@ export default function (app: Express) {
 
         const statusCode = await db.transaction(async () => {
           const habit = await Habit.findOne({
-            where: { id: id, ownerId: req.session.userId! },
+            where: { id: id, ownerId: req.session.passport!.user.id },
           });
           if (!habit) {
             return 404;
@@ -137,7 +147,7 @@ export default function (app: Express) {
               name: activity.name,
               value: activity.value,
               HabitId: id,
-              ownerId: req.session.userId!,
+              ownerId: req.session.passport!.user.id,
             });
           }
 
@@ -179,7 +189,11 @@ export default function (app: Express) {
         const { id, direction } = req.body;
         await db.transaction<boolean>(async () => {
           const item = await Habit.findOne({
-            where: { id: id, ownerId: req.session.userId!, archived: false },
+            where: {
+              id: id,
+              ownerId: req.session.passport!.user.id,
+              archived: false,
+            },
           });
           if (!item) {
             return false;
@@ -189,7 +203,7 @@ export default function (app: Express) {
               other = await Habit.findOne({
                 where: {
                   sortIndex: { [Op.lt]: item.sortIndex },
-                  ownerId: req.session.userId!,
+                  ownerId: req.session.passport!.user.id,
                   archived: false,
                 },
                 order: [[Habit.getAttributes().sortIndex.field!, "DESC"]],
@@ -198,7 +212,7 @@ export default function (app: Express) {
               other = await Habit.findOne({
                 where: {
                   sortIndex: { [Op.gt]: item.sortIndex },
-                  ownerId: req.session.userId!,
+                  ownerId: req.session.passport!.user.id,
                   archived: false,
                 },
                 order: [[Habit.getAttributes().sortIndex.field!, "ASC"]],
@@ -223,7 +237,7 @@ export default function (app: Express) {
         const h = await Habit.findOne({
           where: {
             id: req.body.id,
-            ownerId: req.session.userId!,
+            ownerId: req.session.passport!.user.id,
           },
         });
         if (h) {
@@ -243,7 +257,7 @@ export default function (app: Express) {
     isLoggedInMiddleware,
     async (req, res) => {
       const integrations = await Integration.findOne({
-        where: { ownerId: req.session.userId! },
+        where: { ownerId: req.session.passport!.user.id },
       });
       if (
         integrations &&
@@ -273,7 +287,7 @@ export default function (app: Express) {
     async (req, res) => {
       const int = await Integration.findOne({
         where: {
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
         },
       });
       if (int) {
@@ -290,7 +304,7 @@ export default function (app: Express) {
     async (req, res) => {
       const int = await Integration.findOne({
         where: {
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
         },
       });
 
@@ -300,7 +314,7 @@ export default function (app: Express) {
       } else {
         await Integration.create({
           Todos: req.body,
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
         });
       }
 
@@ -314,7 +328,7 @@ export default function (app: Express) {
     async (req, res) => {
       const int = await Integration.findOne({
         where: {
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
         },
       });
 
@@ -335,7 +349,7 @@ export default function (app: Express) {
     isLoggedInMiddleware,
     async (req, res) => {
       // save in session for later
-      req.session.pendingConfig!.gCal = {
+      pendingConfig(req).gCal = {
         client_id: req.body.client_id,
         client_secret: req.body.client_secret,
         redirect_uri: req.body.redirect_uri,
@@ -358,23 +372,24 @@ export default function (app: Express) {
       let config: Attributes<Integration>["Agenda"] | undefined;
 
       if (req.body.google) {
-        if (req.session.pendingConfig!.gCal && req.body.google?.code) {
+        const gCal = pendingConfig(req).gCal;
+        if (gCal && req.body.google?.code) {
           config = {
             schema: 1,
             google: {
-              clientId: req.session.pendingConfig!.gCal.client_id,
-              clientSecret: req.session.pendingConfig!.gCal.client_secret,
+              clientId: gCal.client_id,
+              clientSecret: gCal.client_secret,
               refreshToken: await getTokenFromCode({
-                clientId: req.session.pendingConfig!.gCal.client_id,
-                clientSecret: req.session.pendingConfig!.gCal.client_secret,
-                redirectUri: req.session.pendingConfig!.gCal.redirect_uri,
+                clientId: gCal.client_id,
+                clientSecret: gCal.client_secret,
+                redirectUri: gCal.redirect_uri,
                 code: req.body.google.code,
               }),
             },
           };
 
           // clear session just in case
-          req.session.pendingConfig!.gCal = undefined;
+          pendingConfig(req).gCal = undefined;
         } else {
           // need a pending config in session (leave config undefined)
         }
@@ -386,7 +401,7 @@ export default function (app: Express) {
       if (config !== undefined) {
         const int = await Integration.findOne({
           where: {
-            ownerId: req.session.userId!,
+            ownerId: req.session.passport!.user.id,
           },
         });
 
@@ -396,7 +411,7 @@ export default function (app: Express) {
         } else {
           await Integration.create({
             Agenda: config,
-            ownerId: req.session.userId!,
+            ownerId: req.session.passport!.user.id,
           });
         }
         res.sendStatus(200);
@@ -412,14 +427,14 @@ export default function (app: Express) {
     async (req, res) => {
       const int = await Integration.findOne({
         where: {
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
         },
       });
       if (int) {
         const linkedHabits = await Habit.findAll({
           where: {
             projectId: { [Op.not]: null },
-            ownerId: req.session.userId,
+            ownerId: req.session.passport!.user.id,
           },
         });
         res.send({
@@ -438,7 +453,7 @@ export default function (app: Express) {
     async (req, res) => {
       const int = await Integration.findOne({
         where: {
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
         },
       });
 
@@ -448,10 +463,10 @@ export default function (app: Express) {
             // if this is a different redmine instance, the old project ID's and cached journals are no longer valid
             await Habit.update(
               { projectId: null },
-              { where: { ownerId: req.session.userId } }
+              { where: { ownerId: req.session.passport!.user.id } }
             );
             await ProjectActivityCache.destroy({
-              where: { ownerId: req.session.userId },
+              where: { ownerId: req.session.passport!.user.id },
             });
           }
         }
@@ -461,7 +476,7 @@ export default function (app: Express) {
       } else {
         await Integration.create({
           Projects: req.body,
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
         });
       }
 
@@ -475,7 +490,7 @@ export default function (app: Express) {
     async (req, res) => {
       const int = await Integration.findOne({
         where: {
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
         },
       });
 
@@ -495,7 +510,7 @@ export default function (app: Express) {
     async (req, res) => {
       const int = await Integration.findOne({
         where: {
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
         },
       });
 
@@ -505,7 +520,7 @@ export default function (app: Express) {
       } else {
         await Integration.create({
           Radios: req.body,
-          ownerId: req.session.userId!,
+          ownerId: req.session.passport!.user.id,
         });
       }
 

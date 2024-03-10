@@ -16,6 +16,9 @@ const Security: React.FC = () => {
         <thead>
           <tr>
             <th>
+              <Trans i18nKey="loginMethod">Login Method</Trans>
+            </th>
+            <th>
               <Trans i18nKey="userAgen">User Agent</Trans>
             </th>
             <th>
@@ -30,6 +33,7 @@ const Security: React.FC = () => {
           {sessionData &&
             sessionData.sessions.map((item, index) => (
               <tr key={index}>
+                <td>{item.loginMethod || "N/A"}</td>
                 <td>{item.userAgent}</td>
                 <td>{item.expiresIsoDate}</td>
                 <td>

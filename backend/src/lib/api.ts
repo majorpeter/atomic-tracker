@@ -16,12 +16,20 @@ export namespace Api {
 
       export type get_resp = {
         installed: boolean;
+        social: {
+          google: boolean;
+        };
       };
 
       export type post_type = {
-        userName: string;
+        username: string;
         password: string;
       };
+
+      export namespace Google {
+        export const path = "/login/google";
+        export const callbackPath = "/oauth2/redirect/google";
+      }
     }
 
     export namespace Logout {
@@ -39,7 +47,11 @@ export namespace Api {
     export namespace Sessions {
       export const path = "/api/auth/sessions";
       export type type = {
-        sessions: { userAgent: string; expiresIsoDate: string }[];
+        sessions: {
+          loginMethod?: "local" | "google";
+          userAgent: string;
+          expiresIsoDate: string;
+        }[];
       };
     }
   }
