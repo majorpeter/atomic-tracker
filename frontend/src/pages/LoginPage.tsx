@@ -9,6 +9,7 @@ import { getI18n } from "react-i18next";
 
 import {
   Alert,
+  Box,
   Button,
   Card,
   CardActions,
@@ -32,6 +33,8 @@ import { dashboardRoute } from "./Dashboard";
 import { installRoute } from "./InstallPage";
 import { AppLocalStorage } from "../util/local-storage";
 
+import logo from "../assets/logo.svg";
+
 const LoginPage: React.FC = () => {
   const formRef = useRef<HTMLFormElement>(null);
   const navigate = useNavigate();
@@ -52,7 +55,16 @@ const LoginPage: React.FC = () => {
   }
 
   return (
-    <>
+    <Box sx={{ maxWidth: 600, margin: "auto" }}>
+      <Box sx={{ mb: 4, textAlign: "center" }}>
+        <img
+          id="logo"
+          src={logo}
+          className="mb-2"
+          title="Atomic Tracker"
+          alt="Application Logo"
+        />
+      </Box>
       <Card>
         <form ref={formRef} onSubmit={handleSubmit}>
           <CardContent>
@@ -104,7 +116,7 @@ const LoginPage: React.FC = () => {
           </CardContent>
         </Card>
       )}
-    </>
+    </Box>
   );
 };
 
