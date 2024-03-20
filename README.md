@@ -1,5 +1,7 @@
 # Atomic Tracker
 
+![GitHub CI](https://github.com/majorpeter/atomic-tracker/actions/workflows/docker-image.yml/badge.svg)
+
 A self-hosted habit tracking web application with a personal dashboard and optional integrations to external data providers.
 
 <p align="center">
