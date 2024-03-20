@@ -2,6 +2,10 @@
 
 A self-hosted habit tracking web application with a personal dashboard and optional integrations to external data providers.
 
+<p align="center">
+<img src="frontend/public/icon-512.png"/>
+</p>
+
 ### Why?
 
 I personally find it useful to have a graphical overview of the things I'm working on, the progress I've made, my agenda for the upcoming days and so on.
