@@ -212,14 +212,6 @@ export default function (app: Express) {
       )
     );
 
-    passport.serializeUser(function (user, done) {
-      done(null, user);
-    });
-
-    passport.deserializeUser(function (user, done) {
-      done(null, user as User);
-    });
-
     app.get(Api.Auth.Login.Google.path, passport.authenticate("google"));
 
     app.get(
@@ -235,4 +227,12 @@ export default function (app: Express) {
       }
     );
   }
+
+  passport.serializeUser(function (user, done) {
+    done(null, user);
+  });
+
+  passport.deserializeUser(function (user, done) {
+    done(null, user as User);
+  });
 }
