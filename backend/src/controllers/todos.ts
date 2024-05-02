@@ -73,20 +73,25 @@ async function fetchCalendarObjects(config: {
   });
 
   const calendars = await client.fetchCalendars();
-  const calendarObjects = await client.fetchCalendarObjects({
-    calendar: calendars[0],
-    filters: [
-      {
-        "comp-filter": {
-          _attributes: {
-            name: "VCALENDAR",
+  const result: DAVObject[] = [];
+  for (const c of calendars) {
+    result.push(
+      ...(await client.fetchCalendarObjects({
+        calendar: c,
+        filters: [
+          {
+            "comp-filter": {
+              _attributes: {
+                name: "VCALENDAR",
+              },
+            },
           },
-        },
-      },
-    ],
-  });
+        ],
+      }))
+    );
+  }
 
-  return calendarObjects;
+  return result;
 }
 
 function sortConvFn(todo: Api.Todos.type["todos"][0]): number {
