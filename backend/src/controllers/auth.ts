@@ -11,6 +11,13 @@ import { LimitedMemoryStore } from "../lib/session";
 import { SessionData } from "express-session";
 import { findLocaleForBcp47LangTag } from "../misc/locale";
 
+export namespace Cookie {
+  export namespace autologin {
+    export const name = "autologin";
+    export type type = "google" | undefined;
+  }
+}
+
 export function hashAndSaltPassword(password: string): string {
   const salt = crypto.randomBytes(64);
   const hash = crypto.createHash("sha256");
@@ -64,15 +71,30 @@ export default function (app: Express) {
     (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) !=
     undefined;
 
-  app.get<{}, Api.Auth.Login.get_resp>(Api.Auth.Login.path, async (_, res) => {
-    const hasUser = (await User.findOne()) !== null;
-    res.send({
-      installed: hasUser,
-      social: {
-        google: googleLoginAvailable,
-      },
-    });
-  });
+  app.get<{}, Api.Auth.Login.get_resp>(
+    Api.Auth.Login.path,
+    async (req, res) => {
+      const hasUser = (await User.findOne()) !== null;
+      const redirect =
+        (req.cookies[Cookie.autologin.name] as Cookie.autologin.type) ==
+        "google"
+          ? Api.Auth.Login.Google.path
+          : undefined;
+
+      if (redirect) {
+        // only do the redirect once and allow regular login if it fails
+        res.clearCookie(Cookie.autologin.name);
+      }
+
+      res.send({
+        installed: hasUser,
+        social: {
+          google: googleLoginAvailable,
+        },
+        redirect,
+      });
+    }
+  );
 
   app.post<{}, Api.Auth.Me.type, Api.Auth.Login.post_type>(
     Api.Auth.Login.path,
@@ -223,6 +245,13 @@ export default function (app: Express) {
       function (req, res) {
         req.session.userAgent = req.headers["user-agent"];
         req.session.loginMethod = "google";
+        res.cookie(
+          Cookie.autologin.name,
+          "google" satisfies Cookie.autologin.type,
+          {
+            maxAge: 100 * 24 * 3600e3,
+          }
+        );
         res.redirect("/");
       }
     );

@@ -19,6 +19,8 @@ export namespace Api {
         social: {
           google: boolean;
         };
+        // go to this url instead of displaying the login page
+        redirect?: string;
       };
 
       export type post_type = {

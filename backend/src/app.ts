@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import session from "express-session";
+import cookies from "cookie-parser";
 import path from "path";
 import { configDotenv } from "dotenv";
 
@@ -36,7 +37,7 @@ app.use(
     store: sessionStore,
   })
 );
-
+app.use(cookies());
 app.use(express.json());
 
 app.use((_, res, next) => {

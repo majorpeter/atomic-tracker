@@ -128,6 +128,10 @@ export const loginRoute: RouteObject = {
     if (!loginParams.installed) {
       return redirect(installRoute.path!);
     }
+    if (loginParams.redirect) {
+      // cannot return a redirect() since it's not a route managed by react-router
+      window.location.href = loginParams.redirect;
+    }
     return loginParams;
   },
 };
