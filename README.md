@@ -105,4 +105,12 @@ npx sequelize-cli migration:create --migrations-path src/migrations/ --name <nam
 
 Or just copy from an existing file. Make sure to shut down backend development server before editing migrations since they are applied automatically.
 
+### Adding translations (i18n)
+
+Use new keys in `<Trans>` and `useTranslation`. Then call the following to add missing keys to translation files:
+
+```sh
+(cd frontend/ && npm run i18n)
+```
+
 ![](doc/dashboard.png)

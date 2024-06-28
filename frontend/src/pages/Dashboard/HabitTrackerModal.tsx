@@ -264,6 +264,24 @@ const HabitTrackerModal: React.FC = () => {
                   loading={trackPosting}
                   color={data.type == "good" ? "primary" : "warning"}
                   sx={{ flexGrow: 1 }}
+                  title={(() => {
+                    const lastTracked = new Date(activity.lastTracked);
+                    if (lastTracked.getTime() == 0) {
+                      return t("trackedActivityNever");
+                    }
+                    const trackedDaysAgo = Math.floor(
+                      (new Date().getTime() - lastTracked.getTime()) /
+                        (24 * 3600 * 1e3)
+                    );
+
+                    if (trackedDaysAgo == 0) {
+                      return t("trackedActivityToday");
+                    }
+                    if (trackedDaysAgo == 1) {
+                      return t("trackedActivityYesterday");
+                    }
+                    return t("trackedActivityNDays", { count: trackedDaysAgo });
+                  })()}
                 >
                   <Trans
                     i18nKey="trackActivityName"
