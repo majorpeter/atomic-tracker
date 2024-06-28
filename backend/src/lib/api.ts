@@ -83,7 +83,13 @@ export namespace Api {
       targetValue: number;
       periodLength: number;
       historyLength: number;
-      activities: { id: number; name: string; value: number }[];
+      activities: {
+        id: number;
+        name: string;
+        value: number;
+        // ISO datetime string
+        lastTracked: string;
+      }[];
       trackedInPeriod: {
         value: number;
         count: number;

@@ -73,8 +73,24 @@ export default function (app: Express) {
           id: req.params.id,
           archived: false,
         },
-        include: [Activity],
+        include: [
+          {
+            association: Activity.tableName,
+            include: [
+              {
+                // get last tracked activity for each activity creation time (for sorting)
+                association: TrackedActivity.tableName,
+                attributes: [TrackedActivity.getAttributes().createdAt.field!],
+                limit: 1,
+                order: [
+                  [TrackedActivity.getAttributes().createdAt.field!, "DESC"],
+                ],
+              },
+            ],
+          },
+        ],
       });
+
       if (habit) {
         const periodStart = new Date();
         periodStart.setDate(periodStart.getDate() - habit.periodLength);
@@ -112,13 +128,21 @@ export default function (app: Express) {
             value: trackedInPeriod.sumValue,
           },
           activities: habit.Activities
-            ? habit.Activities.sort((a, b) => b.value - a.value).map(
-                (activity) => ({
-                  id: activity.id,
-                  name: activity.name,
-                  value: activity.value,
-                })
-              )
+            ? habit.Activities.map((activity) => ({
+                id: activity.id,
+                name: activity.name,
+                value: activity.value,
+                lastTracked: activity.TrackedActivities?.length
+                  ? activity.TrackedActivities[0].createdAt
+                  : new Date(0),
+              }))
+                .sort(
+                  (a, b) => b.lastTracked.getTime() - a.lastTracked.getTime()
+                )
+                .map((activity) => ({
+                  ...activity,
+                  lastTracked: activity.lastTracked.toISOString(),
+                }))
             : [],
           history: await Promise.all(
             trackedInHistory.map(async (item) => ({

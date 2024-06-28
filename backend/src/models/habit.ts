@@ -112,6 +112,7 @@ export class Activity extends Model<
   declare Habit?: NonAttribute<Habit>;
   declare HabitId: ForeignKey<Habit["id"]>;
   declare ownerId: ForeignKey<User["id"]>;
+  declare TrackedActivities?: NonAttribute<TrackedActivity[]>;
   declare archived: CreationOptional<boolean>;
 }
 
