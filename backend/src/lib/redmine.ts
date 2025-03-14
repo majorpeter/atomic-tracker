@@ -51,7 +51,7 @@ export async function fetchInProgress(config: {
         },
       }
     );
-    const body = xml2js(resp.body.read().toString());
+    const body = xml2js(await resp.text());
     const js: any[] | undefined = body.elements[0].elements;
 
     if (js) {
